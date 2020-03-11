@@ -1,0 +1,5 @@
+#kaocha/v1
+ {:tests [{:id         :unit
+           :test-paths ["test/unit"]
+           :focus-meta [:focus]}]
+  :kaocha/plugins [:kaocha.plugin/notifier]}
