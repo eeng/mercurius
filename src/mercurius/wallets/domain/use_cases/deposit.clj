@@ -2,6 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [mercurius.core.domain.use-case :refer [UseCase request-type]]
             [mercurius.wallets.domain.entities.wallet :as wallet]
+            [mercurius.accounts.domain.entities.user]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet]]))
 
 (defrecord Deposit [repo]
@@ -14,7 +15,7 @@
 (defn deposit-use-case [repo]
   (Deposit. repo))
 
-(s/def ::user-id int?)
+(s/def ::user-id :user/id)
 (s/def ::currency :wallet/currency)
 (s/def ::amount number?)
 (defmethod request-type :wallets/deposit [_]

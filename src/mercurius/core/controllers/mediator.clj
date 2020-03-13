@@ -1,5 +1,5 @@
 (ns mercurius.core.controllers.mediator
-  (:require [mercurius.core.domain.use-case :as use-case]
+  (:require [mercurius.core.domain.use-case :refer [execute]]
             [slingshot.slingshot :refer [throw+]]
             [mercurius.core.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.core.controllers.mediator.middleware.spec-checker :refer [spec-checker]]))
@@ -12,10 +12,8 @@
 (defn- build-pipeline [use-case-handler]
   (-> use-case-handler spec-checker logger))
 
-(defn dispatch [{:keys [handlers]} {:keys [type] :as command}]
+(defn dispatch [{:keys [handlers]} {:keys [type] :as request}]
   (let [use-case (or (get handlers type)
-                     (throw+ {:type ::use-case-not-found :command command}))
-        use-case-handler (fn [command]
-                           (use-case/execute use-case command))
-        pipeline (build-pipeline use-case-handler)]
-    (pipeline command)))
+                     (throw+ {:type ::use-case-not-found :request request}))
+        pipeline (build-pipeline #(execute use-case %))]
+    (pipeline request)))

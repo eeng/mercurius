@@ -7,10 +7,10 @@
             [mercurius.wallets.domain.use-cases.withdraw :refer [withdraw-use-case]]))
 
 (def config
-  {:use-cases/deposit (ig/ref :wallets.repositories/in-memory)
-   :use-cases/withdraw (ig/ref :wallets.repositories/in-memory)
-   :mediator {:wallets/deposit (ig/ref :use-cases/deposit)
+  {:mediator {:wallets/deposit (ig/ref :use-cases/deposit)
               :wallets/withdraw (ig/ref :use-cases/withdraw)}
+   :use-cases/deposit (ig/ref :wallets.repositories/in-memory)
+   :use-cases/withdraw (ig/ref :wallets.repositories/in-memory)
    :wallets.repositories/in-memory {}})
 
 (defmethod ig/init-key :use-cases/deposit [_ repo]
@@ -26,3 +26,13 @@
 (defmethod ig/init-key :wallets.repositories/in-memory [_ _]
   (log/info "Starting in memory wallet repository")
   (new-in-memory-wallet-repo))
+
+(defn start []
+  (ig/init config))
+
+(defn stop []
+  (ig/halt!))
+
+(comment
+  (start)
+  (stop))
