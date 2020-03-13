@@ -1,5 +1,6 @@
 (ns mercurius.wallets.domain.use-cases.deposit
-  (:require [mercurius.core.domain.use-case :refer [UseCase]]
+  (:require [clojure.spec.alpha :as s]
+            [mercurius.core.domain.use-case :refer [UseCase request-type]]
             [mercurius.wallets.domain.entities.wallet :as wallet]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet]]))
 
@@ -12,3 +13,9 @@
 
 (defn deposit-use-case [repo]
   (Deposit. repo))
+
+(s/def ::user-id int?)
+(s/def ::currency :wallet/currency)
+(s/def ::amount number?)
+(defmethod request-type :wallets/deposit [_]
+  (s/keys :req-un [::user-id ::currency ::amount]))

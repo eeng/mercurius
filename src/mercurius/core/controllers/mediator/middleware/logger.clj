@@ -2,10 +2,10 @@
   (:require [taoensso.timbre :as log]))
 
 (defn logger [next-handler]
-  (fn [command]
-    (log/info "Executing command" command)
+  (fn [request]
+    (log/info "Executing" request)
     (let [start (System/currentTimeMillis)
-          result (next-handler command)
+          result (next-handler request)
           duration (- (System/currentTimeMillis) start)]
-      (log/info "Finished command" (:type command) "in" duration "ms")
+      (log/info "Finished" (:type request) "in" duration "ms")
       result)))
