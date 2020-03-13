@@ -1,4 +1,4 @@
-(ns support.asserts
+(ns mercurius.support.asserts
   (:require [clojure.test :refer [assert-expr do-report]]))
 
 (defn submap? [sm m]

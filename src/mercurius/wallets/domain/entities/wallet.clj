@@ -1,9 +1,13 @@
 (ns mercurius.wallets.domain.entities.wallet
   (:require [slingshot.slingshot :refer [throw+]]
-            [mercurius.lib.uuid :refer [uuid]]))
+            [mercurius.lib.uuid :refer [uuid]]
+            [clojure.spec.alpha :as s]))
 
-(defn new-wallet [user-id currency]
-  {:id (uuid) :user-id user-id :currency currency :balance 0})
+(s/def :wallet/currency #{"USD" "EUR" "BTC" "ETH"})
+
+(defn new-wallet [{:keys [user-id currency balance] :or {balance 0}}]
+  (s/assert :wallet/currency currency)
+  {:id (uuid) :user-id user-id :currency currency :balance balance})
 
 (defn deposit [wallet amount]
   (when (<= amount 0)

@@ -1,6 +1,6 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository-test
   (:require [clojure.test :refer [deftest testing is]]
-            [support.asserts :refer [submap? submaps?]]
+            [mercurius.support.asserts :refer [submap? submaps?]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet get-user-wallets]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [make-in-memory-wallet-repo]]))
 

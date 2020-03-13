@@ -14,7 +14,7 @@
     (if-let [wallet (->> (get-user-wallets this user-id)
                          (detect #(= currency (:currency %))))]
       wallet
-      (save-wallet this (new-wallet user-id currency))))
+      (save-wallet this (new-wallet {:user-id user-id :currency currency}))))
 
   (get-user-wallets [_ user-id]
     (->> @db vals (filter #(= user-id (:user-id %))))))

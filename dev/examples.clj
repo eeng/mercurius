@@ -6,9 +6,10 @@
 (comment
   (def system (ig/init system/config))
 
-  (let [wallet-repo (system :wallets/repository)]
-    (deposit wallet-repo {:amount 100})
-    (deposit wallet-repo {:amount 50})
-    (withdraw wallet-repo {:amount 30}))
+  (def wallet-repo (system :wallets/repository))
+  (deposit wallet-repo {:user-id 1 :amount 100 :currency "USD"})
+  (deposit wallet-repo {:user-id 1 :amount 50 :currency "USD"})
+  (withdraw wallet-repo {:user-id 1 :amount 30 :currency "USD"})
+  (deposit wallet-repo {:user-id 2 :amount 100 :currency "USD"})
 
   (ig/halt! system))
