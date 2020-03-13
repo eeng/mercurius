@@ -19,5 +19,5 @@
   (get-user-wallets [_ user-id]
     (->> @db vals (filter #(= user-id (:user-id %))))))
 
-(defn make-in-memory-wallet-repo []
+(defn new-in-memory-wallet-repo []
   (InMemoryWalletRepository. (atom {})))

@@ -1,15 +1,9 @@
 (ns examples
-  (:require [integrant.core :as ig]
-            [mercurius.system :as system]
-            [mercurius.wallets.domain.use-cases :refer [deposit withdraw]]))
+  (:require [integrant.repl.state :refer [system]]
+            [mercurius.core.controllers.mediator :refer [execute]]))
 
 (comment
-  (def system (ig/init system/config))
-
-  (def wallet-repo (system :wallets/repository))
-  (deposit wallet-repo {:user-id 1 :amount 100 :currency "USD"})
-  (deposit wallet-repo {:user-id 1 :amount 50 :currency "USD"})
-  (withdraw wallet-repo {:user-id 1 :amount 30 :currency "USD"})
-  (deposit wallet-repo {:user-id 2 :amount 100 :currency "USD"})
-
-  (ig/halt! system))
+  (def mediator (:mediator system))
+  (execute mediator {:type :wallets/deposit :user-id 1 :amount 100 :currency "USD"})
+  (execute mediator {:type :wallets/withdraw :user-id 1 :amount 30 :currency "USD"})
+  (execute mediator {:type :wallets/deposit :user-id 2 :amount 50 :currency "USD"}))

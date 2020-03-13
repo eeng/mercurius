@@ -1,8 +1,8 @@
 (ns user
   (:require [integrant.repl :refer [go halt reset reset-all]]
-            [mercurius.system :as system]))
+            [mercurius.core.configuration.system :refer [config]]))
 
-(integrant.repl/set-prep! (constantly system/config))
+(integrant.repl/set-prep! (constantly config))
 
 (comment
   (go)
