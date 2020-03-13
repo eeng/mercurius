@@ -1,7 +1,7 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository
   (:require [mercurius.wallets.domain.repositories.wallet-repository :refer [WalletRepository get-user-wallets save-wallet]]
-            [mercurius.lib.collections :refer [detect]]
-            [mercurius.lib.uuid :refer [uuid]]))
+            [mercurius.wallets.domain.entities.wallet :refer [new-wallet]]
+            [mercurius.lib.collections :refer [detect]]))
 
 (defrecord InMemoryWalletRepository [db]
   WalletRepository
@@ -14,7 +14,7 @@
     (if-let [wallet (->> (get-user-wallets this user-id)
                          (detect #(= currency (:currency %))))]
       wallet
-      (save-wallet this {:id (uuid) :user-id user-id :currency currency})))
+      (save-wallet this (new-wallet user-id currency))))
 
   (get-user-wallets [_ user-id]
     (->> @db vals (filter #(= user-id (:user-id %))))))

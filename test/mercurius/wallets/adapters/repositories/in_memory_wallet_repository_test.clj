@@ -17,7 +17,7 @@
       (is (= wallet2 (load-wallet repo "456" "USD")))))
 
   (testing "load-wallet creates the wallet if it doesn't exists and returns it"
-    (let [wallet {:user-id "456" :currency "USD"}
+    (let [wallet {:user-id "456" :currency "USD" :balance 0}
           repo (make-in-memory-wallet-repo)]
       (is (submap? wallet (load-wallet repo "456" "USD")))
       (is (submap? wallet (load-wallet repo "456" "USD")))

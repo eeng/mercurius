@@ -6,4 +6,5 @@
         slingshot {:mvn/version "0.12.2"}}
 
  :aliases {:dev {:extra-paths ["dev" "test"]}
-           :test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-597"}}}}}
+           :test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-597"}
+                               com.gearswithingears/shrubbery {:mvn/version "0.4.1"}}}}}

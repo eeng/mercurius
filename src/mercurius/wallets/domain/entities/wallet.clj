@@ -1,5 +1,9 @@
 (ns mercurius.wallets.domain.entities.wallet
-  (:require [slingshot.slingshot :refer [throw+]]))
+  (:require [slingshot.slingshot :refer [throw+]]
+            [mercurius.lib.uuid :refer [uuid]]))
+
+(defn new-wallet [user-id currency]
+  {:id (uuid) :user-id user-id :currency currency :balance 0})
 
 (defn deposit [wallet amount]
   (when (<= amount 0)
