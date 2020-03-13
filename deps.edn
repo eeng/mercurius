@@ -3,7 +3,8 @@
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
         integrant {:mvn/version "0.8.0"}
         integrant/repl {:mvn/version "0.3.1"}
-        slingshot {:mvn/version "0.12.2"}}
+        slingshot {:mvn/version "0.12.2"}
+        com.taoensso/timbre {:mvn/version "4.10.0"}}
 
  :aliases {:dev {:extra-paths ["dev" "test"]}
            :test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-597"}
