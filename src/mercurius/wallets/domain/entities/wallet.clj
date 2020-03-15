@@ -5,9 +5,11 @@
 
 (s/def :wallet/currency #{"USD" "EUR" "BTC" "ETH"})
 
+(defrecord Wallet [id user-id currency balance])
+
 (defn new-wallet [{:keys [user-id currency balance] :or {balance 0}}]
   (s/assert :wallet/currency currency)
-  {:id (uuid) :user-id user-id :currency currency :balance balance})
+  (map->Wallet {:id (uuid) :user-id user-id :currency currency :balance balance}))
 
 (defn deposit [wallet amount]
   (when (<= amount 0)

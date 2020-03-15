@@ -8,7 +8,7 @@
   (testing "should increase the wallet balance by the amount passed"
     (let [wallet (build-wallet)
           new-wallet (-> wallet (deposit 100) (deposit 50))]
-      (is (= 150 (new-wallet :balance)))))
+      (is (= 150 (:balance new-wallet)))))
 
   (testing "amount should be positive"
     (is (thrown-with-data? {:type ::w/invalid-deposit-amount}
@@ -20,7 +20,7 @@
   (testing "should decrease the wallet balance by the amount passed"
     (let [wallet (build-wallet {:balance 100})
           new-wallet (-> wallet (withdraw 10) (withdraw 20))]
-      (is (= 70 (new-wallet :balance)))))
+      (is (= 70 (:balance new-wallet)))))
 
   (testing "should not be possible to overdraw the wallet"
     (let [wallet (build-wallet {:balance 30})]
