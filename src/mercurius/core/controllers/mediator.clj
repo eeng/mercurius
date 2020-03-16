@@ -4,6 +4,7 @@
             [mercurius.core.controllers.mediator.middleware.logger :refer [logger]]))
 
 (defrecord Mediator [handlers])
+(defrecord Request [type data])
 
 (defn new-mediator [handlers]
   (Mediator. handlers))
@@ -15,8 +16,11 @@
   "This function is the main entry point to the domain. 
    Dispatchs commands and queries to the use cases, passing them through a pipeline of middleware,
    allowing to intercept the requests to apply cross-cutting concerns like logging."
-  [{:keys [handlers]} {:keys [type] :as request}]
-  (let [use-case (or (get handlers type)
+  [{:keys [handlers]} request-type request-data]
+  (let [request (Request. request-type request-data)
+        use-case (or (get handlers request-type)
                      (throw+ {:type ::use-case-not-found :request request}))
-        pipeline (build-pipeline #(execute use-case %))]
+        use-case-handler (fn [request]
+                           (execute use-case (:data request)))
+        pipeline (build-pipeline use-case-handler)]
     (pipeline request)))
