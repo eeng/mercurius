@@ -1,7 +1,7 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository
   (:require [mercurius.wallets.domain.repositories.wallet-repository :refer [WalletRepository get-user-wallets save-wallet]]
             [mercurius.wallets.domain.entities.wallet :refer [new-wallet]]
-            [mercurius.lib.collections :refer [detect]]))
+            [mercurius.util.collections :refer [detect]]))
 
 (defrecord InMemoryWalletRepository [db]
   WalletRepository

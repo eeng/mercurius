@@ -1,6 +1,6 @@
 (ns mercurius.wallets.domain.entities.wallet
   (:require [slingshot.slingshot :refer [throw+]]
-            [mercurius.lib.uuid :refer [uuid]]
+            [mercurius.util.uuid :refer [uuid]]
             [clojure.spec.alpha :as s]))
 
 (s/def :wallet/currency #{"USD" "EUR" "BTC" "ETH"})

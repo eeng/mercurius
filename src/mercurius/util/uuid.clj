@@ -1,4 +1,4 @@
-(ns mercurius.lib.uuid)
+(ns mercurius.util.uuid)
 
 (defn uuid []
   (str (java.util.UUID/randomUUID)))
