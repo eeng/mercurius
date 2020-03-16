@@ -24,7 +24,7 @@
        :actual   nil}
       (catch ~clojure.lang.ExceptionInfo e#
         (let [d# (ex-data e#)]
-          (if (= ~data d#)
+          (if (submap? ~data d#)
             {:type     :pass
              :message  ~msg
              :expected '~form

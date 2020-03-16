@@ -3,21 +3,38 @@
             [mercurius.util.uuid :refer [uuid]]
             [clojure.spec.alpha :as s]))
 
-(s/def :wallet/currency #{"USD" "EUR" "BTC" "ETH"})
+(def available-currencies #{"USD" "EUR" "BTC" "ETH"})
 
-(defrecord Wallet [id user-id currency balance])
+(s/def :wallet/currency available-currencies)
 
-(defn new-wallet [{:keys [user-id currency balance] :or {balance 0}}]
+(defrecord Wallet [id user-id currency balance reserved])
+
+(defn new-wallet [{:keys [user-id currency balance reserved] :or {balance 0 reserved 0}}]
   (s/assert :wallet/currency currency)
-  (map->Wallet {:id (uuid) :user-id user-id :currency currency :balance balance}))
+  (map->Wallet {:id (uuid)
+                :user-id user-id
+                :currency currency
+                :balance balance
+                :reserved reserved}))
+
+(defn- available-balance [{:keys [balance reserved]}]
+  (- balance reserved))
 
 (defn deposit [wallet amount]
   (when (<= amount 0)
-    (throw+ {:type ::invalid-deposit-amount}))
+    (throw+ {:type :wallet/invalid-amount :amount amount}))
   (update wallet :balance + amount))
 
-(defn withdraw [{:keys [balance] :as wallet} amount]
+(defn withdraw [wallet amount]
   (cond
-    (<= amount 0) (throw+ {:type ::invalid-withdraw-amount})
-    (> amount balance) (throw+ {:type ::wallet-overdrawn}))
+    (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount})
+    (> amount (available-balance wallet)) (throw+ {:type :wallet/not-enough-balance :wallet wallet :amount amount}))
   (update wallet :balance - amount))
+
+(defn reserve
+  "Reserves an order's amount until it's filled, so the amount remains unavailable for future orders."
+  [wallet amount]
+  (cond
+    (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount})
+    (> amount (available-balance wallet)) (throw+ {:type :wallet/not-enough-balance :wallet wallet :amount amount}))
+  (update wallet :reserved + amount))

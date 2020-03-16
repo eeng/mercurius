@@ -3,13 +3,13 @@
             [mercurius.core.domain.use-case :refer [UseCase]]
             [mercurius.wallets.domain.entities.wallet :as wallet]
             [mercurius.accounts.domain.entities.user]
-            [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet]]))
+            [mercurius.wallets.domain.repositories.wallet-repository :refer [fetch-wallet save-wallet]]))
 
 (defrecord Withdraw [repo]
   UseCase
   (execute [_ {:keys [user-id currency amount] :as command}]
     (s/assert ::command command)
-    (as-> (load-wallet repo user-id currency) w
+    (as-> (fetch-wallet repo user-id currency) w
       (wallet/withdraw w amount)
       (save-wallet repo w))))
 

@@ -5,7 +5,7 @@
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]))
 
 (deftest in-memory-wallet-repository-test
-  (testing "save should create or update the wallet"
+  (testing "save-wallet should create or update the wallet"
     (let [wallet1 {:id 1 :user-id "456" :currency "USD"}
           wallet2 (assoc wallet1 :balance 9)
           repo (new-in-memory-wallet-repo)]
