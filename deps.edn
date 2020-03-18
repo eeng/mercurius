@@ -8,5 +8,6 @@
 
  :aliases {:dev {:extra-paths ["dev" "test"]}
            :test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-597"}
-                               com.gearswithingears/shrubbery {:mvn/version "0.4.1"}}
+                               com.gearswithingears/shrubbery {:mvn/version "0.4.1"}
+                               tortue/spy {:mvn/version "2.0.0"}}
                   :jvm-opts ["-Dclojure.spec.check-asserts=true"]}}}

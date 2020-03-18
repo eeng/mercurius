@@ -1,6 +1,5 @@
 (ns mercurius.core.controllers.mediator
-  (:require [mercurius.core.domain.use-case :refer [execute]]
-            [slingshot.slingshot :refer [throw+]]
+  (:require [slingshot.slingshot :refer [throw+]]
             [mercurius.core.controllers.mediator.middleware.logger :refer [logger]]))
 
 (defrecord Mediator [handlers])
@@ -21,6 +20,6 @@
         use-case (or (get handlers request-type)
                      (throw+ {:type ::use-case-not-found :request request}))
         use-case-handler (fn [request]
-                           (execute use-case (:data request)))
+                           (use-case (:data request)))
         pipeline (build-pipeline use-case-handler)]
     (pipeline request)))
