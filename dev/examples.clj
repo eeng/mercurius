@@ -9,8 +9,11 @@
   (dispatch mediator :wallets/withdraw {:user-id 1 :amount 30 :currency "USD"})
   (dispatch mediator :wallets/deposit {:user-id 1 :amount 200 :currency "BTC"})
   (dispatch mediator :wallets/deposit {:user-id 2 :amount 50 :currency "USD"})
+  (dispatch mediator :wallets/deposit {:user-id 2 :amount 10 :currency "ETH"})
 
   (dispatch mediator :trading/place-order {:user-id 1 :type :limit :side :buy
                                            :amount 0.2 :ticker "BTCUSD" :price 100})
   (dispatch mediator :trading/place-order {:user-id 1 :type :limit :side :sell
-                                           :amount 0.5 :ticker "BTCUSD" :price 100}))
+                                           :amount 0.5 :ticker "BTCUSD" :price 100})
+  (dispatch mediator :trading/place-order {:user-id 2 :type :limit :side :buy
+                                           :amount 0.3 :ticker "ETHUSD" :price 110}))

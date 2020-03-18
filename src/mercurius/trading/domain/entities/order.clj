@@ -6,6 +6,7 @@
 (defrecord Order [id user-id type side ticker amount price])
 
 (defn new-order [fields]
+  ; TODO the placed-at is missing
   (map->Order (assoc fields :id (uuid))))
 
 (defn reserve-currency
