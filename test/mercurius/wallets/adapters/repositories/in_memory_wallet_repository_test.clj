@@ -1,7 +1,7 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository-test
   (:require [clojure.test :refer [deftest testing is]]
             [mercurius.support.asserts :refer [submap? submaps?]]
-            [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet get-user-wallets]]
+            [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet fetch-wallet get-user-wallets]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]))
 
 (deftest in-memory-wallet-repository-test
@@ -21,4 +21,11 @@
           repo (new-in-memory-wallet-repo)]
       (is (submap? wallet (load-wallet repo "456" "USD")))
       (is (submap? wallet (load-wallet repo "456" "USD")))
-      (is (submaps? [wallet] (get-user-wallets repo "456"))))))
+      (is (submaps? [wallet] (get-user-wallets repo "456")))))
+
+  (testing "fetch-wallet raises an error if it doesn't exists"
+    (let [wallet {:user-id "456" :currency "USD" :balance 0}
+          repo (new-in-memory-wallet-repo)]
+      (is (thrown-with-data? {:type :wallet/not-found} (fetch-wallet repo "456" "USD")))
+      (save-wallet repo wallet)
+      (is (submap? wallet (fetch-wallet repo "456" "USD"))))))

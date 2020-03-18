@@ -1,6 +1,5 @@
 (ns mercurius.core.controllers.mediator-test
   (:require [clojure.test :refer [deftest testing is]]
-            [shrubbery.clojure.test]
             [mercurius.core.controllers.mediator :refer [new-mediator dispatch]]))
 
 (deftest dispatch-test

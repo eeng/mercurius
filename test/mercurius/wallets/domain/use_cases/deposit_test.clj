@@ -9,7 +9,7 @@
   (testing "should load the wallet, make the deposit, and save the wallet"
     (let [wallet (build-wallet {:balance 100})
           load-wallet (spy/mock (constantly wallet))
-          save-wallet (spy/mock (constantly true))
+          save-wallet (spy/mock identity)
           deposit (new-deposit-use-case {:load-wallet load-wallet :save-wallet save-wallet})]
       (deposit {:user-id 1 :amount 30 :currency "BTC"})
       (assert/called-with? load-wallet 1 "BTC")

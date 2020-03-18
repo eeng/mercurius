@@ -1,5 +1,5 @@
 (ns examples
-  (:require [integrant.repl.state :refer [system]]
+  (:require [user :refer [system]]
             [mercurius.core.controllers.mediator :refer [dispatch]]))
 
 (comment

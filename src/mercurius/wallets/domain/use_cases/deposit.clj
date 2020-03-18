@@ -9,7 +9,7 @@
 (s/def ::command (s/keys :req-un [::user-id ::currency ::amount]))
 
 (defn new-deposit-use-case
-  "Returns a use case that allows to deposit into a wallet."
+  "Returns a use case that allows to deposit some amount into a wallet."
   [{:keys [load-wallet save-wallet]}]
   (fn [{:keys [user-id currency amount] :as command}]
     (s/assert ::command command)
