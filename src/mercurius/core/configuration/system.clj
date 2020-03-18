@@ -6,16 +6,19 @@
             [mercurius.wallets.domain.use-cases.deposit :refer [deposit-use-case]]
             [mercurius.wallets.domain.use-cases.withdraw :refer [withdraw-use-case]]
             [mercurius.trading.domain.use-cases.place-order :refer [place-order-use-case]]
+            [mercurius.trading.domain.use-cases.get-order-book :refer [get-order-book-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]))
 
 (def config
-  {:mediator {:wallets/deposit (ig/ref :use-cases/deposit)
-              :wallets/withdraw (ig/ref :use-cases/withdraw)
-              :trading/place-order (ig/ref :use-cases/place-order)}
+  {:mediator {:deposit (ig/ref :use-cases/deposit)
+              :withdraw (ig/ref :use-cases/withdraw)
+              :place-order (ig/ref :use-cases/place-order)
+              :get-order-book (ig/ref :use-cases/get-order-book)}
    :use-cases/deposit (ig/ref :wallets.repositories/in-memory)
    :use-cases/withdraw (ig/ref :wallets.repositories/in-memory)
    :use-cases/place-order {:wallet-repo (ig/ref :wallets.repositories/in-memory)
                            :order-book-repo (ig/ref :trading.repositories/in-memory)}
+   :use-cases/get-order-book {:repo (ig/ref :trading.repositories/in-memory)}
    :wallets.repositories/in-memory {}
    :trading.repositories/in-memory {}})
 
@@ -27,6 +30,9 @@
 
 (defmethod ig/init-key :use-cases/place-order [_ deps]
   (place-order-use-case deps))
+
+(defmethod ig/init-key :use-cases/get-order-book [_ deps]
+  (get-order-book-use-case deps))
 
 (defmethod ig/init-key :mediator [_ handlers]
   (log/info "Starting mediator for use cases" (keys handlers))

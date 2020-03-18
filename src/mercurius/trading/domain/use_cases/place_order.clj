@@ -21,7 +21,8 @@
       (as-> (fetch-wallet wallet-repo user-id (:currency money-to-reserve)) w
         (wallet/reserve w (:amount money-to-reserve))
         (save-wallet wallet-repo w))
-      (insert-order order-book-repo order))))
+      (insert-order order-book-repo order)
+      :ok)))
 
 (def place-order-use-case map->PlaceOrder)
 
