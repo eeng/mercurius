@@ -13,8 +13,7 @@
       (wallet/deposit w amount)
       (save-wallet repo w))))
 
-(defn deposit-use-case [repo]
-  (Deposit. repo))
+(def deposit-use-case map->Deposit)
 
 (s/def ::user-id :user/id)
 (s/def ::currency :wallet/currency)

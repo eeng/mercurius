@@ -11,6 +11,6 @@
   (testing "should load the wallet, make the deposit, and save the wallet"
     (let [wallet (build-wallet {:balance 100})
           repo (mock WalletRepository {:find-wallet wallet})]
-      (execute (deposit-use-case repo) {:user-id 1 :amount 30 :currency "BTC"})
+      (execute (deposit-use-case {:repo repo}) {:user-id 1 :amount 30 :currency "BTC"})
       (is (received? repo find-wallet [1 "BTC"]))
       (is (received? repo save-wallet [(assoc wallet :balance 130)])))))

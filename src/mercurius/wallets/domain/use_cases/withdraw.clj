@@ -13,8 +13,7 @@
       (wallet/withdraw w amount)
       (save-wallet repo w))))
 
-(defn withdraw-use-case [repo]
-  (Withdraw. repo))
+(def withdraw-use-case map->Withdraw)
 
 (s/def ::user-id :user/id)
 (s/def ::currency :wallet/currency)

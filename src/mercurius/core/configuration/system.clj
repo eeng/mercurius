@@ -14,8 +14,8 @@
               :withdraw (ig/ref :use-cases/withdraw)
               :place-order (ig/ref :use-cases/place-order)
               :get-order-book (ig/ref :use-cases/get-order-book)}
-   :use-cases/deposit (ig/ref :wallets.repositories/in-memory)
-   :use-cases/withdraw (ig/ref :wallets.repositories/in-memory)
+   :use-cases/deposit {:repo (ig/ref :wallets.repositories/in-memory)}
+   :use-cases/withdraw {:repo (ig/ref :wallets.repositories/in-memory)}
    :use-cases/place-order {:wallet-repo (ig/ref :wallets.repositories/in-memory)
                            :order-book-repo (ig/ref :trading.repositories/in-memory)}
    :use-cases/get-order-book {:repo (ig/ref :trading.repositories/in-memory)}
