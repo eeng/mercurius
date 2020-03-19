@@ -5,6 +5,7 @@
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
             [mercurius.wallets.domain.use-cases.withdraw :refer [new-withdraw-use-case]]
+            [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order]]
@@ -29,6 +30,7 @@
                                                 :save-wallet save-wallet})
         withdraw-use-case (new-withdraw-use-case {:fetch-wallet fetch-wallet
                                                   :save-wallet save-wallet})
+        get-wallet-use-case (new-get-wallet-use-case {:fetch-wallet fetch-wallet})
         place-order-use-case (new-place-order-use-case {:fetch-wallet fetch-wallet
                                                         :save-wallet save-wallet
                                                         :insert-order insert-order})
@@ -36,8 +38,9 @@
 
         mediator (new-mediator {:deposit deposit-use-case
                                 :withdraw withdraw-use-case
-                                :get-order-book get-order-book-use-case
-                                :place-order place-order-use-case})]
+                                :get-wallet get-wallet-use-case
+                                :place-order place-order-use-case
+                                :get-order-book get-order-book-use-case})]
 
     {:mediator mediator}))
 

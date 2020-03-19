@@ -1,5 +1,6 @@
 (ns mercurius.core.configuration.system-test
   (:require [clojure.test :refer [deftest testing is]]
+            [mercurius.support.asserts :refer [submap? submaps?]]
             [mercurius.core.configuration.system :refer [start stop]]
             [mercurius.core.controllers.mediator :refer [dispatch]]))
 
@@ -14,12 +15,17 @@
        (finally
          (stop system#)))))
 
-(deftest start-test
-  (testing "Configures and start the entire system"
+(deftest ^:integration start-test
+  (testing "Assembles the system and allows to execute the use cases"
     (with-system [{:keys [mediator] :as system} {}]
       (is (map? system))
+
       (dispatch mediator :deposit {:user-id 1 :amount 100 :currency "USD"})
       (dispatch mediator :withdraw {:user-id 1 :amount 30 :currency "USD"})
+      (let [wallet (dispatch mediator :get-wallet {:user-id 1 :currency "USD"})]
+        (is (submap? {:balance 70} wallet)))
+
       (dispatch mediator :place-order {:user-id 1 :type :limit :side :buy
                                        :amount 0.2 :ticker "BTCUSD" :price 100})
-      (dispatch mediator :get-order-book {:ticker "BTCUSD"}))))
+      (let [{:keys [buying]} (dispatch mediator :get-order-book {:ticker "BTCUSD"})]
+        (is (submaps? [{:amount 0.2}] buying))))))
