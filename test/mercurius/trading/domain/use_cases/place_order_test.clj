@@ -1,8 +1,8 @@
 (ns mercurius.trading.domain.use-cases.place-order-test
   (:require [clojure.test :refer [deftest testing is]]
+            [matcher-combinators.test]
             [spy.core :as spy]
             [spy.assert :as assert]
-            [mercurius.support.asserts :refer [submap?]]
             [mercurius.support.factory :refer [build-wallet]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]))
 
@@ -37,6 +37,4 @@
                                                  :insert-order insert-order})]
       (place-order {:user-id 1 :type :limit :side :buy :amount 0.1 :ticker "BTCUSD" :price 100})
       (let [[[order]] (spy/calls insert-order)]
-        (is (submap? {:side :buy :amount 0.1 :price 100} order))
-        (is (some? (:id order)))
-        (is (some? (:placed-at order)))))))
+        (is (match? {:side :buy :amount 0.1 :price 100 :id some? :placed-at some?} order))))))

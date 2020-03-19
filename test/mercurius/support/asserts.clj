@@ -6,11 +6,6 @@
   (and (map? m)
        (= sm (select-keys m (keys sm)))))
 
-(defn submaps? [submaps maps]
-  (and (every? (fn [[sm m]] (submap? sm m))
-               (map vector submaps maps))
-       (= (count submaps) (count maps))))
-
 (defmethod assert-expr 'thrown-with-data?
   [msg [_ data & body :as form]]
   `(do-report
