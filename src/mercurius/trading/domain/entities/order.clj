@@ -1,13 +1,13 @@
 (ns mercurius.trading.domain.entities.order
   (:require [clojure.spec.alpha :as s]
             [mercurius.util.uuid :refer [uuid]]
-            [mercurius.trading.domain.entities.ticker :as ticker :refer [pairs]]))
+            [mercurius.trading.domain.entities.ticker :as ticker :refer [pairs]]
+            [tick.alpha.api :as t]))
 
 (defrecord Order [id user-id type side ticker amount price])
 
 (defn new-order [fields]
-  ; TODO the placed-at is missing
-  (map->Order (assoc fields :id (uuid))))
+  (map->Order (assoc fields :id (uuid) :placed-at (t/now))))
 
 (defn reserve-currency
   "Returns the pair's currency that should be used for reservations.

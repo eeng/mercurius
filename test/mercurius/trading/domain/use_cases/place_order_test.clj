@@ -37,4 +37,6 @@
                                                  :insert-order insert-order})]
       (place-order {:user-id 1 :type :limit :side :buy :amount 0.1 :ticker "BTCUSD" :price 100})
       (let [[[order]] (spy/calls insert-order)]
-        (is (submap? {:side :buy :amount 0.1 :price 100} order))))))
+        (is (submap? {:side :buy :amount 0.1 :price 100} order))
+        (is (some? (:id order)))
+        (is (some? (:placed-at order)))))))
