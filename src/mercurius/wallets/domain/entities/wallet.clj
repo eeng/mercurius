@@ -22,12 +22,12 @@
 
 (defn deposit [wallet amount]
   (when (<= amount 0)
-    (throw+ {:type :wallet/invalid-amount :amount amount}))
+    (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet}))
   (update wallet :balance + amount))
 
 (defn withdraw [wallet amount]
   (cond
-    (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount})
+    (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet})
     (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
   (update wallet :balance - amount))
 
@@ -35,9 +35,16 @@
   "Reserves an order's amount until it's filled, so the amount remains unavailable for future orders."
   [wallet amount]
   (cond
-    (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount})
+    (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet})
     (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
   (update wallet :reserved + amount))
+
+(defn cancel-reservation
+  "Restores the order's reserved amount."
+  [{:keys [reserved] :as wallet} amount]
+  (when (> amount reserved)
+    (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet}))
+  (update wallet :reserved - amount))
 
 (defn transfer
   "Transfer the `amount` from the `src` wallet to the `dst` wallet.

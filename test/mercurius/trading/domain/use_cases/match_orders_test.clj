@@ -9,10 +9,10 @@
 (deftest match-orders-test
   (testing "if the orders match should make two wallet transfers (one for each currency)"
     (let [[buyer seller] [1 2]
-          buyer-usd-wallet (build-wallet {:balance 110 :currency "USD" :user-id buyer})
+          buyer-usd-wallet (build-wallet {:balance 110 :currency "USD" :reserved 100 :user-id buyer})
           seller-usd-wallet (build-wallet {:balance 7 :currency "USD" :user-id seller})
           buyer-btc-wallet (build-wallet {:balance 2 :currency "BTC" :user-id buyer})
-          seller-btc-wallet (build-wallet {:balance 5 :currency "BTC" :user-id seller})
+          seller-btc-wallet (build-wallet {:balance 5 :currency "BTC" :reserved 3 :user-id seller})
           fetch-wallet (spy/mock (fn [user-id currency]
                                    (case [user-id currency]
                                      [1 "USD"] buyer-usd-wallet
@@ -25,14 +25,14 @@
           match-orders (new-match-orders-use-case {:fetch-wallet fetch-wallet
                                                    :load-wallet load-wallet
                                                    :save-wallet save-wallet})
-          bid (build-order {:price 50 :amount 2 :ticker "BTCUSD" :user-id buyer})
-          ask (build-order {:price 50 :amount 2 :ticker "BTCUSD" :user-id seller})]
+          bid (build-order {:price 50 :amount 2 :side :buy :ticker "BTCUSD" :user-id buyer})
+          ask (build-order {:price 50 :amount 2 :side :sell :ticker "BTCUSD" :user-id seller})]
       (is (match? {:price 50} (match-orders {:bid bid :ask ask})))
       (let [[[buyer-usd-wallet] [seller-usd-wallet] [seller-btc-wallet] [buyer-btc-wallet]]
             (spy/calls save-wallet)]
-        (is (match? {:balance 10 :currency "USD" :user-id buyer} buyer-usd-wallet))
+        (is (match? {:balance 10 :currency "USD" :reserved 0 :user-id buyer} buyer-usd-wallet))
         (is (match? {:balance 107 :currency "USD" :user-id seller} seller-usd-wallet))
-        (is (match? {:balance 3 :currency "BTC" :user-id seller} seller-btc-wallet))
+        (is (match? {:balance 3 :currency "BTC" :reserved 1 :user-id seller} seller-btc-wallet))
         (is (match? {:balance 4 :currency "BTC" :user-id buyer} buyer-btc-wallet)))))
 
   (testing "if the orders don't match it shouldn't do anything"
