@@ -3,14 +3,14 @@
             [mercurius.accounts.domain.entities.user :as user]
             [mercurius.wallets.domain.entities.wallet :as wallet]
             [mercurius.trading.domain.entities.ticker :as ticker]
-            [mercurius.trading.domain.entities.order :refer [calculate-reservation new-order]]))
+            [mercurius.trading.domain.entities.order :as order :refer [calculate-reservation new-order]]))
 
 (s/def ::user-id ::user/id)
-(s/def ::type #{:market :limit})
-(s/def ::side #{:buy :sell})
+(s/def ::type ::order/type)
+(s/def ::side ::order/side)
 (s/def ::ticker ::ticker/ticker)
-(s/def ::amount (s/and number? pos?))
-(s/def ::price (s/and number? pos?))
+(s/def ::amount ::order/amount)
+(s/def ::price ::order/price)
 (s/def ::command (s/keys :req-un [::user-id ::type ::side ::ticker ::amount ::price]))
 
 (defn new-place-order-use-case

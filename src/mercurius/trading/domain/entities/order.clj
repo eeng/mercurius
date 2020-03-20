@@ -5,7 +5,6 @@
             [mercurius.accounts.domain.entities.user :as user]
             [tick.alpha.api :as t]))
 
-;; TODO many fields duplicated in the command, and the new-order should be spec to return ::order
 (s/def ::id string?)
 (s/def ::user-id ::user/id)
 (s/def ::type #{:market :limit})
