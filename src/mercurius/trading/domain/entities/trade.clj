@@ -2,7 +2,7 @@
   (:require [tick.alpha.api :as t]
             [mercurius.trading.domain.entities.order :refer [remaining-amount]]))
 
-(defrecord Trade [price amount created-at])
+(defrecord Trade [price amount created-at bid ask])
 
 (def new-trade map->Trade)
 

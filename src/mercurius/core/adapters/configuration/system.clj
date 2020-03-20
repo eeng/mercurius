@@ -1,6 +1,6 @@
 (ns mercurius.core.adapters.configuration.system
   (:require [taoensso.timbre :as log]
-            [mercurius.core.adapters.controllers.mediator :refer [new-mediator]]
+            [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet]]
@@ -8,7 +8,8 @@
             [mercurius.wallets.domain.use-cases.withdraw :refer [new-withdraw-use-case]]
             [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order]]
+            [mercurius.trading.adapters.processes.bid-ask-provider :refer [start-bid-ask-provider stop-bid-ask-provider]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-bid-ask]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
             [mercurius.trading.domain.use-cases.match-orders :refer [new-match-orders-use-case]]))
@@ -27,6 +28,7 @@
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
         insert-order (partial insert-order order-book-repo)
+        get-bid-ask (partial get-bid-ask order-book-repo)
 
         deposit-use-case (new-deposit-use-case {:load-wallet load-wallet
                                                 :save-wallet save-wallet})
@@ -46,11 +48,19 @@
                                 :withdraw withdraw-use-case
                                 :get-wallet get-wallet-use-case
                                 :place-order place-order-use-case
-                                :get-order-book get-order-book-use-case}
-                               [logger])]
+                                :get-order-book get-order-book-use-case
+                                :match-orders match-orders-use-case}
+                               [logger])
 
-    {:mediator mediator}))
+        bid-ask-provider (start-bid-ask-provider {:get-bid-ask get-bid-ask
+                                                  :match-orders (partial dispatch mediator :match-orders)
+                                                  :run-every-ms 1000})]
 
-(defn stop [system]
+    {:mediator mediator
+     :bid-ask-provider bid-ask-provider}))
+
+(defn stop [{:keys [bid-ask-provider] :as system}]
   (when system
-    (log/info "Stopping system ...")))
+    (log/info "Stopping system ...")
+    (stop-bid-ask-provider bid-ask-provider))
+  nil)

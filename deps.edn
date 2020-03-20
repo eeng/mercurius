@@ -1,6 +1,7 @@
 {:paths ["src"]
 
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/core.async {:mvn/version "1.0.567"}
         slingshot {:mvn/version "0.12.2"}
         com.taoensso/timbre {:mvn/version "4.10.0"}
         tick {:mvn/version "0.4.23-alpha"}}

@@ -12,15 +12,13 @@
 (s/def ::ticker ::ticker/ticker)
 (s/def ::amount (s/and number? pos?))
 (s/def ::price (s/and number? pos?))
-;; TODO make sure it's used
-(s/def ::state #{:pending :matching :partially-filled :completely-filled})
 (s/def ::filled number?)
-(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::amount ::price ::placed-at ::state ::filled]))
+(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::amount ::price ::placed-at ::filled]))
 
 (defrecord Order [id user-id type side ticker amount price placed-at filled])
 
 (defn new-order [fields]
-  (let [defaults {:id (uuid) :placed-at (t/now) :state :pending :filled 0}]
+  (let [defaults {:id (uuid) :placed-at (t/now) :filled 0}]
     (->> fields (merge defaults) map->Order)))
 
 (defn currency-delivered

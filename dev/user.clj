@@ -5,7 +5,8 @@
 (def system nil)
 
 (defn start []
-  (alter-var-root #'system (constantly (s/start)))
+  (when-not system
+    (alter-var-root #'system (constantly (s/start))))
   :started)
 
 (defn stop []
