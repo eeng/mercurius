@@ -3,42 +3,69 @@
             [matcher-combinators.test]
             [spy.core :as spy]
             [spy.assert :as assert]
+            [tick.alpha.api :as t]
             [mercurius.support.factory :refer [build-wallet build-order]]
             [mercurius.trading.domain.use-cases.match-orders :refer [new-match-orders-use-case]]))
 
+(def buyer 1)
+(def seller 2)
+
+(defn- build-use-case-for-wallets [& wallets-args]
+  (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet] (map build-wallet wallets-args)
+        fetch-wallet (spy/mock (fn [user-id currency]
+                                 (case [user-id currency]
+                                   [1 "USD"] buyer-usd-wallet
+                                   [2 "BTC"] seller-btc-wallet)))
+        load-wallet (spy/mock (fn [user-id currency]
+                                (case [user-id currency]
+                                  [1 "BTC"] buyer-btc-wallet
+                                  [2 "USD"] seller-usd-wallet)))
+        save-wallet (spy/mock identity)
+        deps {:fetch-wallet fetch-wallet
+              :load-wallet load-wallet
+              :save-wallet save-wallet}
+        match-orders (new-match-orders-use-case deps)]
+    [match-orders deps]))
+
 (deftest match-orders-test
   (testing "if the orders match should make two wallet transfers (one for each currency)"
-    (let [[buyer seller] [1 2]
-          buyer-usd-wallet (build-wallet {:balance 110 :currency "USD" :reserved 100 :user-id buyer})
-          seller-usd-wallet (build-wallet {:balance 7 :currency "USD" :user-id seller})
-          buyer-btc-wallet (build-wallet {:balance 2 :currency "BTC" :user-id buyer})
-          seller-btc-wallet (build-wallet {:balance 5 :currency "BTC" :reserved 3 :user-id seller})
-          fetch-wallet (spy/mock (fn [user-id currency]
-                                   (case [user-id currency]
-                                     [1 "USD"] buyer-usd-wallet
-                                     [2 "BTC"] seller-btc-wallet)))
-          load-wallet (spy/mock (fn [user-id currency]
-                                  (case [user-id currency]
-                                    [1 "BTC"] buyer-btc-wallet
-                                    [2 "USD"] seller-usd-wallet)))
-          save-wallet (spy/mock identity)
-          match-orders (new-match-orders-use-case {:fetch-wallet fetch-wallet
-                                                   :load-wallet load-wallet
-                                                   :save-wallet save-wallet})
+    (let [[match-orders deps]
+          (build-use-case-for-wallets
+           {:user-id buyer :currency "USD" :balance 110 :reserved 100}
+           {:user-id seller :currency "USD" :balance 7}
+           {:user-id seller :currency "BTC" :balance 5  :reserved 3}
+           {:user-id buyer :currency "BTC" :balance 2})
           bid (build-order {:price 50 :amount 2 :side :buy :ticker "BTCUSD" :user-id buyer})
           ask (build-order {:price 50 :amount 2 :side :sell :ticker "BTCUSD" :user-id seller})]
       (is (match? {:price 50} (match-orders {:bid bid :ask ask})))
-      (let [[[buyer-usd-wallet] [seller-usd-wallet] [seller-btc-wallet] [buyer-btc-wallet]]
-            (spy/calls save-wallet)]
-        (is (match? {:balance 10 :currency "USD" :reserved 0 :user-id buyer} buyer-usd-wallet))
-        (is (match? {:balance 107 :currency "USD" :user-id seller} seller-usd-wallet))
-        (is (match? {:balance 3 :currency "BTC" :reserved 1 :user-id seller} seller-btc-wallet))
-        (is (match? {:balance 4 :currency "BTC" :user-id buyer} buyer-btc-wallet)))))
+      (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet]
+            (-> deps :save-wallet spy/calls flatten)]
+        (is (match? {:user-id buyer :currency "USD" :balance 10 :reserved 0} buyer-usd-wallet))
+        (is (match? {:user-id seller :currency "USD" :balance 107} seller-usd-wallet))
+        (is (match? {:user-id seller :currency "BTC" :balance 3  :reserved 1} seller-btc-wallet))
+        (is (match? {:user-id buyer :currency "BTC" :balance 4} buyer-btc-wallet)))))
+
+  (testing "if the order is filled completely for a better price, should cancel reservation for the amount reserved"
+    (let [[match-orders deps]
+          (build-use-case-for-wallets
+           {:user-id buyer :currency "USD" :balance 60 :reserved 51}
+           {:user-id seller :currency "USD" :balance 0}
+           {:user-id seller :currency "BTC" :balance 1  :reserved 1}
+           {:user-id buyer :currency "BTC" :balance 0})
+          bid (build-order {:price 51 :amount 1 :side :buy :ticker "BTCUSD" :user-id buyer :placed-at (t/time "12:00")})
+          ask (build-order {:price 50 :amount 1 :side :sell :ticker "BTCUSD" :user-id seller :placed-at (t/time "13:00")})]
+      (is (match? {:price 50} (match-orders {:bid bid :ask ask})))
+      (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet]
+            (-> deps :save-wallet spy/calls flatten)]
+        (is (match? {:user-id buyer :currency "USD" :balance 10 :reserved 0} buyer-usd-wallet))
+        (is (match? {:user-id seller :currency "USD" :balance 50} seller-usd-wallet))
+        (is (match? {:user-id seller :currency "BTC" :balance 0  :reserved 0} seller-btc-wallet))
+        (is (match? {:user-id buyer :currency "BTC" :balance 1} buyer-btc-wallet)))))
 
   (testing "if the orders don't match it shouldn't do anything"
     (let [fetch-wallet (spy/spy)
           match-orders (new-match-orders-use-case {:fetch-wallet fetch-wallet})
-          bid (build-order {:price 40 :user-id 1})
-          ask (build-order {:price 60 :user-id 2})]
+          bid (build-order {:price 40 :user-id buyer})
+          ask (build-order {:price 60 :user-id seller})]
       (is (nil? (match-orders {:bid bid :ask ask})))
       (assert/not-called? fetch-wallet))))
