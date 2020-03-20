@@ -21,12 +21,20 @@
       (is (match? {:price 101 :amount 5} (generate-trade bid ask)))))
 
   (testing "the amount should be the minimum of the two"
-    (let [bid (build-order {:price 100 :amount 5})
-          ask (build-order {:price 100 :amount 6})]
-      (is (match? {:price 100 :amount 5} (generate-trade bid ask))))
-    (let [bid (build-order {:price 100 :amount 6})
-          ask (build-order {:price 100 :amount 5})]
-      (is (match? {:price 100 :amount 5} (generate-trade bid ask)))))
+    (let [bid (build-order {:amount 5 :price 100})
+          ask (build-order {:amount 6 :price 100})]
+      (is (match? {:amount 5 :price 100} (generate-trade bid ask))))
+    (let [bid (build-order {:amount 6 :price 100})
+          ask (build-order {:amount 5 :price 100})]
+      (is (match? {:amount 5 :price 100} (generate-trade bid ask)))))
+
+  (testing "if the order is partially filled, should use the remaining amount"
+    (let [bid (build-order {:amount 5 :filled 1 :price 100})
+          ask (build-order {:amount 5 :price 100})]
+      (is (match? {:amount 4 :price 100} (generate-trade bid ask))))
+    (let [bid (build-order {:amount 5 :price 100})
+          ask (build-order {:amount 5 :filled 2 :price 100})]
+      (is (match? {:amount 3 :price 100} (generate-trade bid ask)))))
 
   (testing "the trade should contain additional data"
     (let [bid (build-order {:price 100 :amount 5 :ticker "BTCUSD"})

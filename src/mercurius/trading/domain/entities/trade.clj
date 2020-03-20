@@ -1,5 +1,6 @@
 (ns mercurius.trading.domain.entities.trade
-  (:require [tick.alpha.api :as t]))
+  (:require [tick.alpha.api :as t]
+            [mercurius.trading.domain.entities.order :refer [remaining-amount]]))
 
 (defrecord Trade [price amount created-at])
 
@@ -8,11 +9,11 @@
 (defn generate-trade
   "If the bid price is greater or equal to the ask price, a trade is returned.
   Otherwise returns nil."
-  [{bid-price :price bid-amount :amount bid-placed-at :placed-at ticker :ticker :as bid}
-   {ask-price :price ask-amount :amount ask-placed-at :placed-at :as ask}]
+  [{bid-price :price bid-placed-at :placed-at ticker :ticker :as bid}
+   {ask-price :price ask-placed-at :placed-at :as ask}]
   (when (>= bid-price ask-price)
     (let [trade-price (if (t/< bid-placed-at ask-placed-at) ask-price bid-price)
-          trade-amount (min bid-amount ask-amount)]
+          trade-amount (min (remaining-amount bid) (remaining-amount ask))]
       (new-trade {:price trade-price
                   :amount trade-amount
                   :ticker ticker
