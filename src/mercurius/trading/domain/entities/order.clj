@@ -4,10 +4,21 @@
             [mercurius.trading.domain.entities.ticker :as ticker :refer [pairs]]
             [tick.alpha.api :as t]))
 
-(defrecord Order [id user-id type side ticker amount price])
+;; TODO many fields duplicated in the command, and the new-order should be spec to return ::order
+(s/def ::id uuid?)
+(s/def ::user-id uuid?)
+(s/def ::type #{:market :limit})
+(s/def ::side #{:buy :sell})
+(s/def ::ticker ::ticker/ticker)
+(s/def ::amount (s/and number? pos?))
+(s/def ::price (s/and number? pos?))
+(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::amount ::price ::placed-at]))
+
+(defrecord Order [id user-id type side ticker amount price placed-at])
 
 (defn new-order [fields]
-  (map->Order (assoc fields :id (uuid) :placed-at (t/now))))
+  (let [defaults {:id (uuid) :placed-at (t/now)}]
+    (->> fields (merge defaults) map->Order)))
 
 (defn reserve-currency
   "Returns the pair's currency that should be used for reservations.
