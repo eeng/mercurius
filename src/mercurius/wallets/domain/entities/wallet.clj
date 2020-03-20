@@ -5,12 +5,12 @@
 
 (def available-currencies #{"USD" "EUR" "BTC" "ETH"})
 
-(s/def :wallet/currency available-currencies)
+(s/def ::currency available-currencies)
 
 (defrecord Wallet [id user-id currency balance reserved])
 
 (defn new-wallet [{:keys [user-id currency balance reserved] :or {balance 0 reserved 0}}]
-  (s/assert :wallet/currency currency)
+  (s/assert ::currency currency)
   (map->Wallet {:id (uuid)
                 :user-id user-id
                 :currency currency

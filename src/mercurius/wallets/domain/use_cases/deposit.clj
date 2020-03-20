@@ -3,9 +3,8 @@
             [mercurius.wallets.domain.entities.wallet :as wallet]
             [mercurius.accounts.domain.entities.user :as user]))
 
-;; TODO there is an inconsistency between ::user/id and :wallet/currency
 (s/def ::user-id ::user/id)
-(s/def ::currency :wallet/currency)
+(s/def ::currency ::wallet/currency)
 (s/def ::amount number?)
 (s/def ::command (s/keys :req-un [::user-id ::currency ::amount]))
 

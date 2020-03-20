@@ -4,7 +4,7 @@
             [mercurius.accounts.domain.entities.user :as user]))
 
 (s/def ::user-id ::user/id)
-(s/def ::currency :wallet/currency)
+(s/def ::currency ::wallet/currency)
 (s/def ::amount number?)
 (s/def ::command (s/keys :req-un [::user-id ::currency ::amount]))
 
