@@ -10,10 +10,9 @@
                         #(= (get-in % [:bid :ticker])
                             (get-in % [:ask :ticker]))))
 
-  ;; TODO the amount-to-cancel I think will be wrong for partially filled orders (in that case we DO need to cancel de trade amount)
 (defn- make-transfer [fetch-wallet load-wallet save-wallet trade
                       from-user to-user {:keys [side ticker] :as order-reserved}]
-  (let [amount-to-cancel (amount-delivered side (:amount order-reserved) (:price order-reserved))
+  (let [amount-to-cancel (amount-delivered side (:amount trade) (:price order-reserved))
         amount-to-transfer (amount-delivered side (:amount trade) (:price trade))
         currency (currency-delivered side ticker)
         src (-> (fetch-wallet from-user currency)

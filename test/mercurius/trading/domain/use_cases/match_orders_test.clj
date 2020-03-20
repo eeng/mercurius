@@ -42,7 +42,7 @@
             (-> deps :save-wallet spy/calls flatten)]
         (is (match? {:user-id buyer :currency "USD" :balance 10 :reserved 0} buyer-usd-wallet))
         (is (match? {:user-id seller :currency "USD" :balance 107} seller-usd-wallet))
-        (is (match? {:user-id seller :currency "BTC" :balance 3  :reserved 1} seller-btc-wallet))
+        (is (match? {:user-id seller :currency "BTC" :balance 3 :reserved 1} seller-btc-wallet))
         (is (match? {:user-id buyer :currency "BTC" :balance 4} buyer-btc-wallet)))))
 
   (testing "if the order is filled completely for a better price, should cancel reservation for the amount reserved"
@@ -50,7 +50,7 @@
           (build-use-case-for-wallets
            {:user-id buyer :currency "USD" :balance 60 :reserved 51}
            {:user-id seller :currency "USD" :balance 0}
-           {:user-id seller :currency "BTC" :balance 1  :reserved 1}
+           {:user-id seller :currency "BTC" :balance 1 :reserved 1}
            {:user-id buyer :currency "BTC" :balance 0})
           bid (build-order {:price 51 :amount 1 :side :buy :ticker "BTCUSD" :user-id buyer :placed-at (t/time "12:00")})
           ask (build-order {:price 50 :amount 1 :side :sell :ticker "BTCUSD" :user-id seller :placed-at (t/time "13:00")})]
@@ -59,7 +59,24 @@
             (-> deps :save-wallet spy/calls flatten)]
         (is (match? {:user-id buyer :currency "USD" :balance 10 :reserved 0} buyer-usd-wallet))
         (is (match? {:user-id seller :currency "USD" :balance 50} seller-usd-wallet))
-        (is (match? {:user-id seller :currency "BTC" :balance 0  :reserved 0} seller-btc-wallet))
+        (is (match? {:user-id seller :currency "BTC" :balance 0 :reserved 0} seller-btc-wallet))
+        (is (match? {:user-id buyer :currency "BTC" :balance 1} buyer-btc-wallet)))))
+
+  (testing "if the order is filled partially, should cancel reservation for the trade's amount"
+    (let [[match-orders deps]
+          (build-use-case-for-wallets
+           {:user-id buyer :currency "USD" :balance 200 :reserved 200}
+           {:user-id seller :currency "USD" :balance 0}
+           {:user-id seller :currency "BTC" :balance 1 :reserved 1}
+           {:user-id buyer :currency "BTC" :balance 0})
+          bid (build-order {:amount 4 :price 50 :side :buy :ticker "BTCUSD" :user-id buyer})
+          ask (build-order {:amount 1 :price 50 :side :sell :ticker "BTCUSD" :user-id seller})]
+      (is (match? {:amount 1 :price 50} (match-orders {:bid bid :ask ask})))
+      (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet]
+            (-> deps :save-wallet spy/calls flatten)]
+        (is (match? {:user-id buyer :currency "USD" :balance 150 :reserved 150} buyer-usd-wallet))
+        (is (match? {:user-id seller :currency "USD" :balance 50} seller-usd-wallet))
+        (is (match? {:user-id seller :currency "BTC" :balance 0 :reserved 0} seller-btc-wallet))
         (is (match? {:user-id buyer :currency "BTC" :balance 1} buyer-btc-wallet)))))
 
   (testing "if the orders don't match it shouldn't do anything"
