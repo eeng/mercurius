@@ -1,7 +1,7 @@
-(ns mercurius.core.configuration.system
+(ns mercurius.core.adapters.configuration.system
   (:require [taoensso.timbre :as log]
-            [mercurius.core.controllers.mediator :refer [new-mediator]]
-            [mercurius.core.controllers.mediator.middleware.logger :refer [logger]]
+            [mercurius.core.adapters.controllers.mediator :refer [new-mediator]]
+            [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]

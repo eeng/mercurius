@@ -1,8 +1,8 @@
-(ns mercurius.core.configuration.system-test
+(ns mercurius.core.adapters.configuration.system-test
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
-            [mercurius.core.configuration.system :refer [start stop]]
-            [mercurius.core.controllers.mediator :refer [dispatch]]))
+            [mercurius.core.adapters.configuration.system :refer [start stop]]
+            [mercurius.core.adapters.controllers.mediator :refer [dispatch]]))
 
 (defmacro with-system
   "Starts the system and makes sure it's stopped afterward.

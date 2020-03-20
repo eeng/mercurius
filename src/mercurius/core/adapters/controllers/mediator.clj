@@ -1,4 +1,4 @@
-(ns mercurius.core.controllers.mediator
+(ns mercurius.core.adapters.controllers.mediator
   (:require [slingshot.slingshot :refer [throw+]]))
 
 (defrecord Mediator [handlers middleware])

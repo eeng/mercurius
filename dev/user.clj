@@ -1,5 +1,5 @@
 (ns user
-  (:require [mercurius.core.configuration.system :as s]
+  (:require [mercurius.core.adapters.configuration.system :as s]
             [clojure.tools.namespace.repl :as repl]))
 
 (def system nil)

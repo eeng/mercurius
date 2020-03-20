@@ -1,6 +1,6 @@
 (ns examples
   (:require [user :refer [system]]
-            [mercurius.core.controllers.mediator :as m]))
+            [mercurius.core.adapters.controllers.mediator :as m]))
 
 (comment
   (def dispatch (partial m/dispatch (:mediator system)))
