@@ -1,8 +1,8 @@
 (ns mercurius.wallets.domain.use-cases.get-wallet
   (:require [clojure.spec.alpha :as s]
-            [mercurius.accounts.domain.entities.user]))
+            [mercurius.accounts.domain.entities.user :as user]))
 
-(s/def ::user-id :user/id)
+(s/def ::user-id ::user/id)
 (s/def ::currency :wallet/currency)
 (s/def ::command (s/keys :req-un [::user-id ::currency]))
 

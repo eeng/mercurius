@@ -28,7 +28,7 @@
 (defn withdraw [wallet amount]
   (cond
     (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount})
-    (> amount (available-balance wallet)) (throw+ {:type :wallet/not-enough-balance :wallet wallet :amount amount}))
+    (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
   (update wallet :balance - amount))
 
 (defn reserve
@@ -36,5 +36,13 @@
   [wallet amount]
   (cond
     (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount})
-    (> amount (available-balance wallet)) (throw+ {:type :wallet/not-enough-balance :wallet wallet :amount amount}))
+    (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
   (update wallet :reserved + amount))
+
+(defn transfer
+  "Transfer the `amount` from the `src` wallet to the `dst` wallet.
+  Returns both updated wallets."
+  [src dst amount]
+  (when (not= (:currency src) (:currency dst))
+    (throw+ {:type :wallet/different-currencies :src src :dst dst}))
+  [(withdraw src amount) (deposit dst amount)])

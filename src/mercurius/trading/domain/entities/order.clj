@@ -1,12 +1,13 @@
 (ns mercurius.trading.domain.entities.order
   (:require [clojure.spec.alpha :as s]
             [mercurius.util.uuid :refer [uuid]]
-            [mercurius.trading.domain.entities.ticker :as ticker :refer [pairs]]
+            [mercurius.trading.domain.entities.ticker :as ticker :refer [first-currency last-currency]]
+            [mercurius.accounts.domain.entities.user :as user]
             [tick.alpha.api :as t]))
 
 ;; TODO many fields duplicated in the command, and the new-order should be spec to return ::order
-(s/def ::id uuid?)
-(s/def ::user-id uuid?)
+(s/def ::id string?)
+(s/def ::user-id ::user/id)
 (s/def ::type #{:market :limit})
 (s/def ::side #{:buy :sell})
 (s/def ::ticker ::ticker/ticker)
@@ -26,8 +27,8 @@
   [side ticker]
   (s/assert ::ticker/ticker ticker)
   (case side
-    :buy (get-in pairs [ticker :last-currency])
-    :sell (get-in pairs [ticker :first-currency])))
+    :buy (last-currency ticker)
+    :sell (first-currency ticker)))
 
 (defn reserve-amount
   "Calculates the amount to reserve in the wallet.

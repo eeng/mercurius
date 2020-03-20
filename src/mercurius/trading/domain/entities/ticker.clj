@@ -11,3 +11,14 @@
 (def available-tickers (keys pairs))
 
 (s/def ::ticker (set available-tickers))
+
+(defn first-currency [ticker]
+  (get-in pairs [ticker :first-currency]))
+
+(defn last-currency [ticker]
+  (get-in pairs [ticker :last-currency]))
+
+(def currencies (juxt first-currency last-currency))
+
+(comment
+  (currencies "BTCUSD"))

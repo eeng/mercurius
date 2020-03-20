@@ -9,10 +9,13 @@
   (dispatch :withdraw {:user-id 1 :amount 30 :currency "USD"})
   (dispatch :deposit {:user-id 1 :amount 200 :currency "BTC"})
   (dispatch :deposit {:user-id 2 :amount 50 :currency "USD"})
-  (dispatch :deposit {:user-id 2 :amount 10 :currency "ETH"})
+  (dispatch :deposit {:user-id 2 :amount 10 :currency "BTC"})
 
   (dispatch :place-order {:user-id 1 :side :buy :amount 0.2 :ticker "BTCUSD" :price 100 :type :limit})
-  (dispatch :place-order {:user-id 1 :side :sell :amount 0.5 :ticker "BTCUSD" :price 100 :type :limit})
-  (dispatch :place-order {:user-id 2 :side :buy :amount 0.3 :ticker "ETHUSD" :price 110 :type :limit})
+  (dispatch :place-order {:user-id 2 :side :sell :amount 0.2 :ticker "BTCUSD" :price 100 :type :limit})
 
-  (dispatch :get-order-book {:ticker "BTCUSD"}))
+  (def order-book (dispatch :get-order-book {:ticker "BTCUSD"}))
+
+  #_(let [match-orders (:match-orders-use-case system)]
+      (match-orders {:bid (-> order-book :buying first)
+                     :ask (-> order-book :selling first)})))

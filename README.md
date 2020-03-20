@@ -1,4 +1,4 @@
 # TODO
 
 - Handle market orders
-- Add timestamp to orders
+- Handle partial order filling

@@ -1,11 +1,11 @@
 (ns mercurius.trading.domain.use-cases.place-order
   (:require [clojure.spec.alpha :as s]
-            [mercurius.accounts.domain.entities.user]
+            [mercurius.accounts.domain.entities.user :as user]
             [mercurius.wallets.domain.entities.wallet :as wallet]
             [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.trading.domain.entities.order :refer [reserve-money new-order]]))
 
-(s/def ::user-id :user/id)
+(s/def ::user-id ::user/id)
 (s/def ::type #{:market :limit})
 (s/def ::side #{:buy :sell})
 (s/def ::ticker ::ticker/ticker)

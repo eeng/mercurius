@@ -28,10 +28,11 @@
           ask (build-order {:price 100 :amount 5})]
       (is (match? {:price 100 :amount 5} (generate-trade bid ask)))))
 
-  (testing "the trade should contain the ticker and time"
+  (testing "the trade should contain additional data"
     (let [bid (build-order {:price 100 :amount 5 :ticker "BTCUSD"})
           ask (build-order {:price 100 :amount 5 :ticker "BTCUSD"})]
-      (is (match? {:ticker "BTCUSD" :created-at some?} (generate-trade bid ask)))))
+      (is (match? {:ticker "BTCUSD" :created-at some? :bid bid :ask ask}
+                  (generate-trade bid ask)))))
 
   (testing "if the bid price is lower than the ask price, returns nil"
     (let [bid (build-order {:price 99})
