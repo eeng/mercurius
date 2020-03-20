@@ -8,8 +8,8 @@
 (defn generate-trade
   "If the bid price is greater or equal to the ask price, a trade is returned.
   Otherwise returns nil."
-  [{bid-price :price bid-placed-at :placed-at bid-amount :amount ticker :ticker :as bid}
-   {ask-price :price ask-placed-at :placed-at ask-amount :amount :as ask}]
+  [{bid-price :price bid-amount :amount bid-placed-at :placed-at ticker :ticker :as bid}
+   {ask-price :price ask-amount :amount ask-placed-at :placed-at :as ask}]
   (when (>= bid-price ask-price)
     (let [trade-price (if (t/< bid-placed-at ask-placed-at) ask-price bid-price)
           trade-amount (min bid-amount ask-amount)]

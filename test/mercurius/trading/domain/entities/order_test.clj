@@ -1,9 +1,9 @@
 (ns mercurius.trading.domain.entities.order-test
   (:require [clojure.test :refer [deftest testing is]]
-            [mercurius.trading.domain.entities.order :refer [reserve-currency]]))
+            [mercurius.trading.domain.entities.order :refer [currency-delivered]]))
 
-(deftest reserve-currency-test
-  (testing "on buy orders should reserve in the last currency"
-    (is (= "USD" (reserve-currency :buy "BTCUSD")))
-    (is (= "BTC" (reserve-currency :sell "BTCUSD")))
-    (is (= "ETH" (reserve-currency :sell "ETHUSD")))))
+(deftest currency-delivered-test
+  (testing "returns the last currency when buying and the first one when selling"
+    (is (= "USD" (currency-delivered :buy "BTCUSD")))
+    (is (= "BTC" (currency-delivered :sell "BTCUSD")))
+    (is (= "ETH" (currency-delivered :sell "ETHUSD")))))
