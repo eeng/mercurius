@@ -39,6 +39,8 @@
     :buy (* amount price)
     :sell amount))
 
-(defn reserve-money [side amount ticker price]
+(defn calculate-reservation
+  "Calculates the amount and currency to reserve for an order."
+  [{:keys [side amount ticker price]}]
   {:amount (reserve-amount side amount price)
    :currency (reserve-currency side ticker)})

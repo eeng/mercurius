@@ -3,7 +3,7 @@
             [mercurius.accounts.domain.entities.user :as user]
             [mercurius.wallets.domain.entities.wallet :as wallet]
             [mercurius.trading.domain.entities.ticker :as ticker]
-            [mercurius.trading.domain.entities.order :refer [reserve-money new-order]]))
+            [mercurius.trading.domain.entities.order :refer [calculate-reservation new-order]]))
 
 (s/def ::user-id ::user/id)
 (s/def ::type #{:market :limit})
@@ -18,11 +18,12 @@
   The `amount` is considered to be in first currency (BTC in the previous example)
   and `price` (which is the limit price for limit orders) in the second currency (USD)."
   [{:keys [fetch-wallet save-wallet insert-order]}]
-  (fn [{:keys [user-id side ticker amount price] :as command}]
+  (fn [{:keys [user-id] :as command}]
     (s/assert ::command command)
-    (let [money-to-reserve (reserve-money side amount ticker price)]
-      (-> (fetch-wallet user-id (:currency money-to-reserve))
-          (wallet/reserve (:amount money-to-reserve))
+    (let [order (new-order command)
+          reservation (calculate-reservation order)]
+      (-> (fetch-wallet user-id (:currency reservation))
+          (wallet/reserve (:amount reservation))
           (save-wallet))
-      (-> command new-order insert-order)
+      (insert-order order)
       :ok)))

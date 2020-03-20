@@ -7,7 +7,7 @@
             [mercurius.trading.domain.use-cases.match-orders :refer [new-match-orders-use-case]]))
 
 (deftest match-orders-test
-  (testing "if the orders match should make two exchanges (one for each currency)"
+  (testing "if the orders match should make two wallet transfers (one for each currency)"
     (let [[buyer seller] [1 2]
           buyer-usd-wallet (build-wallet {:balance 110 :currency "USD" :user-id buyer})
           seller-usd-wallet (build-wallet {:balance 7 :currency "USD" :user-id seller})
