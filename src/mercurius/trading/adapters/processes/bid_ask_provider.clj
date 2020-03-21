@@ -9,11 +9,10 @@
       (Thread/sleep run-every-ms)
       (when @active
         (try
-          (let [{:keys [bids asks]} (get-bids-asks ticker)]
-            (when (and (seq bids) (seq asks))
-              (execute-trades (get-bids-asks ticker))))
+          (execute-trades (get-bids-asks ticker))
           (catch Exception e
-            (log/error e)))
+            (log/error e)
+            (throw e)))
         (recur))))
   bap)
 

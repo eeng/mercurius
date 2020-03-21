@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
             [mercurius.trading.domain.entities.order :refer [new-order]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bids-asks]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bids-asks update-order remove-order]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]))
 
 (deftest insert-order-test
@@ -20,6 +20,26 @@
       (insert-order repo (new-order {:ticker "ETHUSD" :side :buy}))
       (is (= 1 (-> (get-order-book repo "BTCUSD") :buying count)))
       (is (= 1 (-> (get-order-book repo "ETHUSD") :buying count))))))
+
+(deftest update-order-test
+  (testing "updates the order by id"
+    (let [repo (new-in-memory-order-book-repo)
+          o1 (new-order {:id "O1" :ticker "BTCUSD" :side :buy :amount 5})
+          o2 (new-order {:id "O2" :ticker "BTCUSD" :side :buy :amount 5})
+          new-o1 (assoc o1 :remaining 3)]
+      (doseq [order [o1 o2]] (insert-order repo order))
+      (update-order repo new-o1)
+      (is (match? [o2 new-o1] (:buying (get-order-book repo "BTCUSD")))))))
+
+(deftest remove-order-test
+  (testing "removes the order by id"
+    (let [repo (new-in-memory-order-book-repo)
+          o1 (new-order {:id "O1" :ticker "BTCUSD" :side :buy :amount 5})
+          o2 (new-order {:id "O2" :ticker "BTCUSD" :side :buy :amount 5})
+          new-o1 (assoc o1 :remaining 0)]
+      (doseq [order [o1 o2]] (insert-order repo order))
+      (remove-order repo new-o1)
+      (is (match? [o2] (:buying (get-order-book repo "BTCUSD")))))))
 
 (deftest get-order-book-test
   (testing "returns the buying side sorted by price desc"

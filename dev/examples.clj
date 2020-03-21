@@ -14,4 +14,4 @@
   (dispatch :place-order {:user-id 1 :side :buy :amount 0.2 :ticker "BTCUSD" :price 100 :type :limit})
   (dispatch :place-order {:user-id 2 :side :sell :amount 0.2 :ticker "BTCUSD" :price 100 :type :limit})
 
-  (def order-book (dispatch :get-order-book {:ticker "BTCUSD"})))
+  (dispatch :get-order-book {:ticker "BTCUSD"}))

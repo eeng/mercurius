@@ -4,6 +4,12 @@
   (insert-order [this order]
     "Inserts the order in the order book.")
 
+  (update-order [this order]
+    "Updates the order by id.")
+
+  (remove-order [this order]
+    "Removes the order by id.")
+
   (get-order-book [this ticker]
     "Returns the full order book as a map with :buying and :selling keys to orders.")
 

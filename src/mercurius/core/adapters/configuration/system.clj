@@ -9,7 +9,7 @@
             [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.processes.bid-ask-provider :refer [start-bid-ask-provider stop-bid-ask-provider]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-bids-asks]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
             [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]))
@@ -28,6 +28,8 @@
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
         insert-order (partial insert-order order-book-repo)
+        update-order (partial update-order order-book-repo)
+        remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
 
         deposit-use-case (new-deposit-use-case {:load-wallet load-wallet
@@ -42,7 +44,9 @@
         get-order-book-use-case (new-get-order-book-use-case {:repo order-book-repo})
         execute-trades-use-case (new-execute-trades-use-case {:fetch-wallet fetch-wallet
                                                               :load-wallet load-wallet
-                                                              :save-wallet save-wallet})
+                                                              :save-wallet save-wallet
+                                                              :update-order update-order
+                                                              :remove-order remove-order})
 
         mediator (new-mediator {:deposit deposit-use-case
                                 :withdraw withdraw-use-case
