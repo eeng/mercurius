@@ -9,7 +9,9 @@
       (Thread/sleep run-every-ms)
       (when @active
         (try
-          (execute-trades (get-bids-asks ticker))
+          (let [{:keys [bids asks]} (get-bids-asks ticker)]
+            (when (and (seq bids) (seq asks))
+              (execute-trades (get-bids-asks ticker))))
           (catch Exception e
             (log/error e)))
         (recur))))
@@ -30,6 +32,6 @@
 
 (comment
   (def bap (start-bid-ask-provider
-            {:get-bids-asks (fn [ticker] {:bid [(str "bid " (rand-int 5))] :ask [(str "ask " ticker)]})
+            {:get-bids-asks (fn [ticker] {:bids [(str "bid " (rand-int 5))] :asks [(str "ask " ticker)]})
              :execute-trades #(log/info "Matching" %)}))
   (stop-bid-ask-provider bap))

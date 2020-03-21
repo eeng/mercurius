@@ -40,7 +40,7 @@
           o1 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 5}))
           _o2 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 4}))
           o3 (insert-order repo (new-order {:ticker "BTCUSD" :side :sell :price 6}))]
-      (is (match? {:bid [o1] :ask [o3]}
+      (is (match? {:bids [o1] :asks [o3]}
                   (get-bids-asks repo "BTCUSD")))))
 
   (testing "it could be many orders at the best price"
@@ -48,10 +48,10 @@
           o1 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 5}))
           _o2 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 4}))
           o3 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 5}))]
-      (is (match? {:bid [o3 o1] :ask []}
+      (is (match? {:bids [o3 o1] :asks []}
                   (get-bids-asks repo "BTCUSD")))))
 
   (testing "returns [] for the bids or asks if there is no order on the side"
     (let [repo (new-in-memory-order-book-repo)]
-      (is (= {:bid [] :ask []}
+      (is (= {:bids [] :asks []}
              (get-bids-asks repo "BTCUSD"))))))

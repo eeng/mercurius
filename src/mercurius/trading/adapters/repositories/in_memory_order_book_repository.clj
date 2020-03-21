@@ -23,8 +23,8 @@
           (update :selling selling-sorter))))
 
   (get-bids-asks [this ticker]
-    {:bid (find-best-orders this ticker :buying)
-     :ask (find-best-orders this ticker :selling)}))
+    {:bids (find-best-orders this ticker :buying)
+     :asks (find-best-orders this ticker :selling)}))
 
 (defn new-in-memory-order-book-repo []
   (InMemoryOrderBookRepository.
