@@ -12,13 +12,13 @@
 (s/def ::ticker ::ticker/ticker)
 (s/def ::amount (s/and number? pos?))
 (s/def ::price (s/and number? pos?))
-(s/def ::filled number?)
-(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::amount ::price ::placed-at ::filled]))
+(s/def ::remaining number?)
+(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::amount ::price ::placed-at ::remaining]))
 
-(defrecord Order [id user-id type side ticker amount price placed-at filled])
+(defrecord Order [id user-id type side ticker amount price placed-at remaining])
 
-(defn new-order [fields]
-  (let [defaults {:id (uuid) :placed-at (t/now) :filled 0}]
+(defn new-order [{:keys [amount] :as fields}]
+  (let [defaults {:id (uuid) :placed-at (t/now) :remaining amount}]
     (->> fields (merge defaults) map->Order)))
 
 (defn currency-delivered
@@ -45,5 +45,15 @@
   {:amount (amount-delivered side amount price)
    :currency (currency-delivered side ticker)})
 
-(defn remaining-amount [{:keys [amount filled]}]
-  (- amount filled))
+(defn fill-order [{:keys [remaining] :as order} fill-amount]
+  {:pre [(<= fill-amount remaining)]}
+  (update order :remaining - fill-amount))
+
+(defn status? [{:keys [amount remaining]}]
+  (cond
+    (= remaining amount) :pending
+    (zero? remaining) :completely-filled
+    (< remaining amount) :partially-filled))
+
+(defn partially-filled? [order]
+  (= (status? order) :partially-filled))
