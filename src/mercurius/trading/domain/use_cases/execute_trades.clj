@@ -1,4 +1,4 @@
-(ns mercurius.trading.domain.use-cases.match-orders
+(ns mercurius.trading.domain.use-cases.execute-trades
   (:require [clojure.spec.alpha :as s]
             [mercurius.trading.domain.entities.order :as order :refer [amount-delivered currency-delivered]]
             [mercurius.trading.domain.entities.trade :refer [generate-trade]]
@@ -22,7 +22,7 @@
     (doseq [wallet wallets]
       (save-wallet wallet))))
 
-(defn new-match-orders-use-case
+(defn new-execute-trades-use-case
   "Returns a use case that match bid an ask orders to see if a trade can be made.
   If a trade is made, a transfer is made between buyer and seller for each pais's currency."
   [{:keys [fetch-wallet load-wallet save-wallet]}]

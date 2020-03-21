@@ -12,7 +12,7 @@
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-bids-asks]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
-            [mercurius.trading.domain.use-cases.match-orders :refer [new-match-orders-use-case]]))
+            [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]))
 
 (defn start
   "Injects all the dependencies into the respective components and starts the system.
@@ -40,20 +40,20 @@
                                                         :insert-order insert-order})
 
         get-order-book-use-case (new-get-order-book-use-case {:repo order-book-repo})
-        match-orders-use-case (new-match-orders-use-case {:fetch-wallet fetch-wallet
-                                                          :load-wallet load-wallet
-                                                          :save-wallet save-wallet})
+        execute-trades-use-case (new-execute-trades-use-case {:fetch-wallet fetch-wallet
+                                                              :load-wallet load-wallet
+                                                              :save-wallet save-wallet})
 
         mediator (new-mediator {:deposit deposit-use-case
                                 :withdraw withdraw-use-case
                                 :get-wallet get-wallet-use-case
                                 :place-order place-order-use-case
                                 :get-order-book get-order-book-use-case
-                                :match-orders match-orders-use-case}
+                                :execute-trades execute-trades-use-case}
                                [logger])
 
         bid-ask-provider (start-bid-ask-provider {:get-bids-asks get-bids-asks
-                                                  :match-orders (partial dispatch mediator :match-orders)
+                                                  :execute-trades (partial dispatch mediator :execute-trades)
                                                   :run-every-ms 1000})]
 
     {:mediator mediator
