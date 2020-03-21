@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
             [mercurius.trading.domain.entities.order :refer [new-order]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bid-ask]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bids-asks]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]))
 
 (deftest insert-order-test
@@ -34,16 +34,24 @@
         (insert-order repo (new-order {:ticker "BTCUSD" :side :sell :price price})))
       (is (= [4 5 6] (->> (get-order-book repo "BTCUSD") :selling (map :price)))))))
 
-(deftest get-bid-ask-test
-  (testing "returns a map with the bid and ask orders"
+(deftest get-bids-asks-test
+  (testing "returns a map with the bids and asks orders"
     (let [repo (new-in-memory-order-book-repo)
           o1 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 5}))
           _o2 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 4}))
           o3 (insert-order repo (new-order {:ticker "BTCUSD" :side :sell :price 6}))]
-      (is (= {:bid o1 :ask o3}
-             (get-bid-ask repo "BTCUSD")))))
+      (is (match? {:bid [o1] :ask [o3]}
+                  (get-bids-asks repo "BTCUSD")))))
 
-  (testing "returns nil for the bid or ask if there is no order on the side"
+  (testing "it could be many orders at the best price"
+    (let [repo (new-in-memory-order-book-repo)
+          o1 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 5}))
+          _o2 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 4}))
+          o3 (insert-order repo (new-order {:ticker "BTCUSD" :side :buy :price 5}))]
+      (is (match? {:bid [o3 o1] :ask []}
+                  (get-bids-asks repo "BTCUSD")))))
+
+  (testing "returns [] for the bids or asks if there is no order on the side"
     (let [repo (new-in-memory-order-book-repo)]
-      (is (= {:bid nil :ask nil}
-             (get-bid-ask repo "BTCUSD"))))))
+      (is (= {:bid [] :ask []}
+             (get-bids-asks repo "BTCUSD"))))))

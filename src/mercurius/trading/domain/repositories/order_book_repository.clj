@@ -7,5 +7,5 @@
   (get-order-book [this ticker]
     "Returns the full order book as a map with :buying and :selling keys to orders.")
 
-  (get-bid-ask [this ticker]
-    "Returns the bid (best buying order) and ask (best selling order)."))
+  (get-bids-asks [this ticker]
+    "Returns the bids (orders at the best buying price) and asks (orders at the best selling price)."))

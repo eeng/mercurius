@@ -9,7 +9,7 @@
             [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.processes.bid-ask-provider :refer [start-bid-ask-provider stop-bid-ask-provider]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-bid-ask]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-bids-asks]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
             [mercurius.trading.domain.use-cases.match-orders :refer [new-match-orders-use-case]]))
@@ -28,7 +28,7 @@
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
         insert-order (partial insert-order order-book-repo)
-        get-bid-ask (partial get-bid-ask order-book-repo)
+        get-bids-asks (partial get-bids-asks order-book-repo)
 
         deposit-use-case (new-deposit-use-case {:load-wallet load-wallet
                                                 :save-wallet save-wallet})
@@ -52,7 +52,7 @@
                                 :match-orders match-orders-use-case}
                                [logger])
 
-        bid-ask-provider (start-bid-ask-provider {:get-bid-ask get-bid-ask
+        bid-ask-provider (start-bid-ask-provider {:get-bids-asks get-bids-asks
                                                   :match-orders (partial dispatch mediator :match-orders)
                                                   :run-every-ms 1000})]
 

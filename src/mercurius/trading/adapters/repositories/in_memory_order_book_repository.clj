@@ -2,6 +2,11 @@
   (:require [mercurius.trading.domain.repositories.order-book-repository :refer [OrderBookRepository get-order-book]]
             [mercurius.trading.domain.entities.ticker :refer [available-tickers]]))
 
+(defn- find-best-orders [repo ticker side]
+  (let [all-orders (side (get-order-book repo ticker))
+        best-price (-> all-orders first :price)]
+    (filter #(= (:price %) best-price) all-orders)))
+
 (defrecord InMemoryOrderBookRepository [db]
   OrderBookRepository
 
@@ -17,9 +22,9 @@
           (update :buying buying-sorter)
           (update :selling selling-sorter))))
 
-  (get-bid-ask [this ticker]
-    {:bid (-> (get-order-book this ticker) :buying first)
-     :ask (-> (get-order-book this ticker) :selling first)}))
+  (get-bids-asks [this ticker]
+    {:bid (find-best-orders this ticker :buying)
+     :ask (find-best-orders this ticker :selling)}))
 
 (defn new-in-memory-order-book-repo []
   (InMemoryOrderBookRepository.
