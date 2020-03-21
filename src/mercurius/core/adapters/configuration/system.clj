@@ -9,7 +9,7 @@
             [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.wallets.domain.use-cases.get-wallets :refer [new-get-wallets-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
-            [mercurius.trading.adapters.processes.bid-ask-provider :refer [start-bid-ask-provider stop-bid-ask-provider]]
+            [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder stop-trade-finder]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
@@ -43,13 +43,13 @@
         place-order-use-case (new-place-order-use-case {:fetch-wallet fetch-wallet
                                                         :save-wallet save-wallet
                                                         :insert-order insert-order})
-
         get-order-book-use-case (new-get-order-book-use-case {:repo order-book-repo})
-        execute-trades-use-case (new-execute-trades-use-case {:fetch-wallet fetch-wallet
-                                                              :load-wallet load-wallet
-                                                              :save-wallet save-wallet
+        execute-trades-use-case (new-execute-trades-use-case {:get-bids-asks get-bids-asks
                                                               :update-order update-order
-                                                              :remove-order remove-order})
+                                                              :remove-order remove-order
+                                                              :fetch-wallet fetch-wallet
+                                                              :load-wallet load-wallet
+                                                              :save-wallet save-wallet})
 
         mediator (new-mediator {:deposit deposit-use-case
                                 :withdraw withdraw-use-case
@@ -60,15 +60,14 @@
                                 :execute-trades execute-trades-use-case}
                                [(logger :exclude #{:execute-trades})])
 
-        bid-ask-provider (start-bid-ask-provider {:get-bids-asks get-bids-asks
-                                                  :execute-trades (partial dispatch mediator :execute-trades)
-                                                  :run-every-ms 1000})]
+        trade-finder (start-trade-finder {:execute-trades (partial dispatch mediator :execute-trades)
+                                          :run-every-ms 1000})]
 
     {:mediator mediator
-     :bid-ask-provider bid-ask-provider}))
+     :trade-finder trade-finder}))
 
-(defn stop [{:keys [bid-ask-provider] :as system}]
+(defn stop [{:keys [trade-finder] :as system}]
   (when system
     (log/info "Stopping system ...")
-    (stop-bid-ask-provider bid-ask-provider))
+    (stop-trade-finder trade-finder))
   nil)

@@ -1,7 +1,6 @@
 (ns mercurius.trading.adapters.repositories.in-memory-order-book-repository
   (:require [mercurius.trading.domain.repositories.order-book-repository :refer [OrderBookRepository get-order-book]]
-            [mercurius.trading.domain.entities.ticker :refer [available-tickers]]
-            [mercurius.util.collections :refer [update-where]]))
+            [mercurius.trading.domain.entities.ticker :refer [available-tickers]]))
 
 (defn- find-best-orders [repo ticker side]
   (let [all-orders (side (get-order-book repo ticker))
@@ -11,8 +10,8 @@
 (defn- book-side [{:keys [side]}]
   (case side :buy :buying :sell :selling))
 
-(defn- replace-order [orders {:keys [id] :as order}]
-  (update-where orders #(= (:id %) id) (constantly order)))
+(defn- replace-order [orders {:keys [id] :as changed-order}]
+  (map #(if (= (:id %) id) changed-order %) orders))
 
 (defn- remove-order [orders {:keys [id]}]
   (remove #(= (:id %) id) orders))

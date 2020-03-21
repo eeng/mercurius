@@ -2,13 +2,12 @@
   (:require [clojure.spec.alpha :as s]
             [mercurius.trading.domain.entities.order :as order :refer [partially-filled?]]
             [mercurius.trading.domain.entities.trade :refer [match-orders build-transfers]]
+            [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.wallets.domain.entities.wallet :refer [transfer cancel-reservation]]
             [taoensso.timbre :as log]))
 
-(s/def ::bids (s/coll-of ::order/order))
-(s/def ::asks (s/coll-of ::order/order))
-(s/def ::command (s/and (s/keys :req-un [::bids ::asks])
-                        #(= 1 (->> (map :ticker %) distinct count))))
+(s/def ::ticker ::ticker/ticker)
+(s/def ::command (s/and (s/keys :req-un [::ticker])))
 
 (defn- make-transfer [{:keys [fetch-wallet load-wallet save-wallet]}
                       {:keys [from to currency transfer-amount cancel-amount]}]
@@ -25,13 +24,14 @@
     (remove-order order)))
 
 (defn new-execute-trades-use-case
-  "Returns a use case that match bid an ask orders to find trades, and executes them.
+  "Returns a use case that match bid an ask orders to discover trades, and executes them.
   For each trade, a transfer is made between buyer and seller for each pais's currency.
   Finally the order book is updated."
-  [deps]
-  (fn [{:keys [bids asks] :as command}]
+  [{:keys [get-bids-asks] :as deps}]
+  (fn [{:keys [ticker] :as command}]
     (s/assert ::command command)
-    (let [trades (match-orders bids asks)]
+    (let [{:keys [bids asks]} (get-bids-asks ticker)
+          trades (match-orders bids asks)]
       (doseq [{:keys [bid ask] :as trade} trades]
         (log/info "Trade made!" trade)
         (doseq [transfer (build-transfers trade)]
