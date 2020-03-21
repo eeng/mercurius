@@ -54,7 +54,7 @@
                                 :place-order place-order-use-case
                                 :get-order-book get-order-book-use-case
                                 :execute-trades execute-trades-use-case}
-                               [logger])
+                               [(logger :exclude #{:execute-trades})])
 
         bid-ask-provider (start-bid-ask-provider {:get-bids-asks get-bids-asks
                                                   :execute-trades (partial dispatch mediator :execute-trades)

@@ -2,7 +2,8 @@
   (:require [clojure.spec.alpha :as s]
             [mercurius.trading.domain.entities.order :as order :refer [partially-filled?]]
             [mercurius.trading.domain.entities.trade :refer [match-orders build-transfers]]
-            [mercurius.wallets.domain.entities.wallet :refer [transfer cancel-reservation]]))
+            [mercurius.wallets.domain.entities.wallet :refer [transfer cancel-reservation]]
+            [taoensso.timbre :as log]))
 
 (s/def ::bids (s/coll-of ::order/order))
 (s/def ::asks (s/coll-of ::order/order))
@@ -32,6 +33,7 @@
     (s/assert ::command command)
     (let [trades (match-orders bids asks)]
       (doseq [{:keys [bid ask] :as trade} trades]
+        (log/info "Trade made!" trade)
         (doseq [transfer (build-transfers trade)]
           (make-transfer deps transfer))
         (doseq [order [bid ask]]
