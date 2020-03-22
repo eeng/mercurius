@@ -22,9 +22,11 @@
   []
   (log/info "Starting system ...")
 
-  (let [wallet-repo (new-in-memory-wallet-repo)
+  (let [;; Repositories
+        wallet-repo (new-in-memory-wallet-repo)
         order-book-repo (new-in-memory-order-book-repo)
 
+        ;; Repository functions
         load-wallet (partial load-wallet wallet-repo)
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
@@ -34,6 +36,7 @@
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
 
+        ;; Use cases
         deposit-use-case (new-deposit-use-case {:load-wallet load-wallet
                                                 :save-wallet save-wallet})
         withdraw-use-case (new-withdraw-use-case {:fetch-wallet fetch-wallet
@@ -51,6 +54,11 @@
                                                               :load-wallet load-wallet
                                                               :save-wallet save-wallet})
 
+        ;; Background processes
+        trade-finder (start-trade-finder {:execute-trades execute-trades-use-case
+                                          :run-every-ms 1000})
+
+        ;; Controllers
         mediator (new-mediator {:deposit deposit-use-case
                                 :withdraw withdraw-use-case
                                 :get-wallet get-wallet-use-case
@@ -58,10 +66,7 @@
                                 :place-order place-order-use-case
                                 :get-order-book get-order-book-use-case
                                 :execute-trades execute-trades-use-case}
-                               [(logger :exclude #{:execute-trades})])
-
-        trade-finder (start-trade-finder {:execute-trades (partial dispatch mediator :execute-trades)
-                                          :run-every-ms 1000})]
+                               [(logger :exclude #{:execute-trades})])]
 
     {:mediator mediator
      :trade-finder trade-finder}))
