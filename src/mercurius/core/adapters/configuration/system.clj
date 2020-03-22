@@ -1,6 +1,6 @@
 (ns mercurius.core.adapters.configuration.system
   (:require [taoensso.timbre :as log]
-            [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
+            [mercurius.core.adapters.controllers.mediator :refer [new-mediator]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets]]
@@ -66,7 +66,7 @@
                                 :place-order place-order-use-case
                                 :get-order-book get-order-book-use-case
                                 :execute-trades execute-trades-use-case}
-                               [(logger :exclude #{:execute-trades})])]
+                               [logger])]
 
     {:mediator mediator
      :trade-finder trade-finder}))
