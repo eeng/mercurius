@@ -1,9 +1,8 @@
 (ns examples
-  (:require [user :refer [system]]
-            [mercurius.core.adapters.controllers.mediator :as m]))
+  (:require [user :refer [system]]))
 
 (comment
-  (def dispatch (partial m/dispatch (:mediator system)))
+  (def dispatch (:dispatch system))
 
   (dispatch :deposit {:user-id 1 :amount 500 :currency "USD"})
   (dispatch :deposit {:user-id 2 :amount 10 :currency "BTC"})

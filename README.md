@@ -8,3 +8,5 @@
 
 - Handle market orders
 - Trigger events, like when a trade is made. Then remove the "trade made" logging.
+- Think about aggregate's invariants and transactions.
+- Store some trx-id in deposits/withdraws related to transfers?
