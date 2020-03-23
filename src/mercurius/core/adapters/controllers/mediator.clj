@@ -8,9 +8,7 @@
   (Mediator. handlers (or middleware [])))
 
 (defn- build-pipeline [use-case-handler middleware]
-  (->> (conj middleware use-case-handler)
-       reverse
-       (reduce (fn [m1 m2] (m2 m1)))))
+  ((apply comp middleware) use-case-handler))
 
 (defn dispatch
   "This function is the main entry point to the domain. 
