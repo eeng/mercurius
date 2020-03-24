@@ -17,7 +17,7 @@
                 :balance (bigdec balance)
                 :reserved (bigdec reserved)}))
 
-(defn- available-balance [{:keys [balance reserved]}]
+(defn available-balance [{:keys [balance reserved]}]
   (- balance reserved))
 
 (defn deposit [wallet amount]
