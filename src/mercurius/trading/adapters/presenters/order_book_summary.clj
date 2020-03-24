@@ -1,5 +1,6 @@
 (ns mercurius.trading.adapters.presenters.order-book-summary
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [mercurius.util.collections :refer [sum-by]]))
 
 (defn- min-divisor-for-price [price]
   (->> price Math/log10 Math/ceil dec (Math/pow 10)))
@@ -24,7 +25,7 @@
 (defn- build-summary-at-price [[price orders]]
   {:price price
    :count (count orders)
-   :amount (->> orders (map :remaining) (reduce +))})
+   :amount (sum-by :remaining orders)})
 
 (defn- summarize [orders pow-of-ten]
   (->> orders

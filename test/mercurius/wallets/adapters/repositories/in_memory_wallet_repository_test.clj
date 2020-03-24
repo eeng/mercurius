@@ -1,6 +1,6 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository-test
   (:require [clojure.test :refer [deftest testing is]]
-            [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet fetch-wallet get-user-wallets]]
+            [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]))
 
 (deftest in-memory-wallet-repository-test
@@ -28,4 +28,12 @@
       (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/not-found}
                          (fetch-wallet repo "456" "USD")))
       (save-wallet repo wallet)
-      (is (match? wallet (fetch-wallet repo "456" "USD"))))))
+      (is (match? wallet (fetch-wallet repo "456" "USD")))))
+
+  (testing "calculate-monetary-base should create or update the wallet"
+    (let [repo (new-in-memory-wallet-repo)]
+      (save-wallet repo {:id 1 :user-id "1" :currency "USD" :balance 5.5M})
+      (save-wallet repo {:id 2 :user-id "2" :currency "USD" :balance 4M})
+      (save-wallet repo {:id 3 :user-id "1" :currency "BTC" :balance 3M})
+      (is (match? {"USD" 9.5M "BTC" 3M}
+                  (calculate-monetary-base repo))))))

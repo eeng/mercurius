@@ -3,11 +3,12 @@
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
-            [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets]]
+            [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
             [mercurius.wallets.domain.use-cases.withdraw :refer [new-withdraw-use-case]]
             [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.wallets.domain.use-cases.get-wallets :refer [new-get-wallets-use-case]]
+            [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder stop-trade-finder]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
@@ -31,6 +32,7 @@
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
         get-user-wallets (partial get-user-wallets wallet-repo)
+        calculate-monetary-base (partial calculate-monetary-base wallet-repo)
         insert-order (partial insert-order order-book-repo)
         update-order (partial update-order order-book-repo)
         remove-order (partial remove-order order-book-repo)
@@ -38,22 +40,31 @@
         get-order-book (partial get-order-book order-book-repo)
 
         ;; Use cases
-        deposit-use-case (new-deposit-use-case {:load-wallet load-wallet
-                                                :save-wallet save-wallet})
-        withdraw-use-case (new-withdraw-use-case {:fetch-wallet fetch-wallet
-                                                  :save-wallet save-wallet})
-        get-wallet-use-case (new-get-wallet-use-case {:fetch-wallet fetch-wallet})
-        get-wallets-use-case (new-get-wallets-use-case {:get-user-wallets get-user-wallets})
-        place-order-use-case (new-place-order-use-case {:fetch-wallet fetch-wallet
-                                                        :save-wallet save-wallet
-                                                        :insert-order insert-order})
-        get-order-book-use-case (new-get-order-book-use-case {:get-order-book get-order-book})
-        execute-trades-use-case (new-execute-trades-use-case {:get-bids-asks get-bids-asks
-                                                              :update-order update-order
-                                                              :remove-order remove-order
-                                                              :fetch-wallet fetch-wallet
-                                                              :load-wallet load-wallet
-                                                              :save-wallet save-wallet})
+        deposit-use-case (new-deposit-use-case
+                          {:load-wallet load-wallet
+                           :save-wallet save-wallet})
+        withdraw-use-case (new-withdraw-use-case
+                           {:fetch-wallet fetch-wallet
+                            :save-wallet save-wallet})
+        get-wallet-use-case (new-get-wallet-use-case
+                             {:fetch-wallet fetch-wallet})
+        get-wallets-use-case (new-get-wallets-use-case
+                              {:get-user-wallets get-user-wallets})
+        calculate-monetary-base-use-case (new-calculate-monetary-base-use-case
+                                          {:calculate-monetary-base calculate-monetary-base})
+        place-order-use-case (new-place-order-use-case
+                              {:fetch-wallet fetch-wallet
+                               :save-wallet save-wallet
+                               :insert-order insert-order})
+        get-order-book-use-case (new-get-order-book-use-case
+                                 {:get-order-book get-order-book})
+        execute-trades-use-case (new-execute-trades-use-case
+                                 {:get-bids-asks get-bids-asks
+                                  :update-order update-order
+                                  :remove-order remove-order
+                                  :fetch-wallet fetch-wallet
+                                  :load-wallet load-wallet
+                                  :save-wallet save-wallet})
 
         ;; Background processes
         trade-finder (start-trade-finder {:execute-trades execute-trades-use-case
@@ -66,7 +77,8 @@
                                 :get-wallets get-wallets-use-case
                                 :place-order place-order-use-case
                                 :get-order-book get-order-book-use-case
-                                :execute-trades execute-trades-use-case}
+                                :execute-trades execute-trades-use-case
+                                :calculate-monetary-base calculate-monetary-base-use-case}
                                [logger])]
 
     {:dispatch (partial dispatch mediator)

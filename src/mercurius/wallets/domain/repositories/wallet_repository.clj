@@ -10,7 +10,10 @@
     "Finds the wallet for the user-id and currency. Returns nil if it doesn't exists.")
 
   (get-user-wallets [this user-id]
-    "Finds all the wallets for the specified user-id"))
+    "Finds all the wallets for the specified user-id.")
+
+  (calculate-monetary-base [this]
+    "Returns a map with the total amount of each currency in the system."))
 
 (defn load-wallet
   "Finds the wallet for the user-id and currency. Creates it if doesn't exists yet."

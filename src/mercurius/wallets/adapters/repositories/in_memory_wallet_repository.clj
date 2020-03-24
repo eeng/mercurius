@@ -1,6 +1,6 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository
   (:require [mercurius.wallets.domain.repositories.wallet-repository :refer [WalletRepository get-user-wallets]]
-            [mercurius.util.collections :refer [detect]]))
+            [mercurius.util.collections :refer [detect map-vals sum-by]]))
 
 (defrecord InMemoryWalletRepository [db]
   WalletRepository
@@ -14,7 +14,12 @@
          (detect #(= currency (:currency %)))))
 
   (get-user-wallets [_ user-id]
-    (->> @db vals (filter #(= user-id (:user-id %))))))
+    (->> @db vals (filter #(= user-id (:user-id %)))))
+
+  (calculate-monetary-base [_]
+    (->> (vals @db)
+         (group-by :currency)
+         (map-vals #(sum-by :balance %)))))
 
 (defn new-in-memory-wallet-repo []
   (InMemoryWalletRepository. (atom {})))
