@@ -4,7 +4,7 @@
 (comment
   (def dispatch (:dispatch system))
 
-  (dispatch :deposit {:user-id 1 :amount 500 :currency "USD"})
+  (dispatch :deposit {:user-id 1 :amount 1000 :currency "USD"})
   (dispatch :deposit {:user-id 2 :amount 10 :currency "BTC"})
 
   (dispatch :place-order {:user-id 1 :side :buy :amount 3 :ticker "BTCUSD" :price 100 :type :limit})
@@ -13,6 +13,6 @@
 
   (dispatch :execute-trades {:ticker "BTCUSD"})
 
-  (dispatch :get-order-book {:ticker "BTCUSD"})
+  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P2"})
   (dispatch :get-wallets {:user-id 1})
   (dispatch :get-wallets {:user-id 2}))

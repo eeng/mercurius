@@ -6,7 +6,7 @@
             [mercurius.support.factory :refer [build-wallet]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]))
 
-(deftest execute-test
+(deftest place-order-test
   (testing "for a buy order, should reserve the corresponding amount in the last currency's wallet"
     (let [wallet (build-wallet {:balance 50 :currency "USD"})
           fetch-wallet (spy/mock (constantly wallet))

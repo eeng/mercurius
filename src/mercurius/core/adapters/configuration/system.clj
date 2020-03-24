@@ -10,7 +10,7 @@
             [mercurius.wallets.domain.use-cases.get-wallets :refer [new-get-wallets-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder stop-trade-finder]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
             [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]))
@@ -35,6 +35,7 @@
         update-order (partial update-order order-book-repo)
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
+        get-order-book (partial get-order-book order-book-repo)
 
         ;; Use cases
         deposit-use-case (new-deposit-use-case {:load-wallet load-wallet
@@ -46,7 +47,7 @@
         place-order-use-case (new-place-order-use-case {:fetch-wallet fetch-wallet
                                                         :save-wallet save-wallet
                                                         :insert-order insert-order})
-        get-order-book-use-case (new-get-order-book-use-case {:repo order-book-repo})
+        get-order-book-use-case (new-get-order-book-use-case {:get-order-book get-order-book})
         execute-trades-use-case (new-execute-trades-use-case {:get-bids-asks get-bids-asks
                                                               :update-order update-order
                                                               :remove-order remove-order
@@ -56,7 +57,7 @@
 
         ;; Background processes
         trade-finder (start-trade-finder {:execute-trades execute-trades-use-case
-                                          :run-every-ms 1000})
+                                          :run-every-ms 0})
 
         ;; Controllers
         mediator (new-mediator {:deposit deposit-use-case

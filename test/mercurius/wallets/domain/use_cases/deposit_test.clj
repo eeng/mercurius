@@ -5,7 +5,7 @@
             [mercurius.support.factory :refer [build-wallet]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]))
 
-(deftest execute-test
+(deftest deposit-test
   (testing "should load the wallet, make the deposit, and save the wallet"
     (let [wallet (build-wallet {:balance 100})
           load-wallet (spy/mock (constantly wallet))
