@@ -57,11 +57,11 @@
                             {:count 1 :amount 1.1M :price 52.0}
                             {:count 1 :amount 2.1M :price 49.0}]
                    :selling [{:count 1 :amount 0.4M :price 61.0}]}
-                  (summarize-order-book order-book "P3")))
+                  (summarize-order-book order-book {:precision "P3"})))
       (is (match? {:buying [{:count 3 :amount 1.7M :price 50.0}
                             {:count 1 :amount 2.1M :price 40.0}]
                    :selling [{:count 1 :amount 0.4M :price 60.0}]}
-                  (summarize-order-book order-book "P4")))))
+                  (summarize-order-book order-book {:precision "P4"})))))
 
   (testing "summarizes the orders remaining amount"
     (let [order-book {:buying [(build-order {:amount 3 :remaining 2 :price 55.3})
@@ -69,8 +69,8 @@
                       :selling []}]
       (is (match? {:buying [{:count 2 :amount 6M :price 50.0}]
                    :selling []}
-                  (summarize-order-book order-book "P4")))))
+                  (summarize-order-book order-book {:precision "P4"})))))
 
   (testing "when the order book is empty"
     (let [order-book {:buying [] :selling []}]
-      (is (= order-book (summarize-order-book order-book "P0"))))))
+      (is (= order-book (summarize-order-book order-book {:precision "P0"}))))))

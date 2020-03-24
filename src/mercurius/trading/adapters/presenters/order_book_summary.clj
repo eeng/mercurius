@@ -27,18 +27,19 @@
    :count (count orders)
    :amount (sum-by :remaining orders)})
 
-(defn- summarize [orders pow-of-ten order]
+(defn- summarize [orders pow-of-ten order limit]
   (let [comparator (case order
                      :asc #(compare %1 %2)
                      :desc #(compare %2 %1))]
     (->> orders
          (group-by #(round-with-pow-of-ten (:price %) pow-of-ten))
          (map build-summary-at-price)
-         (sort-by :price comparator))))
+         (sort-by :price comparator)
+         (take (or limit 100)))))
 
-(defn summarize-order-book [order-book precision]
+(defn summarize-order-book [order-book {:keys [precision limit]}]
   (let [max-price (find-max-price order-book)
         pow-of-ten (precision-to-pow-of-ten precision max-price)]
     (-> order-book
-        (update :buying summarize pow-of-ten :desc)
-        (update :selling summarize pow-of-ten :asc))))
+        (update :buying summarize pow-of-ten :desc limit)
+        (update :selling summarize pow-of-ten :asc limit))))

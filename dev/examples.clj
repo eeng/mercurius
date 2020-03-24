@@ -15,12 +15,13 @@
   (dispatch :execute-trades {:ticker "BTCUSD"})
 
   (dispatch :calculate-monetary-base {})
-  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P2"})
+  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P2" :limit 10})
   (dispatch :get-wallets {:user-id 1})
   (dispatch :get-wallets {:user-id 2})
 
   (time (run-simulation system
                         :tickers {"BTCUSD" {:initial-price 6000}}
                         :n-traders 100
+                        :n-orders-per-trader 5
                         :pos-size-pct (partial rand 0.3)
                         :spread-around-better-price [0.2 0.01])))

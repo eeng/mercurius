@@ -12,9 +12,9 @@
 (defn new-get-order-book-use-case
   "Returns a use case that provides access to the order book of a ticker."
   [{:keys [get-order-book]}]
-  (fn [{:keys [ticker precision] :as command :or {precision "R0"}}]
+  (fn [{:keys [ticker precision limit] :as command :or {precision "R0"}}]
     (s/assert ::command command)
     (let [book (get-order-book ticker)]
       (if (= precision "R0")
         book
-        (summarize-order-book book precision)))))
+        (summarize-order-book book {:precision precision :limit limit})))))
