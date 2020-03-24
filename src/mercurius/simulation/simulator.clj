@@ -35,32 +35,38 @@
 (defn- pick-side []
   (rand-nth [:buy :sell]))
 
+(defn- pick-ticker [tickers]
+  (rand-nth (keys tickers)))
+
 (defn- select-src-currency [ticker side]
   (let [[sell-cur buy-cur] (ticker/currencies ticker)]
     (case side
       :buy buy-cur
       :sell sell-cur)))
 
-(defn- pick-price [last-price side]
-  (let [better-price-gap 0.01
-        worse-price-gap 0.10
-        buy? (= side :buy)
-        min-price (* last-price ((if buy? - +) 1 worse-price-gap))
-        max-price (* last-price ((if buy? + -) 1 better-price-gap))]
+(defn- pick-price [last-price side [worse-price-pct better-price-pct]]
+  (let [buy? (= side :buy)
+        min-price (* last-price ((if buy? - +) 1 worse-price-pct))
+        max-price (* last-price ((if buy? + -) 1 better-price-pct))]
     (rr/rand min-price max-price)))
+
+(defn- find-current-balance [trader currency dispatch]
+  (-> (dispatch :get-wallet {:user-id trader :currency currency})
+      (available-balance)))
 
 (defn- calculate-amount [position-size price side]
   (case side
     :buy (/ position-size price)
     :sell position-size))
 
-(defn- place-order [trader dispatch {:keys [tickers pos-size-pct]}]
-  (let [ticker (rand-nth (keys tickers))
+(defn- place-order [trader dispatch {:keys [tickers pos-size-pct spread-around-better-price]
+                                     :or {spread-around-better-price [0.2 0.01]}}]
+  (let [ticker (pick-ticker tickers)
         side (pick-side)
         src-currency (select-src-currency ticker side)
-        src-wallet (dispatch :get-wallet {:user-id trader :currency src-currency})
-        position-size (* (pos-size-pct) (available-balance src-wallet))
-        price (pick-price (get-in tickers [ticker :initial-price]) side)
+        current-balance (find-current-balance trader src-currency dispatch)
+        position-size (* (pos-size-pct) current-balance)
+        price (pick-price (get-in tickers [ticker :initial-price]) side spread-around-better-price)
         amount (calculate-amount position-size price side)]
     (dispatch :place-order {:user-id trader
                             :side side

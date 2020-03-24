@@ -1,6 +1,6 @@
 (ns mercurius.trading.domain.entities.trade
   (:require [tick.alpha.api :as t]
-            [mercurius.trading.domain.entities.order :refer [fill-order partially-filled? amount-delivered currency-delivered]]))
+            [mercurius.trading.domain.entities.order :refer [fill-order partially-filled? amount-paid currency-paid]]))
 
 (defrecord Trade [price amount created-at bid ask])
 
@@ -48,11 +48,11 @@
     {seller :user-id ask-limit-price :price} :ask}]
   [{:from buyer
     :to seller
-    :currency (currency-delivered :buy ticker)
-    :transfer-amount (amount-delivered :buy amount price)
-    :cancel-amount (amount-delivered :buy amount bid-limit-price)}
+    :currency (currency-paid :buy ticker)
+    :transfer-amount (amount-paid :buy amount price)
+    :cancel-amount (amount-paid :buy amount bid-limit-price)}
    {:from seller
     :to buyer
-    :currency (currency-delivered :sell ticker)
-    :transfer-amount (amount-delivered :sell amount price)
-    :cancel-amount (amount-delivered :sell amount ask-limit-price)}])
+    :currency (currency-paid :sell ticker)
+    :transfer-amount (amount-paid :sell amount price)
+    :cancel-amount (amount-paid :sell amount ask-limit-price)}])

@@ -31,8 +31,8 @@
                :price price
                :placed-at placed-at}))
 
-(defn currency-delivered
-  "Returns the pair's currency that is delivered when making a trade. It's also used for reservations.
+(defn currency-paid
+  "Returns the pair's currency that is paid when making a trade. It's also used for reservations.
   I.e., when buying BTCUSD, we should reserve USD. When selling instead, we should reserve BTC."
   [side ticker]
   (s/assert ::ticker/ticker ticker)
@@ -40,7 +40,7 @@
     :buy (last-currency ticker)
     :sell (first-currency ticker)))
 
-(defn amount-delivered
+(defn amount-paid
   "Calculates the amount to deliver to the other party. It's also used for reservations.
   E.g., when buying 0.2 BTCUSD at a price of 1000, we should reserve 100 USD.
   but when selling, 0.2 BTC should be reserved."
@@ -52,8 +52,8 @@
 (defn calculate-reservation
   "Calculates the amount and currency to reserve for an order."
   [{:keys [side amount ticker price]}]
-  {:amount (amount-delivered side amount price)
-   :currency (currency-delivered side ticker)})
+  {:amount (amount-paid side amount price)
+   :currency (currency-paid side ticker)})
 
 (defn fill-order [{:keys [remaining] :as order} fill-amount]
   {:pre [(<= fill-amount remaining)]}
