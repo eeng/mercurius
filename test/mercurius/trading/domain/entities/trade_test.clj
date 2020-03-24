@@ -9,32 +9,32 @@
   (testing "if the bid price equal to the ask price, a trade is made for that price"
     (let [bid (build-order {:price 100 :amount 5})
           ask (build-order {:price 100 :amount 5})]
-      (is (match? {:price 100 :amount 5} (generate-trade bid ask)))))
+      (is (match? {:price 100 :amount 5M} (generate-trade bid ask)))))
 
   (testing "if the bid price is greater than the ask price, a trade is made for the better price for the first placed order"
     (let [bid (build-order {:price 101 :amount 5 :placed-at (t/time "10:00")})
           ask (build-order {:price 100 :amount 5 :placed-at (t/time "10:05")})]
-      (is (match? {:price 100 :amount 5} (generate-trade bid ask))))
+      (is (match? {:price 100 :amount 5M} (generate-trade bid ask))))
 
     (let [bid (build-order {:price 101 :amount 5 :placed-at (t/time "10:05")})
           ask (build-order {:price 100 :amount 5 :placed-at (t/time "10:00")})]
-      (is (match? {:price 101 :amount 5} (generate-trade bid ask)))))
+      (is (match? {:price 101 :amount 5M} (generate-trade bid ask)))))
 
   (testing "the amount should be the minimum of the two"
     (let [bid (build-order {:amount 5 :price 100})
           ask (build-order {:amount 6 :price 100})]
-      (is (match? {:amount 5 :price 100} (generate-trade bid ask))))
+      (is (match? {:amount 5M :price 100} (generate-trade bid ask))))
     (let [bid (build-order {:amount 6 :price 100})
           ask (build-order {:amount 5 :price 100})]
-      (is (match? {:amount 5 :price 100} (generate-trade bid ask)))))
+      (is (match? {:amount 5M :price 100} (generate-trade bid ask)))))
 
   (testing "if the order is partially filled, should use the remaining amount"
     (let [bid (build-order {:amount 5 :remaining 4 :price 100})
           ask (build-order {:amount 5 :price 100})]
-      (is (match? {:amount 4 :price 100} (generate-trade bid ask))))
+      (is (match? {:amount 4M :price 100} (generate-trade bid ask))))
     (let [bid (build-order {:amount 5 :price 100})
           ask (build-order {:amount 5 :remaining 3 :price 100})]
-      (is (match? {:amount 3 :price 100} (generate-trade bid ask)))))
+      (is (match? {:amount 3M :price 100} (generate-trade bid ask)))))
 
   (testing "the trade should contain additional data"
     (let [bid (build-order {:price 100 :amount 5 :ticker "BTCUSD"})
@@ -58,9 +58,9 @@
                 (build-order {:amount 10})]
           asks [(build-order {:amount 15})
                 (build-order {:amount 20})]]
-      (is (match? [{:amount 15 :bid {:remaining 5} :ask {:remaining 0}}
-                   {:amount 5 :bid {:remaining 0} :ask {:remaining 15}}
-                   {:amount 10 :bid {:remaining 0} :ask {:remaining 5}}]
+      (is (match? [{:amount 15M :bid {:remaining 5M} :ask {:remaining 0M}}
+                   {:amount 5M :bid {:remaining 0M} :ask {:remaining 15M}}
+                   {:amount 10M :bid {:remaining 0M} :ask {:remaining 5M}}]
                   (match-orders bids asks)))))
 
   (testing "most recent orders are matched first"
@@ -68,7 +68,7 @@
                 (build-order {:amount 1 :placed-at (t/time "20:00") :id "b"})
                 (build-order {:amount 1 :placed-at (t/time "20:02") :id "c"})]
           asks [(build-order {:amount 1 :placed-at (t/time "20:30")})]]
-      (is (match? [{:amount 1 :bid {:id "b"}}]
+      (is (match? [{:amount 1M :bid {:id "b"}}]
                   (match-orders bids asks))))))
 
 (def buyer 1)

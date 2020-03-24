@@ -1,7 +1,6 @@
 (ns mercurius.trading.domain.entities.order
   (:require [clojure.spec.alpha :as s]
             [mercurius.util.uuid :refer [uuid]]
-            [mercurius.util.collections :refer [reverse-merge]]
             [mercurius.trading.domain.entities.ticker :as ticker :refer [first-currency last-currency]]
             [mercurius.accounts.domain.entities.user :as user]
             [tick.alpha.api :as t]))
@@ -19,10 +18,18 @@
 
 (defrecord Order [id user-id type side ticker amount price placed-at remaining])
 
-(defn new-order [{:keys [amount] :as fields}]
+(defn new-order [{:keys [id user-id type side ticker amount price placed-at remaining]
+                  :or {id (uuid) placed-at (t/now) remaining amount}}]
   {:post [(s/assert ::order %)]}
-  (let [defaults {:id (uuid) :placed-at (t/now) :remaining amount}]
-    (-> fields (reverse-merge defaults) map->Order)))
+  (map->Order {:id id
+               :user-id user-id
+               :type type
+               :side side
+               :ticker ticker
+               :amount (bigdec amount)
+               :remaining (bigdec remaining)
+               :price price
+               :placed-at placed-at}))
 
 (defn currency-delivered
   "Returns the pair's currency that is delivered when making a trade. It's also used for reservations.

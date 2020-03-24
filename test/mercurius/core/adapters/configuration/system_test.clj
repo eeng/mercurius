@@ -27,4 +27,4 @@
       (dispatch :place-order {:user-id 1 :type :limit :side :buy
                               :amount 0.2 :ticker "BTCUSD" :price 100})
       (let [{:keys [buying]} (dispatch :get-order-book {:ticker "BTCUSD"})]
-        (is (match? [{:amount 0.2}] buying))))))
+        (is (match? [{:amount 0.2M}] buying))))))

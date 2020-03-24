@@ -21,11 +21,10 @@
 (defn round-with-pow-of-ten [number divisor]
   (- number (mod number divisor)))
 
-;; TODO the bigdec should be done at the domain level (maybe in the new-order?)
 (defn- build-summary-at-price [[price orders]]
   {:price price
    :count (count orders)
-   :amount (->> orders (map :remaining) (map bigdec) (reduce +))})
+   :amount (->> orders (map :remaining) (reduce +))})
 
 (defn- summarize [orders pow-of-ten]
   (->> orders

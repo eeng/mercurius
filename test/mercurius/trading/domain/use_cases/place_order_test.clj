@@ -16,7 +16,7 @@
                                                  :insert-order identity})]
       (place-order {:user-id 1 :type :limit :side :buy :amount 0.2 :ticker "BTCUSD" :price 100})
       (assert/called-with? fetch-wallet 1 "USD")
-      (assert/called-with? save-wallet (assoc wallet :reserved (* 0.2 100)))))
+      (assert/called-with? save-wallet (assoc wallet :reserved (* 0.2M 100)))))
 
   (testing "for a sell order, should reserve the amount in the first currency's wallet"
     (let [wallet (build-wallet {:balance 1 :currency "BTC"})
@@ -27,7 +27,7 @@
                                                  :insert-order identity})]
       (place-order {:user-id 1 :type :limit :side :sell :amount 0.2 :ticker "BTCUSD" :price 100})
       (assert/called-with? fetch-wallet 1 "BTC")
-      (assert/called-with? save-wallet (assoc wallet :reserved 0.2))))
+      (assert/called-with? save-wallet (assoc wallet :reserved 0.2M))))
 
   (testing "should insert the order in the order book"
     (let [wallet (build-wallet {:balance 50 :currency "USD"})
@@ -37,4 +37,4 @@
                                                  :insert-order insert-order})]
       (place-order {:user-id 1 :type :limit :side :buy :amount 0.1 :ticker "BTCUSD" :price 100})
       (let [[[order]] (spy/calls insert-order)]
-        (is (match? {:side :buy :amount 0.1 :price 100 :id some? :placed-at some?} order))))))
+        (is (match? {:side :buy :amount 0.1M :price 100 :id some? :placed-at some?} order))))))
