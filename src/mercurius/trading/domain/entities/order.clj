@@ -20,6 +20,7 @@
 (defrecord Order [id user-id type side ticker amount price placed-at remaining])
 
 (defn new-order [{:keys [amount] :as fields}]
+  {:post [(s/assert ::order %)]}
   (let [defaults {:id (uuid) :placed-at (t/now) :remaining amount}]
     (-> fields (reverse-merge defaults) map->Order)))
 
