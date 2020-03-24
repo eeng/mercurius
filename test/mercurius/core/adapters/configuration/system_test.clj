@@ -22,7 +22,7 @@
       (dispatch :deposit {:user-id 1 :amount 100 :currency "USD"})
       (dispatch :withdraw {:user-id 1 :amount 30 :currency "USD"})
       (let [wallet (dispatch :get-wallet {:user-id 1 :currency "USD"})]
-        (is (match? {:balance 70} wallet)))
+        (is (match? {:balance 70M} wallet)))
 
       (dispatch :place-order {:user-id 1 :type :limit :side :buy
                               :amount 0.2 :ticker "BTCUSD" :price 100})

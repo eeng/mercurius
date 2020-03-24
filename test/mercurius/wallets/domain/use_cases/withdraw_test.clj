@@ -13,4 +13,4 @@
           withdraw (new-withdraw-use-case {:fetch-wallet fetch-wallet :save-wallet save-wallet})]
       (withdraw {:user-id 1 :amount 30 :currency "BTC"})
       (assert/called-with? fetch-wallet 1 "BTC")
-      (assert/called-with? save-wallet (assoc wallet :balance 70)))))
+      (assert/called-with? save-wallet (assoc wallet :balance 70M)))))

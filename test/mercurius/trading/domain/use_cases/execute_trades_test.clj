@@ -43,10 +43,10 @@
       (is (match? [{:price 50}] (execute-trades {:ticker "BTCUSD"})))
       (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet]
             (-> save-wallet spy/calls flatten)]
-        (is (match? {:user-id buyer :currency "USD" :balance 10 :reserved 0} buyer-usd-wallet))
-        (is (match? {:user-id seller :currency "USD" :balance 107} seller-usd-wallet))
-        (is (match? {:user-id seller :currency "BTC" :balance 3 :reserved 1} seller-btc-wallet))
-        (is (match? {:user-id buyer :currency "BTC" :balance 4} buyer-btc-wallet)))))
+        (is (match? {:user-id buyer :currency "USD" :balance 10M :reserved 0M} buyer-usd-wallet))
+        (is (match? {:user-id seller :currency "USD" :balance 107M} seller-usd-wallet))
+        (is (match? {:user-id seller :currency "BTC" :balance 3M :reserved 1M} seller-btc-wallet))
+        (is (match? {:user-id buyer :currency "BTC" :balance 4M} buyer-btc-wallet)))))
 
   (testing "should update the order book (updating or removing the order according to it's new state)"
     (let [bid (build-order {:price 50 :amount 1 :side :buy :ticker "BTCUSD" :user-id buyer})
@@ -55,10 +55,10 @@
           update-order (spy/mock identity)
           remove-order (spy/mock identity)
           execute-trades (build-use-case-for-wallets
-                          [{:user-id buyer :currency "USD" :balance 50 :reserved 50}
-                           {:user-id seller :currency "USD" :balance 0}
-                           {:user-id seller :currency "BTC" :balance 2 :reserved 2}
-                           {:user-id buyer :currency "BTC" :balance 0}]
+                          [{:user-id buyer :currency "USD" :balance 50M :reserved 50M}
+                           {:user-id seller :currency "USD" :balance 0M}
+                           {:user-id seller :currency "BTC" :balance 2M :reserved 2M}
+                           {:user-id buyer :currency "BTC" :balance 0M}]
                           {:get-bids-asks get-bids-asks :update-order update-order :remove-order remove-order})]
       (is (match? [{:price 50}] (execute-trades {:ticker "BTCUSD"})))
       (is (match? [[{:id (:id bid)}]] (spy/calls remove-order)))

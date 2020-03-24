@@ -6,9 +6,9 @@
 
 (deftest deposit-test
   (testing "should increase the wallet balance by the amount passed"
-    (let [wallet (build-wallet)
-          new-wallet (-> wallet (deposit 100) (deposit 50))]
-      (is (= 150 (:balance new-wallet)))))
+    (let [wallet (build-wallet)]
+      (is (match? {:balance 150M}
+                  (-> wallet (deposit 100) (deposit 50))))))
 
   (testing "amount should be positive"
     (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/invalid-amount}
@@ -18,8 +18,10 @@
 
 (deftest withdraw-test
   (testing "should decrease the wallet balance by the amount passed"
-    (is (= 70 (-> (build-wallet {:balance 100}) (withdraw 10) (withdraw 20) :balance)))
-    (is (= 0 (-> (build-wallet {:balance 30}) (withdraw 30) :balance))))
+    (is (match? {:balance 70M}
+                (-> (build-wallet {:balance 100}) (withdraw 10) (withdraw 20))))
+    (is (match? {:balance 0M}
+                (-> (build-wallet {:balance 30}) (withdraw 30)))))
 
   (testing "amount should be greater or equal to the available balance"
     (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/insufficient-balance}
@@ -34,7 +36,7 @@
 
 (deftest reserve-test
   (testing "should increase the wallet reserved amount by the amount passed"
-    (is (= 30 (-> (build-wallet {:balance 30}) (reserve 10) (reserve 20) :reserved))))
+    (is (match? {:reserved 30M} (-> (build-wallet {:balance 30}) (reserve 10) (reserve 20)))))
 
   (testing "amount should be positive"
     (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/invalid-amount}
@@ -48,7 +50,7 @@
   (testing "should transfer the amount from the first wallet to the second one"
     (let [src (build-wallet {:balance 10})
           dst (build-wallet {:balance 5})]
-      (is (match? [{:balance 7} {:balance 8}]
+      (is (match? [{:balance 7M} {:balance 8M}]
                   (transfer src dst 3)))))
 
   (testing "is not possible if the src wallet doesn't have enough balance"

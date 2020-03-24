@@ -13,4 +13,4 @@
           deposit (new-deposit-use-case {:load-wallet load-wallet :save-wallet save-wallet})]
       (deposit {:user-id 1 :amount 30 :currency "BTC"})
       (assert/called-with? load-wallet 1 "BTC")
-      (assert/called-with? save-wallet (assoc wallet :balance 130)))))
+      (assert/called-with? save-wallet (assoc wallet :balance 130M)))))

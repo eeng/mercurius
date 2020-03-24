@@ -14,8 +14,8 @@
   (map->Wallet {:id (uuid)
                 :user-id user-id
                 :currency currency
-                :balance balance
-                :reserved reserved}))
+                :balance (bigdec balance)
+                :reserved (bigdec reserved)}))
 
 (defn- available-balance [{:keys [balance reserved]}]
   (- balance reserved))
