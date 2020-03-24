@@ -3,7 +3,7 @@
             [mercurius.trading.domain.entities.ticker :refer [available-tickers]]
             [taoensso.timbre :as log]))
 
-(defn- process-bids-asks [{:keys [active execute-trades run-every-ms tickers] :as bap}]
+(defn- process-bids-asks [{:keys [active execute-trades run-every-ms tickers] :as tf}]
   (doseq [ticker tickers]
     (thread
       (Thread/sleep run-every-ms)
@@ -14,22 +14,20 @@
             (log/error e)
             (throw e)))
         (recur))))
-  bap)
+  tf)
 
 (defrecord BidAskProvider [active execute-trades run-every-ms tickers])
 
 (defn start-trade-finder
   "Starts a background job that, for each ticker, matches bids and asks to discover trades."
   [{:keys [execute-trades run-every-ms] :or {run-every-ms 1000}}]
-  (-> (BidAskProvider. (atom true) execute-trades run-every-ms available-tickers)
+  (-> (BidAskProvider. (atom (pos? run-every-ms)) execute-trades run-every-ms available-tickers)
       (process-bids-asks)))
 
-(defn stop-trade-finder [{:keys [active] :as bap}]
+(defn stop-trade-finder [{:keys [active] :as tf}]
   (reset! active false)
-  bap)
+  tf)
 
 (comment
-  (def bap (start-trade-finder
-            {:get-bids-asks (fn [ticker] {:bids [(str "bid " (rand-int 5))] :asks [(str "ask " ticker)]})
-             :execute-trades #(log/info "Matching" %)}))
-  (stop-trade-finder bap))
+  (def tf (start-trade-finder {:execute-trades #(log/info "Matching" %)}))
+  (stop-trade-finder tf))
