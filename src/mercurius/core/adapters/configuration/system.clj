@@ -1,5 +1,6 @@
 (ns mercurius.core.adapters.configuration.system
   (:require [taoensso.timbre :as log]
+            [mercurius.core.adapters.configuration.logging :refer [configure-logger]]
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
@@ -21,6 +22,7 @@
   Returns a map containing the components needed to drive the system.
   The resources that need to be freed when stopping the system should also be there."
   []
+  (configure-logger)
   (log/info "Starting system ...")
 
   (let [;; Repositories
