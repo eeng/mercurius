@@ -49,16 +49,18 @@
   (let [buy? (= side :buy)
         min-price (* last-price ((if buy? - +) 1 worse-price-pct))
         max-price (* last-price ((if buy? + -) 1 better-price-pct))]
-    (rr/rand min-price max-price)))
+    (-> (rr/rand min-price max-price)
+        (ticker/round-number))))
 
 (defn- find-current-balance [trader currency dispatch]
   (-> (dispatch :get-wallet {:user-id trader :currency currency})
       (available-balance)))
 
 (defn- calculate-amount [position-size price side]
-  (case side
-    :buy (/ position-size price)
-    :sell position-size))
+  (-> (case side
+        :buy (/ position-size price)
+        :sell position-size)
+      (ticker/round-number)))
 
 (defn- place-order [trader dispatch {:keys [tickers pos-size-pct spread-around-better-price]
                                      :or {spread-around-better-price [0.2 0.01]}}]

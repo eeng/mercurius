@@ -19,8 +19,8 @@
   (max (-> buying first :price (or 0))
        (-> selling first :price (or 0))))
 
-(defn round-with-pow-of-ten [number divisor]
-  (- number (mod number divisor)))
+(defn round-with-pow-of-ten [number pow-of-ten]
+  (- number (mod number pow-of-ten)))
 
 (defn- build-summary-at-price [[price orders]]
   {:price price

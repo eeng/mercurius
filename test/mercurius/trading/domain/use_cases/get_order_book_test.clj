@@ -8,9 +8,10 @@
 
 (deftest get-order-book-test
   (testing "getting the raw order book"
-    (let [repo-fn (spy/mock (constantly "the book"))
+    (let [the-book {:buying [] :selling []}
+          repo-fn (spy/mock (constantly the-book))
           get-order-book (new-get-order-book-use-case {:get-order-book repo-fn})]
-      (is (= "the book" (get-order-book {:ticker "BTCUSD"})))
+      (is (= the-book (get-order-book {:ticker "BTCUSD"})))
       (assert/called-with? repo-fn "BTCUSD")))
 
   (testing "getting a summarized order book"

@@ -5,18 +5,18 @@
             [mercurius.trading.adapters.presenters.order-book-summary :refer [summarize-order-book round-with-pow-of-ten precision-to-pow-of-ten]]))
 
 (deftest round-with-pow-of-ten-test
-  (testing "divisor 0.1 should round to the tenth"
+  (testing "rounding with 10^-1"
     (is (= 51.1 (round-with-pow-of-ten 51.16 0.1)))
     (is (= 51.1 (round-with-pow-of-ten 51.11 0.1))))
 
-  (testing "divisor 1 should round to the unit"
+  (testing "rounding with 10^0"
     (is (= 173.0 (round-with-pow-of-ten 173.4 1)))
     (is (= 51.0 (round-with-pow-of-ten 51.1 1)))
     (is (= 51.0 (round-with-pow-of-ten 51.9 1)))
     (is (= 9.0 (round-with-pow-of-ten 9.55 1)))
     (is (= 0.0 (round-with-pow-of-ten 0.3 1))))
 
-  (testing "divisor 10 should round to the tens"
+  (testing "rounding with 10^1"
     (is (= 170.0 (round-with-pow-of-ten 173.4 10)))
     (is (= 50.0 (round-with-pow-of-ten 51.1 10)))
     (is (= 50.0 (round-with-pow-of-ten 51.9 10)))

@@ -1,5 +1,6 @@
 (ns mercurius.trading.domain.entities.ticker
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [mercurius.util.number :refer [round-to-significant-figures]]))
 
 (def pairs
   {"BTCUSD" {:first-currency "BTC" :last-currency "USD"}
@@ -19,6 +20,11 @@
   (get-in pairs [ticker :last-currency]))
 
 (def currencies (juxt first-currency last-currency))
+
+(def significant-figures 5)
+
+(defn round-number [num]
+  (round-to-significant-figures num significant-figures))
 
 (comment
   (currencies "BTCUSD"))
