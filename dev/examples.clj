@@ -23,5 +23,6 @@
                         :tickers {"BTCUSD" {:initial-price 6000 :initial-funds 10000}}
                         :n-traders 100
                         :n-orders-per-trader 5
+                        :max-ms-between-orders 100
                         :max-pos-size-pct 0.3
                         :spread-around-better-price [0.2 0.01])))

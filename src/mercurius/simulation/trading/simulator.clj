@@ -1,22 +1,8 @@
 (ns mercurius.simulation.trading.simulator
-  (:require [clojure.string :as str]
-            [clojure.spec.alpha :as s]
+  (:require [clojure.spec.alpha :as s]
             [roul.random :as rr]
             [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.wallets.domain.entities.wallet :refer [available-balance]]))
-
-(defmacro in-section [& body]
-  `(do (println (str/join (repeat 80 "=")))
-       ~@body
-       (println (str/join (repeat 80 "=")))))
-
-(defn- report-config [config]
-  (in-section
-   (println "Starting simulation with config:" config)))
-
-(defn- report-summary [stage dispatch]
-  (in-section
-   (println stage "monetary base:" (dispatch :calculate-monetary-base {}))))
 
 (defn user-id-gen []
   (let [last-user-id (atom 0)]
@@ -26,9 +12,8 @@
 (defn- make-trader [gen-user-id]
   (gen-user-id))
 
-(defn- fund-accounts [traders tickers-opts dispatch]
-  (doseq [trader traders
-          [ticker {:keys [initial-funds initial-price]}] tickers-opts
+(defn- fund-accounts [trader tickers-opts dispatch]
+  (doseq [[ticker {:keys [initial-funds initial-price]}] tickers-opts
           :let [[first-cur second-cur] (ticker/currencies ticker)]]
     (dispatch :deposit {:user-id trader
                         :amount (ticker/round-number (/ (float initial-funds) initial-price))
@@ -85,25 +70,20 @@
                             :price price
                             :type :limit})))
 
-(defn- start-trading [trader dispatch {:keys [n-orders-per-trader]
-                                       :or {n-orders-per-trader 1}
+(defn- start-trading [trader dispatch {:keys [tickers n-orders-per-trader max-ms-between-orders]
+                                       :or {n-orders-per-trader 1
+                                            max-ms-between-orders 0}
                                        :as config}]
-  #_(Thread/sleep (* 3000 (rand)))
+  (fund-accounts trader tickers dispatch)
   (doseq [_ (range n-orders-per-trader)]
+    (Thread/sleep (rand max-ms-between-orders))
     (place-order trader dispatch config)))
 
-(defn run-simulation [{:keys [dispatch]} &
-                      {:keys [n-traders tickers]
-                       :as config}]
+(defn run-simulation [{:keys [dispatch]} & {:keys [n-traders] :as config}]
   (s/assert ::config config)
-  (report-config config)
-
   (let [traders (repeatedly n-traders (partial make-trader (user-id-gen)))]
-    (fund-accounts traders tickers dispatch)
-    (report-summary "Initial" dispatch)
     (doall (pmap #(start-trading % dispatch config) traders)))
-
-  (report-summary "Final" dispatch))
+  :done)
 
 (s/def ::percent (s/and number? #(<= 0 % 1)))
 (s/def ::initial-price (s/and number? pos?))
@@ -112,9 +92,11 @@
 (s/def ::n-traders pos-int?)
 (s/def ::n-orders-per-trader pos-int?)
 (s/def ::max-pos-size-pct ::percent)
+(s/def ::max-ms-between-orders int?)
 (s/def ::spread-around-better-price (s/cat :worse ::percent :better ::percent))
 (s/def ::config (s/keys :req-un [::tickers
                                  ::n-traders
                                  ::n-orders-per-trader
                                  ::max-pos-size-pct
-                                 ::spread-around-better-price]))
+                                 ::spread-around-better-price
+                                 ::max-ms-between-orders]))
