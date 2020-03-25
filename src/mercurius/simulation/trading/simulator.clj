@@ -26,18 +26,22 @@
 (defn- make-trader [gen-user-id]
   (gen-user-id))
 
-(defn- fund-accounts [traders currencies dispatch]
+(defn- fund-accounts [traders tickers-opts dispatch]
   (doseq [trader traders
-          currency currencies]
+          [ticker {:keys [initial-funds initial-price]}] tickers-opts
+          :let [[first-cur second-cur] (ticker/currencies ticker)]]
     (dispatch :deposit {:user-id trader
-                        :amount 10000
-                        :currency currency})))
+                        :amount (ticker/round-number (/ (float initial-funds) initial-price))
+                        :currency first-cur})
+    (dispatch :deposit {:user-id trader
+                        :amount initial-funds
+                        :currency second-cur})))
 
 (defn- pick-side []
   (rand-nth [:buy :sell]))
 
-(defn- pick-ticker [tickers]
-  (rand-nth (keys tickers)))
+(defn- pick-ticker [tickers-opts]
+  (rand-nth (keys tickers-opts)))
 
 (defn- select-src-currency [ticker side]
   (let [[sell-cur buy-cur] (ticker/currencies ticker)]
@@ -62,13 +66,16 @@
         :sell position-size)
       (ticker/round-number)))
 
-(defn- place-order [trader dispatch {:keys [tickers pos-size-pct spread-around-better-price]
+(defn- calculate-position-size [max-pos-size-pct current-balance]
+  (* (rand max-pos-size-pct) current-balance))
+
+(defn- place-order [trader dispatch {:keys [tickers max-pos-size-pct spread-around-better-price]
                                      :or {spread-around-better-price [0.2 0.01]}}]
   (let [ticker (pick-ticker tickers)
         side (pick-side)
         src-currency (select-src-currency ticker side)
         current-balance (find-current-balance trader src-currency dispatch)
-        position-size (* (pos-size-pct) current-balance)
+        position-size (calculate-position-size max-pos-size-pct current-balance)
         price (pick-price (get-in tickers [ticker :initial-price]) side spread-around-better-price)
         amount (calculate-amount position-size price side)]
     (dispatch :place-order {:user-id trader
@@ -91,9 +98,8 @@
   (s/assert ::config config)
   (report-config config)
 
-  (let [currencies (mapcat ticker/currencies (keys tickers))
-        traders (repeatedly n-traders (partial make-trader (user-id-gen)))]
-    (fund-accounts traders currencies dispatch)
+  (let [traders (repeatedly n-traders (partial make-trader (user-id-gen)))]
+    (fund-accounts traders tickers dispatch)
     (report-summary "Initial" dispatch)
     (doall (pmap #(start-trading % dispatch config) traders)))
 
@@ -101,13 +107,14 @@
 
 (s/def ::percent (s/and number? #(<= 0 % 1)))
 (s/def ::initial-price (s/and number? pos?))
-(s/def ::tickers (s/map-of ::ticker/ticker (s/keys :req-un [::initial-price])))
+(s/def ::initial-funds (s/and number? pos?))
+(s/def ::tickers (s/map-of ::ticker/ticker (s/keys :req-un [::initial-price ::initial-funds])))
 (s/def ::n-traders pos-int?)
 (s/def ::n-orders-per-trader pos-int?)
-(s/def ::pos-size-pct (s/fspec :args (s/cat) :ret ::percent))
+(s/def ::max-pos-size-pct ::percent)
 (s/def ::spread-around-better-price (s/cat :worse ::percent :better ::percent))
 (s/def ::config (s/keys :req-un [::tickers
                                  ::n-traders
                                  ::n-orders-per-trader
-                                 ::pos-size-pct
+                                 ::max-pos-size-pct
                                  ::spread-around-better-price]))
