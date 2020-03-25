@@ -1,4 +1,4 @@
-(ns mercurius.simulation.simulator
+(ns mercurius.simulation.trading.simulator
   (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [roul.random :as rr]

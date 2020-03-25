@@ -54,13 +54,13 @@
                             [(build-order {:price 101})]))))
 
   (testing "for each pair of partially filled orders, tries to generate a trade"
-    (let [bids [(build-order {:amount 20})
-                (build-order {:amount 10})]
-          asks [(build-order {:amount 15})
-                (build-order {:amount 20})]]
-      (is (match? [{:amount 15M :bid {:remaining 5M} :ask {:remaining 0M}}
-                   {:amount 5M :bid {:remaining 0M} :ask {:remaining 15M}}
-                   {:amount 10M :bid {:remaining 0M} :ask {:remaining 5M}}]
+    (let [[b1 b2] [(build-order {:id "b1" :amount 20}) (build-order {:id "b2" :amount 10})]
+          [a1 a2] [(build-order {:id "a1" :amount 15}) (build-order {:id "a2" :amount 20})]
+          bids [b1 b2]
+          asks [a1 a2]]
+      (is (match? [{:amount 15M :bid {:id "b1" :remaining 5M} :ask {:id "a1" :remaining 0M}}
+                   {:amount 5M :bid {:id "b1" :remaining 0M} :ask {:id "a2" :remaining 15M}}
+                   {:amount 10M :bid {:id "b2" :remaining 0M} :ask {:id "a2" :remaining 5M}}]
                   (match-orders bids asks)))))
 
   (testing "most recent orders are matched first"

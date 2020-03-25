@@ -9,8 +9,9 @@
 (def buyer 1)
 (def seller 2)
 
-(defn- build-use-case-for-wallets [wallets-args {:keys [get-bids-asks save-wallet remove-order update-order]
-                                                 :or {save-wallet identity remove-order identity update-order identity}}]
+(defn- build-use-case-for-wallets
+  [wallets-args {:keys [get-bids-asks save-wallet remove-order update-order]
+                 :or {save-wallet identity remove-order identity update-order identity}}]
   (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet] (map build-wallet wallets-args)
         fetch-wallet (spy/mock (fn [user-id currency]
                                  (case [user-id currency]

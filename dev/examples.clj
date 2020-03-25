@@ -1,6 +1,6 @@
 (ns examples
   (:require [user :refer [system]]
-            [mercurius.simulation.simulator :refer [run-simulation]]))
+            [mercurius.simulation.trading.simulator :refer [run-simulation]]))
 
 (comment
   (def dispatch (:dispatch system))
