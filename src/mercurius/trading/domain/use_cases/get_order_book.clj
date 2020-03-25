@@ -15,7 +15,6 @@
   (fn [{:keys [ticker precision limit] :as command :or {precision "R0" limit 100}}]
     (s/assert ::command command)
     (let [book (get-order-book ticker)]
-      ;; TODO The take is done here and in the summarize
       (if (= precision "R0")
         (-> book
             (update :buying (partial take limit))
