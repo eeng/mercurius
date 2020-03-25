@@ -1,7 +1,7 @@
 (ns mercurius.trading.adapters.repositories.in-memory-order-book-repository
   (:require [mercurius.trading.domain.repositories.order-book-repository :refer [OrderBookRepository get-order-book]]
             [mercurius.trading.domain.entities.ticker :refer [available-tickers]]
-            [mercurius.trading.domain.entities.order-book :refer [sort-orders-for-side]]))
+            [mercurius.trading.domain.entities.order-book :refer [new-order-book sort-orders-for-side]]))
 
 (defn- take-orders-surpassing [book side threshold]
   (let [comparator (case side :buying >= :selling <=)]
@@ -48,4 +48,4 @@
 (defn new-in-memory-order-book-repo []
   (InMemoryOrderBookRepository.
    (atom (zipmap available-tickers
-                 (repeat (count available-tickers) {:buying [] :selling []})))))
+                 (repeat (count available-tickers) (new-order-book))))))

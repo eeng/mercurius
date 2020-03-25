@@ -4,11 +4,12 @@
             [spy.core :as spy]
             [spy.assert :as assert]
             [mercurius.support.factory :refer [build-order]]
+            [mercurius.trading.domain.entities.order-book :refer [new-order-book]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]))
 
 (deftest get-order-book-test
   (testing "getting the raw order book"
-    (let [the-book {:buying [] :selling []}
+    (let [the-book (new-order-book)
           repo-fn (spy/mock (constantly the-book))
           get-order-book (new-get-order-book-use-case {:get-order-book repo-fn})]
       (is (= the-book (get-order-book {:ticker "BTCUSD"})))
