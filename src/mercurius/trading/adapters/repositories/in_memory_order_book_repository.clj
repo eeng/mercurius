@@ -1,11 +1,13 @@
 (ns mercurius.trading.adapters.repositories.in-memory-order-book-repository
   (:require [mercurius.trading.domain.repositories.order-book-repository :refer [OrderBookRepository get-order-book]]
-            [mercurius.trading.domain.entities.ticker :refer [available-tickers]]))
+            [mercurius.trading.domain.entities.ticker :refer [available-tickers]]
+            [mercurius.trading.domain.entities.order-book :refer [sort-orders-for-side]]))
 
-(defn- find-best-orders [repo ticker side]
-  (let [all-orders (side (get-order-book repo ticker))
-        best-price (-> all-orders first :price)]
-    (filter #(= (:price %) best-price) all-orders)))
+(defn- take-orders-surpassing [book side threshold]
+  (let [comparator (case side :buying >= :selling <=)]
+    (if threshold
+      (->> book side (take-while #(comparator (:price %) threshold)))
+      [])))
 
 (defn- book-side [{:keys [side]}]
   (case side :buy :buying :sell :selling))
@@ -32,15 +34,16 @@
     order)
 
   (get-order-book [_ ticker]
-    (let [buying-sorter (comp reverse (partial sort-by :price))
-          selling-sorter (partial sort-by :price)]
-      (-> (get @db ticker)
-          (update :buying buying-sorter)
-          (update :selling selling-sorter))))
+    (-> (get @db ticker)
+        (update :buying (partial sort-orders-for-side :buying))
+        (update :selling (partial sort-orders-for-side :selling))))
 
   (get-bids-asks [this ticker]
-    {:bids (find-best-orders this ticker :buying)
-     :asks (find-best-orders this ticker :selling)}))
+    (let [book (get-order-book this ticker)
+          bid (->> book :buying first :price)
+          ask (->> book :selling first :price)]
+      {:bids (take-orders-surpassing book :buying ask)
+       :asks (take-orders-surpassing book :selling bid)})))
 
 (defn new-in-memory-order-book-repo []
   (InMemoryOrderBookRepository.

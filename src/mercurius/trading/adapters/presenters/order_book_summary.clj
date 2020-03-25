@@ -28,13 +28,13 @@
    :amount (sum-by :remaining orders)})
 
 (defn- summarize [orders pow-of-ten order limit]
-  (let [comparator (case order
-                     :asc #(compare %1 %2)
-                     :desc #(compare %2 %1))]
+  (let [price-cmp (case order
+                    :asc #(compare %1 %2)
+                    :desc #(compare %2 %1))]
     (->> orders
          (group-by #(round-with-pow-of-ten (:price %) pow-of-ten))
          (map build-summary-at-price)
-         (sort-by :price comparator)
+         (sort-by :price price-cmp)
          (take (or limit 100)))))
 
 (defn summarize-order-book [order-book {:keys [precision limit]}]

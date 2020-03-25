@@ -14,4 +14,6 @@
     "Returns the full order book as a map with :buying and :selling keys to orders.")
 
   (get-bids-asks [this ticker]
-    "Returns the bids (orders at the best buying price) and asks (orders at the best selling price)."))
+    "Returns the bids and asks orders that will be matched for trades.
+    Bids are those orders with price greater or equal to the best selling price.
+    Conversely, asks are those with price lower or equal to the best buying price."))

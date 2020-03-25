@@ -82,7 +82,9 @@
                                [logger])]
 
     {:dispatch (partial dispatch mediator)
-     :trade-finder trade-finder}))
+     :trade-finder trade-finder
+     :order-book-repo order-book-repo
+     :wallet-repo wallet-repo}))
 
 (defn stop [{:keys [trade-finder] :as system}]
   (when system

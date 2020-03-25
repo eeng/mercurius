@@ -15,7 +15,7 @@
   (dispatch :execute-trades {:ticker "BTCUSD"})
 
   (dispatch :calculate-monetary-base {})
-  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P2" :limit 10})
+  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id 1})
   (dispatch :get-wallets {:user-id 2})
 

@@ -29,7 +29,7 @@
           new-o1 (assoc o1 :remaining 3)]
       (doseq [order [o1 o2]] (insert-order repo order))
       (update-order repo new-o1)
-      (is (match? [o2 new-o1] (:buying (get-order-book repo "BTCUSD")))))))
+      (is (match? [new-o1 o2] (:buying (get-order-book repo "BTCUSD")))))))
 
 (deftest remove-order-test
   (testing "removes the order by id"
@@ -55,23 +55,19 @@
       (is (= [4 5 6] (->> (get-order-book repo "BTCUSD") :selling (map :price)))))))
 
 (deftest get-bids-asks-test
-  (testing "returns a map with the bids and asks orders"
+  (testing "returns a map with the bids and asks orders (those in the intersection of prices)"
     (let [repo (new-in-memory-order-book-repo)
-          o1 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5}))
-          _o2 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 4}))
-          o3 (insert-order repo (build-order {:ticker "BTCUSD" :side :sell :price 6}))]
-      (is (match? {:bids [o1] :asks [o3]}
+          b1 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5.1}))
+          b2 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5.0}))
+          _b3 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 4.9}))
+          s1 (insert-order repo (build-order {:ticker "BTCUSD" :side :sell :price 5.0}))
+          _s2 (insert-order repo (build-order {:ticker "BTCUSD" :side :sell :price 5.2}))]
+      (is (match? {:bids [b1 b2] :asks [s1]}
                   (get-bids-asks repo "BTCUSD")))))
 
-  (testing "it could be many orders at the best price"
-    (let [repo (new-in-memory-order-book-repo)
-          o1 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5}))
-          _o2 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 4}))
-          o3 (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5}))]
-      (is (match? {:bids [o3 o1] :asks []}
-                  (get-bids-asks repo "BTCUSD")))))
-
-  (testing "returns [] for the bids or asks if there is no order on the side"
+  (testing "returns empty vector if there is no intersection of prices"
     (let [repo (new-in-memory-order-book-repo)]
+      (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 4.9}))
+      (insert-order repo (build-order {:ticker "BTCUSD" :side :sell :price 5.1}))
       (is (= {:bids [] :asks []}
              (get-bids-asks repo "BTCUSD"))))))

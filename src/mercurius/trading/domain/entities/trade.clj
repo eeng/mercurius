@@ -1,6 +1,7 @@
 (ns mercurius.trading.domain.entities.trade
   (:require [tick.alpha.api :as t]
-            [mercurius.trading.domain.entities.order :refer [fill-order partially-filled? amount-paid currency-paid]]))
+            [mercurius.trading.domain.entities.order :refer [fill-order partially-filled? amount-paid currency-paid]]
+            [mercurius.trading.domain.entities.order-book :refer [sort-orders-for-side]]))
 
 (defrecord Trade [price amount created-at bid ask])
 
@@ -32,8 +33,8 @@
   Returns a vector of the trades generated, each with the updated orders.
   If no trade is possible returns an empty vector."
   [bids asks]
-  (loop [[bid & next-bids] (sort-by :placed-at bids)
-         [ask & next-asks] (sort-by :placed-at asks)
+  (loop [[bid & next-bids] (sort-orders-for-side :buying bids)
+         [ask & next-asks] (sort-orders-for-side :selling asks)
          trades []]
     (if-let [{:keys [bid ask] :as trade} (generate-trade bid ask)]
       (recur (keeping-partially-filled bid next-bids)

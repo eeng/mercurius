@@ -63,12 +63,23 @@
                    {:amount 10M :bid {:id "b2" :remaining 0M} :ask {:id "a2" :remaining 5M}}]
                   (match-orders bids asks)))))
 
-  (testing "most recent orders are matched first"
-    (let [bids [(build-order {:amount 1 :placed-at (t/time "20:01") :id "a"})
-                (build-order {:amount 1 :placed-at (t/time "20:00") :id "b"})
-                (build-order {:amount 1 :placed-at (t/time "20:02") :id "c"})]
-          asks [(build-order {:amount 1 :placed-at (t/time "20:30")})]]
-      (is (match? [{:amount 1M :bid {:id "b"}}]
+  (testing "orders are match by best price first and then by placed-at"
+    (let [bids [(build-order {:price 5 :amount 1 :placed-at (t/time "20:01") :id "a"})
+                (build-order {:price 5 :amount 1 :placed-at (t/time "20:00") :id "b"})
+                (build-order {:price 5 :amount 1 :placed-at (t/time "20:02") :id "c"})
+                (build-order {:price 6 :amount 1 :placed-at (t/time "20:03") :id "d"})]
+          asks [(build-order {:price 5 :amount 2 :placed-at (t/time "20:30")})]]
+      (is (match? [{:bid {:id "d"}}
+                   {:bid {:id "b"}}]
+                  (match-orders bids asks))))
+
+    (let [bids [(build-order {:price 5 :amount 2 :placed-at (t/time "20:30")})]
+          asks [(build-order {:price 5 :amount 1 :placed-at (t/time "20:01") :id "a"})
+                (build-order {:price 5 :amount 1 :placed-at (t/time "20:00") :id "b"})
+                (build-order {:price 5 :amount 1 :placed-at (t/time "20:02") :id "c"})
+                (build-order {:price 4 :amount 1 :placed-at (t/time "20:03") :id "d"})]]
+      (is (match? [{:ask {:id "d"}}
+                   {:ask {:id "b"}}]
                   (match-orders bids asks))))))
 
 (def buyer 1)
