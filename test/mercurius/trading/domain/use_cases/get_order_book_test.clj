@@ -18,5 +18,5 @@
   (testing "getting a summarized order book"
     (let [order-book {:buying [(build-order {:price 99})]}
           get-order-book (new-get-order-book-use-case {:get-order-book (constantly order-book)})]
-      (is (match? {:buying [{:count 1 :price 90.0}]}
+      (is (match? {:buying [{:count 1 :price 100.0}]}
                   (get-order-book {:ticker "BTCUSD" :precision "P4"}))))))

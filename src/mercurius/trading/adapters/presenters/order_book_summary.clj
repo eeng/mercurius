@@ -1,19 +1,19 @@
 (ns mercurius.trading.adapters.presenters.order-book-summary
   (:require [clojure.spec.alpha :as s]
-            [mercurius.util.collections :refer [sum-by]]))
+            [mercurius.util.collections :refer [sum-by]]
+            [mercurius.util.number :refer [round-to-decimal-places]]))
 
-(defn- min-divisor-for-price [price]
-  (->> price Math/log10 Math/ceil dec (Math/pow 10)))
+(def precision-translations {"P0" 0 "P1" 1 "P2" 2 "P3" 3 "P4" 4})
 
-(def precisions-to-exponent {"P0" 4 "P1" 3 "P2" 2 "P3" 1 "P4" 0})
-
-(defn precision-to-pow-of-ten [precision max-price]
+(defn precision-to-decimal-places [precision max-price]
   (s/assert ::precision precision)
-  (let [min-divisor (min-divisor-for-price max-price)
-        exponent (precisions-to-exponent precision)]
-    (/ min-divisor (.pow 10M exponent))))
+  (when (pos? max-price)
+    (let [n (->> max-price Math/log10 Math/floor int inc)]
+      (- (count precision-translations)
+         (precision-translations precision)
+         n))))
 
-(s/def ::precision (set (keys precisions-to-exponent)))
+(s/def ::precision (set (keys precision-translations)))
 
 (defn- find-max-price [{:keys [buying selling]}]
   (max (-> buying first :price (or 0))
@@ -27,19 +27,19 @@
    :count (count orders)
    :amount (sum-by :remaining orders)})
 
-(defn- summarize [orders pow-of-ten order limit]
+(defn- summarize [orders decimal-places order limit]
   (let [price-cmp (case order
                     :asc #(compare %1 %2)
                     :desc #(compare %2 %1))]
     (->> orders
-         (group-by #(round-with-pow-of-ten (:price %) pow-of-ten))
+         (group-by #(round-to-decimal-places (:price %) decimal-places))
          (map build-summary-at-price)
          (sort-by :price price-cmp)
          (take (or limit 100)))))
 
 (defn summarize-order-book [order-book {:keys [precision limit]}]
   (let [max-price (find-max-price order-book)
-        pow-of-ten (precision-to-pow-of-ten precision max-price)]
+        decimal-places (precision-to-decimal-places precision max-price)]
     (-> order-book
-        (update :buying summarize pow-of-ten :desc limit)
-        (update :selling summarize pow-of-ten :asc limit))))
+        (update :buying summarize decimal-places :desc limit)
+        (update :selling summarize decimal-places :asc limit))))

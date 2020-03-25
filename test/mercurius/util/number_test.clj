@@ -19,4 +19,6 @@
     (is (= 0.012345 (round-to-significant-figures 0.0123451111 5)))
     (is (= 0.0123456 (round-to-significant-figures 0.0123456111 6)))
     (is (= 0.0012345 (round-to-significant-figures 0.00123451111 5)))
-    (is (= 0.00123456 (round-to-significant-figures 0.00123456111 6)))))
+    (is (= 0.00123456 (round-to-significant-figures 0.00123456111 6)))
+    (is (= 100.0 (round-to-significant-figures 100 3)))
+    (is (= 100.0 (round-to-significant-figures 100 2)))))
