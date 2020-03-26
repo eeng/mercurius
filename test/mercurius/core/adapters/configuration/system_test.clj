@@ -1,18 +1,7 @@
 (ns mercurius.core.adapters.configuration.system-test
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
-            [mercurius.core.adapters.configuration.system :refer [start stop]]))
-
-(defmacro with-system
-  "Starts the system and makes sure it's stopped afterward.
-  The bindings works like let where the second argument are passed to start (not implemented yet)."
-  [bindings & body]
-  `(let [system# (start)]
-     (try
-       (let [~(first bindings) system#]
-         ~@body)
-       (finally
-         (stop system#)))))
+            [mercurius.support.fixtures :refer [with-system]]))
 
 (deftest ^:integration start-test
   (testing "Assembles the system and allows to execute the use cases"

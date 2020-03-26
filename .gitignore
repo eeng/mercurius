@@ -5,4 +5,4 @@
 /.cpcache
 /.nrepl-history
 /.nrepl-port
-/.clj-kondo
+/.clj-kondo/.cache
