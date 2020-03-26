@@ -28,12 +28,6 @@
 (defn- pick-ticker [tickers-opts]
   (rand-nth (keys tickers-opts)))
 
-(defn- select-src-currency [ticker side]
-  (let [[sell-cur buy-cur] (ticker/currencies ticker)]
-    (case side
-      :buy buy-cur
-      :sell sell-cur)))
-
 (defn- pick-price [last-price side [worse-price-pct better-price-pct]]
   (let [buy? (= side :buy)
         min-price (* last-price ((if buy? - +) 1 worse-price-pct))
@@ -41,9 +35,16 @@
     (-> (rr/rand min-price max-price)
         (ticker/round-number))))
 
-(defn- find-current-balance [trader currency dispatch]
-  (-> (dispatch :get-wallet {:user-id trader :currency currency})
-      (available-balance)))
+(defn- select-src-currency [ticker side]
+  (let [[sell-cur buy-cur] (ticker/currencies ticker)]
+    (case side
+      :buy buy-cur
+      :sell sell-cur)))
+
+(defn- find-current-balance [trader ticker side dispatch]
+  (let [currency (select-src-currency ticker side)]
+    (-> (dispatch :get-wallet {:user-id trader :currency currency})
+        (available-balance))))
 
 (defn- calculate-amount [position-size price side]
   (-> (case side
@@ -55,11 +56,11 @@
   (* (rand max-pos-size-pct) current-balance))
 
 (defn- place-order [trader dispatch {:keys [tickers max-pos-size-pct spread-around-better-price]
-                                     :or {spread-around-better-price [0.2 0.01]}}]
+                                     :or {max-pos-size-pct 0.3
+                                          spread-around-better-price [0.2 0.01]}}]
   (let [ticker (pick-ticker tickers)
         side (pick-side)
-        src-currency (select-src-currency ticker side)
-        current-balance (find-current-balance trader src-currency dispatch)
+        current-balance (find-current-balance trader ticker side dispatch)
         position-size (calculate-position-size max-pos-size-pct current-balance)
         price (pick-price (get-in tickers [ticker :initial-price]) side spread-around-better-price)
         amount (calculate-amount position-size price side)]
@@ -96,7 +97,7 @@
 (s/def ::spread-around-better-price (s/cat :worse ::percent :better ::percent))
 (s/def ::config (s/keys :req-un [::tickers
                                  ::n-traders
-                                 ::n-orders-per-trader
+                                 ::n-orders-per-trader]
+                        :opt-un [::max-ms-between-orders
                                  ::max-pos-size-pct
-                                 ::spread-around-better-price
-                                 ::max-ms-between-orders]))
+                                 ::spread-around-better-price]))
