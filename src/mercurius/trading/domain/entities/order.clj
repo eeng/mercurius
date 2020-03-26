@@ -1,6 +1,7 @@
 (ns mercurius.trading.domain.entities.order
   (:require [clojure.spec.alpha :as s]
             [mercurius.util.uuid :refer [uuid]]
+            [mercurius.util.money :refer [money-sf money]]
             [mercurius.trading.domain.entities.ticker :as ticker :refer [first-currency last-currency]]
             [mercurius.accounts.domain.entities.user :as user]
             [tick.alpha.api :as t]))
@@ -26,8 +27,8 @@
                :type type
                :side side
                :ticker ticker
-               :amount (bigdec amount)
-               :remaining (bigdec remaining)
+               :amount (money-sf amount)
+               :remaining (money-sf remaining)
                :price price
                :placed-at placed-at}))
 
@@ -45,9 +46,10 @@
   E.g., when buying 0.2 BTCUSD at a price of 1000, we should reserve 100 USD.
   but when selling, 0.2 BTC should be reserved."
   [side amount price]
-  (case side
-    :buy (* amount price)
-    :sell amount))
+  (money
+   (case side
+     :buy (* amount price)
+     :sell amount)))
 
 (defn calculate-reservation
   "Calculates the amount and currency to reserve for an order."

@@ -90,14 +90,14 @@
     (let [bid (build-order {:user-id buyer :ticker "BTCUSD"})
           ask (build-order {:user-id seller :ticker "BTCUSD"})
           trade (new-trade {:amount 2 :price 5 :bid bid :ask ask})]
-      (is (match? [{:from buyer :to seller :currency "USD" :transfer-amount 10}
-                   {:from seller :to buyer :currency "BTC" :transfer-amount 2}]
+      (is (match? [{:from buyer :to seller :currency "USD" :transfer-amount 10M}
+                   {:from seller :to buyer :currency "BTC" :transfer-amount 2M}]
                   (build-transfers trade)))))
 
   (testing "it also indicates the amounts to cancel reservations"
     (let [bid (build-order {:user-id buyer :ticker "BTCUSD" :price 6})
           ask (build-order {:user-id seller :ticker "BTCUSD" :price 5})
           trade (new-trade {:amount 2 :price 5 :bid bid :ask ask})]
-      (is (match? [{:from buyer :to seller :cancel-amount 12}
-                   {:from seller :to buyer :cancel-amount 2}]
+      (is (match? [{:from buyer :to seller :cancel-amount 12M}
+                   {:from seller :to buyer :cancel-amount 2M}]
                   (build-transfers trade))))))

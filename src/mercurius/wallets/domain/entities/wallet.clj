@@ -1,7 +1,8 @@
 (ns mercurius.wallets.domain.entities.wallet
-  (:require [slingshot.slingshot :refer [throw+]]
+  (:require [clojure.spec.alpha :as s]
+            [slingshot.slingshot :refer [throw+]]
             [mercurius.util.uuid :refer [uuid]]
-            [clojure.spec.alpha :as s]))
+            [mercurius.util.money :refer [money]]))
 
 (def available-currencies #{"USD" "EUR" "BTC" "ETH"})
 
@@ -19,8 +20,8 @@
   (map->Wallet {:id (uuid)
                 :user-id user-id
                 :currency currency
-                :balance (bigdec balance)
-                :reserved (bigdec reserved)}))
+                :balance (money balance)
+                :reserved (money reserved)}))
 
 (defn available-balance [{:keys [balance reserved]}]
   (- balance reserved))
@@ -29,14 +30,14 @@
   (s/assert ::wallet wallet)
   (when (<= amount 0)
     (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet}))
-  (update wallet :balance + (bigdec amount)))
+  (update wallet :balance + (money amount)))
 
 (defn withdraw [wallet amount]
   (s/assert ::wallet wallet)
   (cond
     (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet})
     (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
-  (update wallet :balance - (bigdec amount)))
+  (update wallet :balance - (money amount)))
 
 (defn reserve
   "Reserves an order's amount until it's filled, so the amount remains unavailable for future orders."
@@ -45,14 +46,14 @@
   (cond
     (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet})
     (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
-  (update wallet :reserved + (bigdec amount)))
+  (update wallet :reserved + (money amount)))
 
 (defn cancel-reservation
   "Restores the order's reserved amount."
   [{:keys [reserved] :as wallet} amount]
   (when (> amount reserved)
     (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet}))
-  (update wallet :reserved - (bigdec amount)))
+  (update wallet :reserved - (money amount)))
 
 (defn transfer
   "Transfer the `amount` from the `src` wallet to the `dst` wallet.

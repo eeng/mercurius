@@ -12,3 +12,4 @@
 - Store some trx-id in deposits/withdraws related to transfers
 - Track current ticker prices
 - Simulator, place orders around current price
+- Add simulation test invariant: Users without pending orders should have reserved 0 in their wallets

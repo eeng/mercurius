@@ -6,9 +6,12 @@
 
 (deftest deposit-test
   (testing "should increase the wallet balance by the amount passed"
-    (let [wallet (build-wallet)]
-      (is (match? {:balance 150.2M}
-                  (-> wallet (deposit 100) (deposit 50.2))))))
+    (is (match? {:balance 150.2M}
+                (-> (build-wallet) (deposit 100) (deposit 50.2)))))
+
+  (testing "should round the amount to 8 decimals"
+    (is (match? {:balance 0.11111111M}
+                (-> (build-wallet) (deposit 0.11111111333)))))
 
   (testing "amount should be positive"
     (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/invalid-amount}
@@ -37,6 +40,10 @@
 (deftest reserve-test
   (testing "should increase the wallet reserved amount by the amount passed"
     (is (match? {:reserved 30.7M} (-> (build-wallet {:balance 50}) (reserve 10) (reserve 20.7)))))
+
+  (testing "should round the amount to 8 decimals"
+    (is (match? {:reserved 0.11111111M} (-> (build-wallet {:balance 1}) (reserve 0.11111111333))))
+    (is (match? {:reserved 407.5299376M} (-> (build-wallet {:balance 500}) (reserve (* 6018.4 0.067714M))))))
 
   (testing "amount should be positive"
     (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/invalid-amount}

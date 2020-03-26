@@ -2,7 +2,8 @@
   (:require [clojure.spec.alpha :as s]
             [roul.random :as rr]
             [mercurius.trading.domain.entities.ticker :as ticker]
-            [mercurius.wallets.domain.entities.wallet :refer [available-balance]]))
+            [mercurius.wallets.domain.entities.wallet :refer [available-balance]]
+            [mercurius.util.number :refer [round-to-significant-figures]]))
 
 (defn user-id-gen []
   (let [last-user-id (atom 0)]
@@ -16,7 +17,7 @@
   (doseq [[ticker {:keys [initial-funds initial-price]}] tickers-opts
           :let [[first-cur second-cur] (ticker/currencies ticker)]]
     (dispatch :deposit {:user-id trader
-                        :amount (ticker/round-number (/ (float initial-funds) initial-price))
+                        :amount (/ (float initial-funds) initial-price)
                         :currency first-cur})
     (dispatch :deposit {:user-id trader
                         :amount initial-funds
@@ -32,8 +33,7 @@
   (let [buy? (= side :buy)
         min-price (* last-price ((if buy? - +) 1 worse-price-pct))
         max-price (* last-price ((if buy? + -) 1 better-price-pct))]
-    (-> (rr/rand min-price max-price)
-        (ticker/round-number))))
+    (round-to-significant-figures (rr/rand min-price max-price) 5)))
 
 (defn- select-src-currency [ticker side]
   (let [[sell-cur buy-cur] (ticker/currencies ticker)]
@@ -47,10 +47,9 @@
         (available-balance))))
 
 (defn- calculate-amount [position-size price side]
-  (-> (case side
-        :buy (/ position-size price)
-        :sell position-size)
-      (ticker/round-number)))
+  (case side
+    :buy (/ position-size price)
+    :sell position-size))
 
 (defn- calculate-position-size [max-pos-size-pct current-balance]
   (* (rand max-pos-size-pct) current-balance))
