@@ -3,9 +3,14 @@
 
 (defn logger [next-handler]
   (fn [{:keys [type data] :as request}]
-    (log/info "Executing" type data)
-    (let [start (System/currentTimeMillis)
-          result (next-handler request)
-          duration (- (System/currentTimeMillis) start)]
-      (log/info "Finished" type "in" duration "ms")
-      result)))
+    (log/debug "Executing" type data)
+    (try
+      (let [start (System/currentTimeMillis)
+            result (next-handler request)
+            duration (- (System/currentTimeMillis) start)]
+        (log/debug "Finished" type "in" duration "ms")
+        result)
+      (catch Exception e
+        (log/error "Error executing" type data)
+        (log/error e)
+        (throw e)))))

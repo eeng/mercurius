@@ -21,8 +21,13 @@
 
   (time (run-simulation system
                         :tickers {"BTCUSD" {:initial-price 6000 :initial-funds 10000}}
-                        :n-traders 200
+                        :n-traders 1000
                         :n-orders-per-trader 5
-                        :max-ms-between-orders 100
+                        :max-ms-between-orders 10
                         :max-pos-size-pct 0.3
-                        :spread-around-better-price [0.2 0.005])))
+                        :spread-around-better-price [0.2 0.005]))
+
+  (let [orders (-> (:order-book-repo system) :db deref (get "BTCUSD") vals flatten)]
+    (->> orders
+         (filter #(and (= (:user-id %) 128) (= (:side %) :buy)))
+         (map #(* (:price %) (:amount %))))))

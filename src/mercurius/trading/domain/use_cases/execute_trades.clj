@@ -33,7 +33,7 @@
     (let [{:keys [bids asks]} (get-bids-asks ticker)
           trades (match-orders bids asks)]
       (doseq [{:keys [bid ask] :as trade} trades]
-        (log/info "Trade made!" trade)
+        (log/debug "Trade made!" trade)
         (doseq [transfer (build-transfers trade)]
           (make-transfer deps transfer))
         (doseq [order [bid ask]]
