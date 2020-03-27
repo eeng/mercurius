@@ -1,8 +1,7 @@
 (ns mercurius.trading.domain.entities.trade
   (:require [tick.alpha.api :as t]
             [mercurius.trading.domain.entities.order :refer [fill-order partially-filled? amount-paid currency-paid]]
-            [mercurius.trading.domain.entities.order-book :refer [sort-orders-for-side]]
-            [mercurius.core.domain.entities.event :refer [new-event]]))
+            [mercurius.trading.domain.entities.order-book :refer [sort-orders-for-side]]))
 
 (defrecord Trade [price amount created-at bid ask])
 
@@ -57,6 +56,3 @@
     :currency (currency-paid :sell ticker)
     :transfer-amount (amount-paid :sell amount price)
     :cancel-amount (amount-paid :sell amount ask-limit-price)}])
-
-(defn build-event [trade]
-  (new-event :trading/trade-made trade))

@@ -40,7 +40,7 @@
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
         get-order-book (partial get-order-book order-book-repo)
-        publish-events identity
+        publish-event identity
 
         ;; Use cases
         deposit-use-case (new-deposit-use-case
@@ -68,7 +68,7 @@
                                   :fetch-wallet fetch-wallet
                                   :load-wallet load-wallet
                                   :save-wallet save-wallet
-                                  :publish-events publish-events})
+                                  :publish-event publish-event})
 
         ;; Background processes
         trade-finder (start-trade-finder {:execute-trades execute-trades-use-case

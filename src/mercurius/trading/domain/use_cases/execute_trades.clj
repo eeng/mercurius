@@ -1,7 +1,7 @@
 (ns mercurius.trading.domain.use-cases.execute-trades
   (:require [clojure.spec.alpha :as s]
             [mercurius.trading.domain.entities.order :as order :refer [partially-filled?]]
-            [mercurius.trading.domain.entities.trade :refer [match-orders build-transfers build-event]]
+            [mercurius.trading.domain.entities.trade :refer [match-orders build-transfers]]
             [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.wallets.domain.entities.wallet :refer [transfer cancel-reservation]]))
 
@@ -26,7 +26,7 @@
   "Returns a use case that match bid an ask orders to discover trades, and executes them.
   For each trade, a transfer is made between buyer and seller for each pais's currency.
   Finally the order book is updated."
-  [{:keys [get-bids-asks publish-events] :as deps}]
+  [{:keys [get-bids-asks publish-event] :as deps}]
   (fn [{:keys [ticker] :as command}]
     (s/assert ::command command)
     (let [{:keys [bids asks]} (get-bids-asks ticker)
@@ -36,5 +36,5 @@
           (make-transfer deps transfer))
         (doseq [order [bid ask]]
           (update-order-book deps order))
-        (publish-events (build-event trade)))
-      :ok)))
+        (publish-event [:trading/trade-made trade]))
+      trades)))

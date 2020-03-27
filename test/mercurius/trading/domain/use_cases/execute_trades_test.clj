@@ -10,8 +10,8 @@
 (def seller 2)
 
 (defn- build-use-case-for-wallets
-  [wallets-args {:keys [get-bids-asks save-wallet remove-order update-order publish-events]
-                 :or {save-wallet identity remove-order identity update-order identity publish-events identity}}]
+  [wallets-args {:keys [get-bids-asks save-wallet remove-order update-order publish-event]
+                 :or {save-wallet identity remove-order identity update-order identity publish-event identity}}]
   (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet] (map build-wallet wallets-args)
         fetch-wallet (spy/mock (fn [user-id currency]
                                  (case [user-id currency]
@@ -27,7 +27,7 @@
                                                      :get-bids-asks get-bids-asks
                                                      :update-order update-order
                                                      :remove-order remove-order
-                                                     :publish-events publish-events})]
+                                                     :publish-event publish-event})]
     execute-trades))
 
 (deftest ^:integration execute-trades-test
@@ -35,15 +35,15 @@
     (let [bid (build-order {:price 100 :amount 1 :side :buy :ticker "BTCUSD" :user-id buyer})
           ask (build-order {:price 100 :amount 1 :side :sell :ticker "BTCUSD" :user-id seller})
           get-bids-asks (constantly {:bids [bid] :asks [ask]})
-          publish-events (spy/mock identity)
+          publish-event (spy/mock identity)
           execute-trades (build-use-case-for-wallets
                           [{:user-id buyer :currency "USD" :balance 100 :reserved 100}
                            {:user-id seller :currency "USD"}
                            {:user-id seller :currency "BTC" :balance 1 :reserved 1}
                            {:user-id buyer :currency "BTC"}]
-                          {:get-bids-asks get-bids-asks :save-wallet identity :publish-events publish-events})]
+                          {:get-bids-asks get-bids-asks :save-wallet identity :publish-event publish-event})]
       (execute-trades {:ticker "BTCUSD"})
-      (is (match? [[{:type :trading/trade-made :data {:price 100}}]] (spy/calls publish-events)))))
+      (is (match? [[[:trading/trade-made {:price 100}]]] (spy/calls publish-event)))))
 
   (testing "for each trade makes the corresponding transfers between the wallets"
     (let [bid (build-order {:price 50 :amount 2 :side :buy :ticker "BTCUSD" :user-id buyer})
@@ -83,13 +83,13 @@
   (testing "if the orders don't match it shouldn't do anything"
     (let [fetch-wallet (spy/spy)
           save-wallet (spy/spy)
-          publish-events (spy/spy)
+          publish-event (spy/spy)
           get-bids-asks (constantly {:bids [(build-order)] :asks []})
           execute-trades (new-execute-trades-use-case {:fetch-wallet fetch-wallet
                                                        :save-wallet save-wallet
                                                        :get-bids-asks get-bids-asks
-                                                       :publish-events publish-events})]
+                                                       :publish-event publish-event})]
       (execute-trades {:ticker "BTCUSD"})
       (assert/not-called? fetch-wallet)
       (assert/not-called? save-wallet)
-      (assert/not-called? publish-events))))
+      (assert/not-called? publish-event))))
