@@ -3,6 +3,8 @@
             [mercurius.core.adapters.configuration.logging :refer [configure-logger]]
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
+            [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
+            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -40,7 +42,10 @@
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
         get-order-book (partial get-order-book order-book-repo)
-        publish-event identity
+
+        ;; Event bus
+        event-bus (new-channel-based-event-bus)
+        publish-event (partial publish-event event-bus)
 
         ;; Use cases
         deposit-use-case (new-deposit-use-case
@@ -86,12 +91,14 @@
                                [logger])]
 
     {:dispatch (partial dispatch mediator)
-     :trade-finder trade-finder
      :order-book-repo order-book-repo
-     :wallet-repo wallet-repo}))
+     :wallet-repo wallet-repo
+     :trade-finder trade-finder
+     :event-bus event-bus}))
 
-(defn stop [{:keys [trade-finder] :as system}]
+(defn stop [{:keys [trade-finder event-bus] :as system}]
   (when system
     (log/info "Stopping system ...")
-    (stop-trade-finder trade-finder))
+    (stop-trade-finder trade-finder)
+    (.close event-bus))
   nil)

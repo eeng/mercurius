@@ -14,9 +14,9 @@
   (dispatch [this event]
     "Publishes an `Event` to the bus.")
 
-  (subscribe [this event-type out]
+  (subscribe [this event-type]
     "Allows subscribers to listen to events of a specific type.
-    The subscriber must provide a channel where the events will be put."))
+    Returns a channel where the events will be delived."))
 
 (defn publish-event
   "Provides a simplify API to publish events in a simpler form.
