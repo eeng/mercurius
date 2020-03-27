@@ -6,7 +6,7 @@
             [mercurius.wallets.domain.entities.wallet :refer [transfer cancel-reservation]]))
 
 (s/def ::ticker ::ticker/ticker)
-(s/def ::command (s/and (s/keys :req-un [::ticker])))
+(s/def ::command (s/keys :req-un [::ticker]))
 
 (defn- make-transfer [{:keys [fetch-wallet load-wallet save-wallet]}
                       {:keys [from to currency transfer-amount cancel-amount]}]

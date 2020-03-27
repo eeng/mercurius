@@ -12,6 +12,7 @@
   (dispatch :place-order {:user-id 2 :side :sell :amount 4 :ticker "BTCUSD" :price 100 :type :limit})
 
   (dispatch :execute-trades {:ticker "BTCUSD"})
+  (dispatch :get-tickers {})
 
   (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id 1})

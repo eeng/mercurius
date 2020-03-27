@@ -13,12 +13,16 @@
             [mercurius.wallets.domain.use-cases.get-wallets :refer [new-get-wallets-use-case]]
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
+            [mercurius.trading.adapters.repositories.in-memory-ticker-repository :refer [new-in-memory-ticker-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder]]
-            [mercurius.trading.adapters.processes.tick-updater :refer [new-tick-updater]]
+            [mercurius.trading.adapters.processes.ticker-updater :refer [new-ticker-updater]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
+            [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
-            [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]))
+            [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]
+            [mercurius.trading.domain.use-cases.update-ticker :refer [new-update-ticker-use-case]]
+            [mercurius.trading.domain.use-cases.get-tickers :refer [new-get-tickers-use-case]]))
 
 (defn start
   "Injects all the dependencies into the respective components and starts the system.
@@ -42,6 +46,10 @@
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
         get-order-book (partial get-order-book order-book-repo)
+
+        ticker-repo (new-in-memory-ticker-repo)
+        update-ticker (partial update-ticker ticker-repo)
+        get-tickers (partial get-tickers ticker-repo)
 
         ;; Event Bus
         event-bus (new-channel-based-event-bus)
@@ -75,11 +83,16 @@
                                   :load-wallet load-wallet
                                   :save-wallet save-wallet
                                   :publish-event publish-event})
+        update-ticker-use-case (new-update-ticker-use-case
+                                {:update-ticker update-ticker})
+        get-tickers-use-case (new-get-tickers-use-case
+                              {:get-tickers get-tickers})
 
         ;; Background Processes
         trade-finder (start-trade-finder {:execute-trades execute-trades-use-case
                                           :run-every-ms 0})
-        _ (new-tick-updater {:subscribe subscribe})
+        _ (new-ticker-updater {:subscribe subscribe
+                               :update-ticker update-ticker-use-case})
 
         ;; Controllers
         mediator (new-mediator {:deposit deposit-use-case
@@ -89,7 +102,8 @@
                                 :place-order place-order-use-case
                                 :get-order-book get-order-book-use-case
                                 :execute-trades execute-trades-use-case
-                                :calculate-monetary-base calculate-monetary-base-use-case}
+                                :calculate-monetary-base calculate-monetary-base-use-case
+                                :get-tickers get-tickers-use-case}
                                [logger])]
 
     {:dispatch (partial dispatch mediator)
