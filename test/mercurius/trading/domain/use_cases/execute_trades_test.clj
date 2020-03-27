@@ -10,8 +10,8 @@
 (def seller 2)
 
 (defn- build-use-case-for-wallets
-  [wallets-args {:keys [get-bids-asks save-wallet remove-order update-order]
-                 :or {save-wallet identity remove-order identity update-order identity}}]
+  [wallets-args {:keys [get-bids-asks save-wallet remove-order update-order publish-events]
+                 :or {save-wallet identity remove-order identity update-order identity publish-events identity}}]
   (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet] (map build-wallet wallets-args)
         fetch-wallet (spy/mock (fn [user-id currency]
                                  (case [user-id currency]
@@ -26,10 +26,25 @@
                                                      :save-wallet save-wallet
                                                      :get-bids-asks get-bids-asks
                                                      :update-order update-order
-                                                     :remove-order remove-order})]
+                                                     :remove-order remove-order
+                                                     :publish-events publish-events})]
     execute-trades))
 
 (deftest ^:integration execute-trades-test
+  (testing "should publish an event for each trade made"
+    (let [bid (build-order {:price 100 :amount 1 :side :buy :ticker "BTCUSD" :user-id buyer})
+          ask (build-order {:price 100 :amount 1 :side :sell :ticker "BTCUSD" :user-id seller})
+          get-bids-asks (constantly {:bids [bid] :asks [ask]})
+          publish-events (spy/mock identity)
+          execute-trades (build-use-case-for-wallets
+                          [{:user-id buyer :currency "USD" :balance 100 :reserved 100}
+                           {:user-id seller :currency "USD"}
+                           {:user-id seller :currency "BTC" :balance 1 :reserved 1}
+                           {:user-id buyer :currency "BTC"}]
+                          {:get-bids-asks get-bids-asks :save-wallet identity :publish-events publish-events})]
+      (execute-trades {:ticker "BTCUSD"})
+      (is (match? [[{:type :trading/trade-made :data {:price 100}}]] (spy/calls publish-events)))))
+
   (testing "for each trade makes the corresponding transfers between the wallets"
     (let [bid (build-order {:price 50 :amount 2 :side :buy :ticker "BTCUSD" :user-id buyer})
           ask (build-order {:price 50 :amount 2 :side :sell :ticker "BTCUSD" :user-id seller})
@@ -41,7 +56,7 @@
                            {:user-id seller :currency "BTC" :balance 5 :reserved 3}
                            {:user-id buyer :currency "BTC" :balance 2}]
                           {:get-bids-asks get-bids-asks :save-wallet save-wallet})]
-      (is (match? [{:price 50}] (execute-trades {:ticker "BTCUSD"})))
+      (execute-trades {:ticker "BTCUSD"})
       (let [[buyer-usd-wallet seller-usd-wallet seller-btc-wallet buyer-btc-wallet]
             (-> save-wallet spy/calls flatten)]
         (is (match? {:user-id buyer :currency "USD" :balance 10M :reserved 0M} buyer-usd-wallet))
@@ -61,17 +76,20 @@
                            {:user-id seller :currency "BTC" :balance 2M :reserved 2M}
                            {:user-id buyer :currency "BTC" :balance 0M}]
                           {:get-bids-asks get-bids-asks :update-order update-order :remove-order remove-order})]
-      (is (match? [{:price 50}] (execute-trades {:ticker "BTCUSD"})))
+      (execute-trades {:ticker "BTCUSD"})
       (is (match? [[{:id (:id bid)}]] (spy/calls remove-order)))
       (is (match? [[{:id (:id ask)}]] (spy/calls update-order)))))
 
   (testing "if the orders don't match it shouldn't do anything"
     (let [fetch-wallet (spy/spy)
           save-wallet (spy/spy)
+          publish-events (spy/spy)
           get-bids-asks (constantly {:bids [(build-order)] :asks []})
           execute-trades (new-execute-trades-use-case {:fetch-wallet fetch-wallet
                                                        :save-wallet save-wallet
-                                                       :get-bids-asks get-bids-asks})]
-      (is (= [] (execute-trades {:ticker "BTCUSD"})))
+                                                       :get-bids-asks get-bids-asks
+                                                       :publish-events publish-events})]
+      (execute-trades {:ticker "BTCUSD"})
       (assert/not-called? fetch-wallet)
-      (assert/not-called? save-wallet))))
+      (assert/not-called? save-wallet)
+      (assert/not-called? publish-events))))

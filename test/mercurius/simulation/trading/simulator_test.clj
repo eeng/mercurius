@@ -12,11 +12,11 @@
           btc-funds (bigdec (/ usd-funds initial-price))
           expected-monetary-base {"USD" (* n-traders usd-funds)
                                   "BTC" (* n-traders btc-funds)}]
-      (time (run-simulation system
-                            :tickers {"BTCUSD" {:initial-price initial-price :initial-funds usd-funds}}
-                            :n-traders n-traders
-                            :n-orders-per-trader n-orders-per-trader
-                            :max-ms-between-orders 10))
+      (run-simulation system
+                      :tickers {"BTCUSD" {:initial-price initial-price :initial-funds usd-funds}}
+                      :n-traders n-traders
+                      :n-orders-per-trader n-orders-per-trader
+                      :max-ms-between-orders 10)
       (is (= expected-monetary-base (dispatch :calculate-monetary-base {})))
       (dispatch :execute-trades {:ticker "BTCUSD"})
       (is (= expected-monetary-base (dispatch :calculate-monetary-base {}))))))

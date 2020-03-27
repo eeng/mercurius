@@ -29,7 +29,7 @@
         wallet-repo (new-in-memory-wallet-repo)
         order-book-repo (new-in-memory-order-book-repo)
 
-        ;; Repository functions
+        ;; Services
         load-wallet (partial load-wallet wallet-repo)
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
@@ -40,6 +40,7 @@
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
         get-order-book (partial get-order-book order-book-repo)
+        publish-events identity
 
         ;; Use cases
         deposit-use-case (new-deposit-use-case
@@ -66,7 +67,8 @@
                                   :remove-order remove-order
                                   :fetch-wallet fetch-wallet
                                   :load-wallet load-wallet
-                                  :save-wallet save-wallet})
+                                  :save-wallet save-wallet
+                                  :publish-events publish-events})
 
         ;; Background processes
         trade-finder (start-trade-finder {:execute-trades execute-trades-use-case

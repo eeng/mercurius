@@ -39,7 +39,7 @@
   (testing "the trade should contain additional data"
     (let [bid (build-order {:price 100 :amount 5 :ticker "BTCUSD"})
           ask (build-order {:price 100 :amount 5 :ticker "BTCUSD"})]
-      (is (match? {:ticker "BTCUSD" :created-at some? :bid {:id (:id bid)} :ask {:id (:id ask)}}
+      (is (match? {:ticker "BTCUSD" :bid {:id (:id bid)} :ask {:id (:id ask)}}
                   (generate-trade bid ask)))))
 
   (testing "if the bid price is lower than the ask price, returns nil"
