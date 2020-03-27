@@ -16,18 +16,18 @@
         (recur))))
   tf)
 
-(defrecord BidAskProvider [active execute-trades run-every-ms tickers])
+(defrecord TradeFinder [active execute-trades run-every-ms tickers]
+  java.io.Closeable
+  (close [this]
+    (reset! active false)
+    this))
 
 (defn start-trade-finder
   "Starts a background job that, for each ticker, matches bids and asks to discover trades."
   [{:keys [execute-trades run-every-ms] :or {run-every-ms 1000}}]
-  (-> (BidAskProvider. (atom (pos? run-every-ms)) execute-trades run-every-ms available-tickers)
+  (-> (TradeFinder. (atom (pos? run-every-ms)) execute-trades run-every-ms available-tickers)
       (process-bids-asks)))
-
-(defn stop-trade-finder [{:keys [active] :as tf}]
-  (reset! active false)
-  tf)
 
 (comment
   (def tf (start-trade-finder {:execute-trades #(log/info "Matching" %)}))
-  (stop-trade-finder tf))
+  (.close tf))

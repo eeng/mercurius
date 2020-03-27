@@ -13,7 +13,7 @@
             [mercurius.wallets.domain.use-cases.get-wallets :refer [new-get-wallets-use-case]]
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
-            [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder stop-trade-finder]]
+            [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
@@ -99,6 +99,6 @@
 (defn stop [{:keys [trade-finder event-bus] :as system}]
   (when system
     (log/info "Stopping system ...")
-    (stop-trade-finder trade-finder)
+    (.close trade-finder)
     (.close event-bus))
   nil)
