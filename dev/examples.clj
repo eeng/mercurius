@@ -1,7 +1,6 @@
 (ns examples
   (:require [user :refer [system]]
-            [mercurius.simulation.trading.simulator :refer [run-simulation]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [get-bids-asks]]))
+            [mercurius.simulation.trading.simulator :refer [run-simulation]]))
 
 (comment
   (def dispatch (:dispatch system))
@@ -16,7 +15,7 @@
   (dispatch :execute-trades {:ticker "BTCUSD"})
 
   (dispatch :calculate-monetary-base {})
-  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 20})
+  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id 1})
   (dispatch :get-wallets {:user-id 2})
 
@@ -26,11 +25,4 @@
                         :n-orders-per-trader 5
                         :max-ms-between-orders 10
                         :max-pos-size-pct 0.3
-                        :spread-around-better-price [0.2 0.005]))
-
-  (let [orders (-> (:order-book-repo system) :db deref (get "BTCUSD") vals flatten)]
-    (->> orders
-         (filter #(= (:user-id %) 269))
-         (map (fn [{:keys [price amount]}] [price amount (* price amount)]))))
-
-  (-> (:order-book-repo system) (get-bids-asks "BTCUSD") :asks first))
+                        :spread-around-better-price [0.2 0.005])))

@@ -1,5 +1,6 @@
 (ns mercurius.trading.domain.entities.order-test
   (:require [clojure.test :refer [deftest testing is]]
+            [matcher-combinators.test]
             [mercurius.support.factory :refer [build-order]]
             [mercurius.trading.domain.entities.order :refer [currency-paid]]))
 
