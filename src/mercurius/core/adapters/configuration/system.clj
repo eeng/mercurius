@@ -4,7 +4,7 @@
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
-            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
+            [mercurius.core.domain.messaging.event-bus :refer [publish-event subscribe]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -14,6 +14,7 @@
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder]]
+            [mercurius.trading.adapters.processes.tick-updater :refer [new-tick-updater]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
@@ -25,29 +26,29 @@
   The resources that need to be freed when stopping the system should also be there."
   []
   (configure-logger)
-  (log/info "Starting system ...")
+  (log/info "Starting system")
 
   (let [;; Repositories
         wallet-repo (new-in-memory-wallet-repo)
-        order-book-repo (new-in-memory-order-book-repo)
-
-        ;; Services
         load-wallet (partial load-wallet wallet-repo)
         save-wallet (partial save-wallet wallet-repo)
         fetch-wallet (partial fetch-wallet wallet-repo)
         get-user-wallets (partial get-user-wallets wallet-repo)
         calculate-monetary-base (partial calculate-monetary-base wallet-repo)
+
+        order-book-repo (new-in-memory-order-book-repo)
         insert-order (partial insert-order order-book-repo)
         update-order (partial update-order order-book-repo)
         remove-order (partial remove-order order-book-repo)
         get-bids-asks (partial get-bids-asks order-book-repo)
         get-order-book (partial get-order-book order-book-repo)
 
-        ;; Event bus
+        ;; Event Bus
         event-bus (new-channel-based-event-bus)
         publish-event (partial publish-event event-bus)
+        subscribe (partial subscribe event-bus)
 
-        ;; Use cases
+        ;; Use Cases
         deposit-use-case (new-deposit-use-case
                           {:load-wallet load-wallet
                            :save-wallet save-wallet})
@@ -75,9 +76,10 @@
                                   :save-wallet save-wallet
                                   :publish-event publish-event})
 
-        ;; Background processes
+        ;; Background Processes
         trade-finder (start-trade-finder {:execute-trades execute-trades-use-case
                                           :run-every-ms 0})
+        _ (new-tick-updater {:subscribe subscribe})
 
         ;; Controllers
         mediator (new-mediator {:deposit deposit-use-case
@@ -98,7 +100,7 @@
 
 (defn stop [{:keys [trade-finder event-bus] :as system}]
   (when system
-    (log/info "Stopping system ...")
+    (log/info "Stopping system")
     (.close trade-finder)
     (.close event-bus))
   nil)
