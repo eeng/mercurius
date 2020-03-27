@@ -1,6 +1,5 @@
-(ns examples
-  (:require [user :refer [system]]
-            [mercurius.simulation.trading.simulator :refer [run-simulation]]))
+(ns fiddles.mediator
+  (:require [user :refer [system]]))
 
 (comment
   (def dispatch (:dispatch system))
@@ -14,15 +13,7 @@
 
   (dispatch :execute-trades {:ticker "BTCUSD"})
 
-  (dispatch :calculate-monetary-base {})
   (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id 1})
   (dispatch :get-wallets {:user-id 2})
-
-  (time (run-simulation system
-                        :tickers {"BTCUSD" {:initial-price 6000 :initial-funds 10000}}
-                        :n-traders 100
-                        :n-orders-per-trader 5
-                        :max-ms-between-orders 10
-                        :max-pos-size-pct 0.3
-                        :spread-around-better-price [0.2 0.005])))
+  (dispatch :calculate-monetary-base {}))
