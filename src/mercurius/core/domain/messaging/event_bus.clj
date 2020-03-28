@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [tick.alpha.api :as t]
             [mercurius.util.uuid :refer [uuid]]
-            [clojure.core.async :refer [chan]]))
+            [clojure.core.async :refer [chan go-loop <!]]))
 
 (defrecord Event [type id created-at data])
 
@@ -32,9 +32,16 @@
        (dispatch bus)))
 
 (defn subscribe-to
-  "Allows to subscribe to specific event types."
-  [bus event-type & {:keys [out-chan] :or {out-chan (chan)}}]
+  "Allows to subscribe to specific event types.
+  If the `on-event` callback is provided, it'll called with each event received in the channel.
+  Otherwise, the channel is return and must be handled by the client."
+  [bus event-type & {:keys [out-chan on-event] :or {out-chan (chan)}}]
   (subscribe bus event-type out-chan)
-  out-chan)
+  (if on-event
+    (go-loop []
+      (when-let [event (<! out-chan)]
+        (on-event event)
+        (recur)))
+    out-chan))
 
 (s/def ::event-type #{:order-placed :trade-made})
