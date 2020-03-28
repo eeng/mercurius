@@ -54,7 +54,6 @@
         ;; Event Bus
         event-bus (new-channel-based-event-bus)
         publish-event (partial publish-event event-bus)
-        subscribe-to (partial subscribe-to event-bus)
 
         ;; Use Cases
         deposit-use-case (new-deposit-use-case
@@ -90,10 +89,9 @@
                               {:get-tickers get-tickers})
 
         ;; Background Processes
-        ;; TODO pass through the mediator for logging?
-        _ (new-trade-finder {:subscribe-to subscribe-to
+        _ (new-trade-finder {:event-bus event-bus
                              :execute-trades execute-trades-use-case})
-        _ (new-ticker-updater {:subscribe-to subscribe-to
+        _ (new-ticker-updater {:event-bus event-bus
                                :update-ticker update-ticker-use-case})
 
         ;; Controllers

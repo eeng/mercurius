@@ -19,6 +19,6 @@
 
 (defn configure-logger []
   (log/merge-config!
-   {:level :debug
+   {:level :info
     :output-fn output-fn
     :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS"}}))
