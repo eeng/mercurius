@@ -8,10 +8,10 @@
 (deftest event-bus-test
   (testing "subscribe returns a channel that delivers the requested event type"
     (with-open [bus (new-channel-based-event-bus)]
-      (let [events (subscribe bus :ev1)
+      (let [events (subscribe bus :order-placed)
             go-block (go
                        (let [ev (<! events)]
-                         (is (match? {:type :ev1 :data "data1"} ev))))]
-        (publish-event bus [:ev2 "data2"])
-        (publish-event bus [:ev1 "data1"])
+                         (is (match? {:type :order-placed :data "data1"} ev))))]
+        (publish-event bus [:trade-made "data2"])
+        (publish-event bus [:order-placed "data1"])
         (alts!! [go-block (timeout 100)])))))

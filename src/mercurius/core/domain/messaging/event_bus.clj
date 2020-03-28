@@ -1,5 +1,6 @@
 (ns mercurius.core.domain.messaging.event-bus
-  (:require [tick.alpha.api :as t]
+  (:require [clojure.spec.alpha :as s]
+            [tick.alpha.api :as t]
             [mercurius.util.uuid :refer [uuid]]))
 
 (defrecord Event [type id created-at data])
@@ -22,5 +23,8 @@
   "Provides a simplify API to publish events in a simpler form.
   Receives event in the form [event-type event-data], build the event wrapper and dispatches it to the bus."
   [bus [event-type event-data]]
+  (s/assert ::event-type event-type)
   (->> (new-event event-type event-data)
        (dispatch bus)))
+
+(s/def ::event-type #{:order-placed :trade-made})

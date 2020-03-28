@@ -72,7 +72,8 @@
         place-order-use-case (new-place-order-use-case
                               {:fetch-wallet fetch-wallet
                                :save-wallet save-wallet
-                               :insert-order insert-order})
+                               :insert-order insert-order
+                               :publish-event publish-event})
         get-order-book-use-case (new-get-order-book-use-case
                                  {:get-order-book get-order-book})
         execute-trades-use-case (new-execute-trades-use-case

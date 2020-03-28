@@ -17,7 +17,7 @@
   "Returns a use case that allows to place an order for buy or sell the `ticker` (e.g. BTCUSD).
   The `amount` is considered to be in first currency (BTC in the previous example)
   and `price` (which is the limit price for limit orders) in the second currency (USD)."
-  [{:keys [fetch-wallet save-wallet insert-order]}]
+  [{:keys [fetch-wallet save-wallet insert-order publish-event]}]
   (fn [{:keys [user-id] :as command}]
     (s/assert ::command command)
     (let [order (new-order command)
@@ -26,4 +26,5 @@
           (wallet/reserve (:amount reservation))
           (save-wallet))
       (insert-order order)
+      (publish-event [:order-placed order])
       :ok)))
