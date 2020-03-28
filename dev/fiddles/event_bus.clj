@@ -6,7 +6,7 @@
 (comment
   (def bus (new-channel-based-event-bus))
 
-  (let [out (subscribe bus :trading/trade-made)]
+  (let [out (subscribe bus :trade-made)]
     (go-loop []
       (if-let [ev (<! out)]
         (do
@@ -14,7 +14,7 @@
           (recur))
         (println "Bye!"))))
 
-  (publish-event bus [:trading/trade-made {:trade-id "T1"}])
+  (publish-event bus [:trade-made {:trade-id "T1"}])
   (publish-event bus [:wallets/deposited {:wallet-id "W1"}])
 
   (.close bus))

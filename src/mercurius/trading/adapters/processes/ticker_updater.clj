@@ -4,7 +4,7 @@
 
 (defn new-ticker-updater [{:keys [subscribe update-ticker]}]
   (log/info "Starting ticker updater")
-  (let [events (subscribe :trading/trade-made)]
+  (let [events (subscribe :trade-made)]
     (go-loop []
       (if-let [{trade :data} (<! events)]
         (do

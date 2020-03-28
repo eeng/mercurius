@@ -43,7 +43,7 @@
                            {:user-id buyer :currency "BTC"}]
                           {:get-bids-asks get-bids-asks :save-wallet identity :publish-event publish-event})]
       (execute-trades {:ticker "BTCUSD"})
-      (is (match? [[[:trading/trade-made {:price 100}]]] (spy/calls publish-event)))))
+      (is (match? [[[:trade-made {:price 100}]]] (spy/calls publish-event)))))
 
   (testing "for each trade makes the corresponding transfers between the wallets"
     (let [bid (build-order {:price 50 :amount 2 :side :buy :ticker "BTCUSD" :user-id buyer})

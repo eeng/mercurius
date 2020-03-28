@@ -36,5 +36,5 @@
           (make-transfer deps transfer))
         (doseq [order [bid ask]]
           (update-order-book deps order))
-        (publish-event [:trading/trade-made trade]))
+        (publish-event [:trade-made trade]))
       trades)))
