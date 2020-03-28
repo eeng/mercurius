@@ -13,10 +13,11 @@
           one-order-for-ticker-chan #(to-chan [{:data (build-order {:ticker %})}])
           events-channs (atom (map one-order-for-ticker-chan available-tickers))]
       (new-trade-finder
-       {:subscribe #(let [[chan & rest] @events-channs]
-                      (is (= :order-placed %))
-                      (reset! events-channs rest)
-                      chan)
+       {:subscribe-to (fn [event-type _ _]
+                        (let [[chan & rest] @events-channs]
+                          (is (= :order-placed event-type))
+                          (reset! events-channs rest)
+                          chan))
         :execute-trades (fn [args] (>!! calls args))})
       (is (match? (m/in-any-order available-tickers)
                   (for [_ available-tickers]

@@ -4,7 +4,7 @@
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
-            [mercurius.core.domain.messaging.event-bus :refer [publish-event subscribe]]
+            [mercurius.core.domain.messaging.event-bus :refer [publish-event subscribe-to]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -54,7 +54,7 @@
         ;; Event Bus
         event-bus (new-channel-based-event-bus)
         publish-event (partial publish-event event-bus)
-        subscribe (partial subscribe event-bus)
+        subscribe-to (partial subscribe-to event-bus)
 
         ;; Use Cases
         deposit-use-case (new-deposit-use-case
@@ -91,9 +91,9 @@
 
         ;; Background Processes
         ;; TODO pass through the mediator for logging?
-        _ (new-trade-finder {:subscribe subscribe
+        _ (new-trade-finder {:subscribe-to subscribe-to
                              :execute-trades execute-trades-use-case})
-        _ (new-ticker-updater {:subscribe subscribe
+        _ (new-ticker-updater {:subscribe-to subscribe-to
                                :update-ticker update-ticker-use-case})
 
         ;; Controllers

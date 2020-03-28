@@ -8,10 +8,8 @@
   (dispatch [_ event]
     (put! in-chan event))
 
-  (subscribe [_ event-type]
-    (let [out-chan (chan)]
-      (sub events-pub event-type out-chan)
-      out-chan))
+  (subscribe [_ event-type out-chan]
+    (sub events-pub event-type out-chan))
 
   java.io.Closeable
 
