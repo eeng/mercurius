@@ -1,10 +1,11 @@
 (ns mercurius.core.adapters.configuration.system
   (:require [taoensso.timbre :as log]
             [mercurius.core.adapters.configuration.logging :refer [configure-logger]]
+            [mercurius.core.adapters.configuration.config :refer [read-config]]
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
-            [mercurius.core.domain.messaging.event-bus :refer [publish-event subscribe-to]]
+            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -28,88 +29,89 @@
   "Injects all the dependencies into the respective components and starts the system.
   Returns a map containing the components needed to drive the system.
   The resources that need to be freed when stopping the system should also be there."
-  []
-  (configure-logger)
-  (log/info "Starting system")
+  ([] (start (read-config)))
+  ([config]
+   (configure-logger config)
+   (log/info "Starting system")
 
-  (let [;; Repositories
-        wallet-repo (new-in-memory-wallet-repo)
-        load-wallet (partial load-wallet wallet-repo)
-        save-wallet (partial save-wallet wallet-repo)
-        fetch-wallet (partial fetch-wallet wallet-repo)
-        get-user-wallets (partial get-user-wallets wallet-repo)
-        calculate-monetary-base (partial calculate-monetary-base wallet-repo)
+   (let [;; Repositories
+         wallet-repo (new-in-memory-wallet-repo)
+         load-wallet (partial load-wallet wallet-repo)
+         save-wallet (partial save-wallet wallet-repo)
+         fetch-wallet (partial fetch-wallet wallet-repo)
+         get-user-wallets (partial get-user-wallets wallet-repo)
+         calculate-monetary-base (partial calculate-monetary-base wallet-repo)
 
-        order-book-repo (new-in-memory-order-book-repo)
-        insert-order (partial insert-order order-book-repo)
-        update-order (partial update-order order-book-repo)
-        remove-order (partial remove-order order-book-repo)
-        get-bids-asks (partial get-bids-asks order-book-repo)
-        get-order-book (partial get-order-book order-book-repo)
+         order-book-repo (new-in-memory-order-book-repo)
+         insert-order (partial insert-order order-book-repo)
+         update-order (partial update-order order-book-repo)
+         remove-order (partial remove-order order-book-repo)
+         get-bids-asks (partial get-bids-asks order-book-repo)
+         get-order-book (partial get-order-book order-book-repo)
 
-        ticker-repo (new-in-memory-ticker-repo)
-        update-ticker (partial update-ticker ticker-repo)
-        get-tickers (partial get-tickers ticker-repo)
+         ticker-repo (new-in-memory-ticker-repo)
+         update-ticker (partial update-ticker ticker-repo)
+         get-tickers (partial get-tickers ticker-repo)
 
         ;; Event Bus
-        event-bus (new-channel-based-event-bus)
-        publish-event (partial publish-event event-bus)
+         event-bus (new-channel-based-event-bus)
+         publish-event (partial publish-event event-bus)
 
         ;; Use Cases
-        deposit-use-case (new-deposit-use-case
-                          {:load-wallet load-wallet
-                           :save-wallet save-wallet})
-        withdraw-use-case (new-withdraw-use-case
-                           {:fetch-wallet fetch-wallet
+         deposit-use-case (new-deposit-use-case
+                           {:load-wallet load-wallet
                             :save-wallet save-wallet})
-        get-wallet-use-case (new-get-wallet-use-case
-                             {:fetch-wallet fetch-wallet})
-        get-wallets-use-case (new-get-wallets-use-case
-                              {:get-user-wallets get-user-wallets})
-        calculate-monetary-base-use-case (new-calculate-monetary-base-use-case
-                                          {:calculate-monetary-base calculate-monetary-base})
-        place-order-use-case (new-place-order-use-case
-                              {:fetch-wallet fetch-wallet
-                               :save-wallet save-wallet
-                               :insert-order insert-order
-                               :publish-event publish-event})
-        get-order-book-use-case (new-get-order-book-use-case
-                                 {:get-order-book get-order-book})
-        execute-trades-use-case (new-execute-trades-use-case
-                                 {:get-bids-asks get-bids-asks
-                                  :update-order update-order
-                                  :remove-order remove-order
-                                  :fetch-wallet fetch-wallet
-                                  :load-wallet load-wallet
-                                  :save-wallet save-wallet
-                                  :publish-event publish-event})
-        update-ticker-use-case (new-update-ticker-use-case
-                                {:update-ticker update-ticker})
-        get-tickers-use-case (new-get-tickers-use-case
-                              {:get-tickers get-tickers})
+         withdraw-use-case (new-withdraw-use-case
+                            {:fetch-wallet fetch-wallet
+                             :save-wallet save-wallet})
+         get-wallet-use-case (new-get-wallet-use-case
+                              {:fetch-wallet fetch-wallet})
+         get-wallets-use-case (new-get-wallets-use-case
+                               {:get-user-wallets get-user-wallets})
+         calculate-monetary-base-use-case (new-calculate-monetary-base-use-case
+                                           {:calculate-monetary-base calculate-monetary-base})
+         place-order-use-case (new-place-order-use-case
+                               {:fetch-wallet fetch-wallet
+                                :save-wallet save-wallet
+                                :insert-order insert-order
+                                :publish-event publish-event})
+         get-order-book-use-case (new-get-order-book-use-case
+                                  {:get-order-book get-order-book})
+         execute-trades-use-case (new-execute-trades-use-case
+                                  {:get-bids-asks get-bids-asks
+                                   :update-order update-order
+                                   :remove-order remove-order
+                                   :fetch-wallet fetch-wallet
+                                   :load-wallet load-wallet
+                                   :save-wallet save-wallet
+                                   :publish-event publish-event})
+         update-ticker-use-case (new-update-ticker-use-case
+                                 {:update-ticker update-ticker})
+         get-tickers-use-case (new-get-tickers-use-case
+                               {:get-tickers get-tickers})
 
         ;; Background Processes
-        _ (new-trade-finder {:event-bus event-bus
-                             :execute-trades execute-trades-use-case})
-        _ (new-ticker-updater {:event-bus event-bus
-                               :update-ticker update-ticker-use-case})
+         _ (new-trade-finder {:event-bus event-bus
+                              :execute-trades execute-trades-use-case})
+         _ (new-ticker-updater {:event-bus event-bus
+                                :update-ticker update-ticker-use-case})
 
         ;; Controllers
-        mediator (new-mediator {:deposit deposit-use-case
-                                :withdraw withdraw-use-case
-                                :get-wallet get-wallet-use-case
-                                :get-wallets get-wallets-use-case
-                                :place-order place-order-use-case
-                                :get-order-book get-order-book-use-case
-                                :execute-trades execute-trades-use-case
-                                :calculate-monetary-base calculate-monetary-base-use-case
-                                :get-tickers get-tickers-use-case}
-                               [logger])]
+         mediator (new-mediator {:deposit deposit-use-case
+                                 :withdraw withdraw-use-case
+                                 :get-wallet get-wallet-use-case
+                                 :get-wallets get-wallets-use-case
+                                 :place-order place-order-use-case
+                                 :get-order-book get-order-book-use-case
+                                 :execute-trades execute-trades-use-case
+                                 :calculate-monetary-base calculate-monetary-base-use-case
+                                 :get-tickers get-tickers-use-case}
+                                [logger])]
 
-    {:dispatch (partial dispatch mediator)
-     :order-book-repo order-book-repo
-     :wallet-repo wallet-repo
-     :event-bus event-bus}))
+     {:dispatch (partial dispatch mediator)
+      :order-book-repo order-book-repo
+      :wallet-repo wallet-repo
+      :event-bus event-bus})))
 
 (defn stop [{:keys [event-bus] :as system}]
   (when system

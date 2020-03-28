@@ -3,7 +3,7 @@
             [mercurius.trading.domain.entities.order :refer [fill-order partially-filled? amount-paid currency-paid]]
             [mercurius.trading.domain.entities.order-book :refer [sort-orders-for-side]]))
 
-(defrecord Trade [ticker price amount created-at bid ask])
+(defrecord Trade [ticker price amount bid ask])
 
 (def new-trade map->Trade)
 

@@ -14,4 +14,5 @@
   (def dispatch (:dispatch system))
   (dispatch :calculate-monetary-base {})
   (dispatch :execute-trades {:ticker "BTCUSD"})
-  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10}))
+  (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
+  (dispatch :get-tickers {}))

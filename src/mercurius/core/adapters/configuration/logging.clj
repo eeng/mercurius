@@ -17,8 +17,8 @@
      (when-let [err ?err]
        (str "\n" (log/stacktrace err nil))))))
 
-(defn configure-logger []
+(defn configure-logger [{:keys [log-level]}]
   (log/merge-config!
-   {:level :info
+   {:level log-level
     :output-fn output-fn
     :timestamp-opts {:pattern "yy-MM-dd HH:mm:ss.SSS"}}))

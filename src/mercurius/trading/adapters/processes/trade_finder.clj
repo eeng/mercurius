@@ -14,5 +14,4 @@
                   :out-chan (chan (sliding-buffer 1))
                   :on-event (fn [{order :data}]
                               (when (= ticker (:ticker order))
-                                (log/debug "Finding trades for" ticker)
                                 (execute-trades {:ticker ticker}))))))
