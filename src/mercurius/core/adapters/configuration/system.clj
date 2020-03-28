@@ -14,7 +14,7 @@
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.repositories.in-memory-ticker-repository :refer [new-in-memory-ticker-repo]]
-            [mercurius.trading.adapters.processes.trade-finder :refer [start-trade-finder]]
+            [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]
             [mercurius.trading.adapters.processes.ticker-updater :refer [new-ticker-updater]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
             [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers]]
@@ -90,8 +90,9 @@
                               {:get-tickers get-tickers})
 
         ;; Background Processes
-        trade-finder (start-trade-finder {:execute-trades execute-trades-use-case
-                                          :run-every-ms 0})
+        ;; TODO pass through the mediator for logging?
+        _ (new-trade-finder {:subscribe subscribe
+                             :execute-trades execute-trades-use-case})
         _ (new-ticker-updater {:subscribe subscribe
                                :update-ticker update-ticker-use-case})
 
@@ -110,12 +111,10 @@
     {:dispatch (partial dispatch mediator)
      :order-book-repo order-book-repo
      :wallet-repo wallet-repo
-     :trade-finder trade-finder
      :event-bus event-bus}))
 
-(defn stop [{:keys [trade-finder event-bus] :as system}]
+(defn stop [{:keys [event-bus] :as system}]
   (when system
     (log/info "Stopping system")
-    (.close trade-finder)
     (.close event-bus))
   nil)

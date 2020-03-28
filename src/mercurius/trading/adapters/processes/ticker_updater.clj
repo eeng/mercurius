@@ -3,9 +3,9 @@
             [taoensso.timbre :as log]))
 
 (defn new-ticker-updater [{:keys [subscribe update-ticker]}]
-  (log/info "Starting ticker updater")
   (let [events (subscribe :trade-made)]
     (go-loop []
+      (log/info "Starting ticker updater")
       (if-let [{trade :data} (<! events)]
         (do
           (log/debug "Trade made:" trade)

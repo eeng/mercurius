@@ -13,3 +13,4 @@
 - Track current ticker prices
 - Simulator, place orders around current price
 - Add simulation test invariant: Users without pending orders should have reserved 0 in their wallets
+- Handle event handlers failures
