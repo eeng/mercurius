@@ -1,6 +1,6 @@
 (ns mercurius.core.adapters.configuration.config)
 
-(def default-config {:log-level :debug})
+(def default-config {:log-level :info})
 
 (def ^:dynamic *config-overrides* {})
 

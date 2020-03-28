@@ -45,6 +45,11 @@
   (testing "if the bid price is lower than the ask price, returns nil"
     (let [bid (build-order {:price 99})
           ask (build-order {:price 100})]
+      (is (nil? (generate-trade bid ask)))))
+
+  (testing "if the bid and ask are for the same user, returns nil"
+    (let [bid (build-order {:user-id 1 :price 100})
+          ask (build-order {:user-id 1 :price 100})]
       (is (nil? (generate-trade bid ask))))))
 
 (deftest match-orders-test

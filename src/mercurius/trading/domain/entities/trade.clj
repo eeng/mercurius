@@ -11,9 +11,9 @@
   "Tries to produce a trade between the bid and ask orders.
   If the bid price is greater or equal to the ask price, a trade is returned.
   Otherwise returns nil."
-  [{bid-price :price bid-placed-at :placed-at remaining-bid :remaining ticker :ticker :as bid}
-   {ask-price :price ask-placed-at :placed-at remaining-ask :remaining :as ask}]
-  (when (and bid ask (>= bid-price ask-price))
+  [{bid-price :price bid-placed-at :placed-at remaining-bid :remaining bid-user :user-id ticker :ticker :as bid}
+   {ask-price :price ask-placed-at :placed-at remaining-ask :remaining ask-user :user-id :as ask}]
+  (when (and bid ask (>= bid-price ask-price) (not= bid-user ask-user))
     (let [trade-price (if (t/< bid-placed-at ask-placed-at) ask-price bid-price)
           trade-amount (min remaining-bid remaining-ask)]
       (new-trade {:price trade-price

@@ -71,4 +71,11 @@
           dst (build-wallet {:balance 0 :currency "BTC"})]
       (is (thrown-match? clojure.lang.ExceptionInfo
                          {:type :wallet/different-currencies}
-                         (transfer src dst 1))))))
+                         (transfer src dst 1)))))
+
+  (testing "can't transfer between same wallet"
+    (let [w1 (build-wallet {:id "1" :balance 1 :reserved 0})
+          w2 (build-wallet {:id "1" :balance 1 :reserved 1})]
+      (is (thrown-match? clojure.lang.ExceptionInfo
+                         {:type :wallet/transfer-between-same}
+                         (transfer w1 w2 1))))))

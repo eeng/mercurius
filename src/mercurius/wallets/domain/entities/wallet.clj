@@ -14,10 +14,11 @@
 
 (defrecord Wallet [id user-id currency balance reserved])
 
-(defn new-wallet [{:keys [user-id currency balance reserved] :or {balance 0 reserved 0}}]
+(defn new-wallet [{:keys [id user-id currency balance reserved]
+                   :or {id (uuid) balance 0 reserved 0}}]
   {:pre [(s/assert ::currency currency)]
    :post [(s/assert ::wallet %)]}
-  (map->Wallet {:id (uuid)
+  (map->Wallet {:id id
                 :user-id user-id
                 :currency currency
                 :balance (money balance)
@@ -63,4 +64,6 @@
   (s/assert ::wallet dst)
   (when (not= (:currency src) (:currency dst))
     (throw+ {:type :wallet/different-currencies :src src :dst dst}))
+  (when (= (:id src) (:id dst))
+    (throw+ {:type :wallet/transfer-between-same :src src :dst dst}))
   [(withdraw src amount) (deposit dst amount)])
