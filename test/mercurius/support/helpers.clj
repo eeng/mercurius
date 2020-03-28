@@ -1,7 +1,7 @@
 (ns mercurius.support.helpers
   (:require [clojure.core.async :refer [timeout alts!!]]))
 
-(defn recorded-calls [calls-chan expected-count & {:keys [wait-for] :or {wait-for 100}}]
+(defn recorded-calls [calls-chan expected-count & {:keys [wait-for] :or {wait-for 500}}]
   (loop [recorded []
          actual-count 0]
     (if (< actual-count expected-count)
