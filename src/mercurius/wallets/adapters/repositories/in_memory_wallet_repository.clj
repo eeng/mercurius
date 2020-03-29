@@ -1,13 +1,27 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository
   (:require [mercurius.wallets.domain.repositories.wallet-repository :refer [WalletRepository get-user-wallets]]
-            [mercurius.util.collections :refer [detect map-vals sum-by]]))
+            [mercurius.util.collections :refer [detect map-vals sum-by assoc-or]]))
+
+(defn inc-version-if-same [new-val old-val]
+  (let [old-val (assoc-or old-val :version 0)
+        new-val (assoc-or new-val :version 0)]
+    (if (= (:version new-val) (:version old-val))
+      (update new-val :version inc)
+      (throw (IllegalStateException.
+              (format "Stale object. Expected version %d but got %d. Object: %s"
+                      (:version old-val)
+                      (:version new-val)
+                      (pr-str new-val)))))))
+
+(defn optimistic-assoc [m k new-val]
+  (update m k (partial inc-version-if-same new-val)))
 
 (defrecord InMemoryWalletRepository [db]
   WalletRepository
 
   (save-wallet [_ {:keys [id] :as wallet}]
-    (swap! db assoc id wallet)
-    wallet)
+    (swap! db optimistic-assoc id wallet)
+    (@db id))
 
   (find-wallet [this user-id currency]
     (->> (get-user-wallets this user-id)
