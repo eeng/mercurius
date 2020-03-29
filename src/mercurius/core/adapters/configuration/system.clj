@@ -10,6 +10,7 @@
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
             [mercurius.wallets.domain.use-cases.withdraw :refer [new-withdraw-use-case]]
+            [mercurius.wallets.domain.use-cases.transfer :refer [new-transfer-use-case]]
             [mercurius.wallets.domain.use-cases.get-wallet :refer [new-get-wallet-use-case]]
             [mercurius.wallets.domain.use-cases.get-wallets :refer [new-get-wallets-use-case]]
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
@@ -64,6 +65,10 @@
          withdraw-use-case (new-withdraw-use-case
                             {:fetch-wallet fetch-wallet
                              :save-wallet save-wallet})
+         transfer-use-case (new-transfer-use-case
+                            {:fetch-wallet fetch-wallet
+                             :load-wallet load-wallet
+                             :save-wallet save-wallet})
          get-wallet-use-case (new-get-wallet-use-case
                               {:fetch-wallet fetch-wallet})
          get-wallets-use-case (new-get-wallets-use-case
@@ -81,9 +86,7 @@
                                   {:get-bids-asks get-bids-asks
                                    :update-order update-order
                                    :remove-order remove-order
-                                   :fetch-wallet fetch-wallet
-                                   :load-wallet load-wallet
-                                   :save-wallet save-wallet
+                                   :transfer transfer-use-case
                                    :publish-event publish-event})
          update-ticker-use-case (new-update-ticker-use-case
                                  {:update-ticker update-ticker})
