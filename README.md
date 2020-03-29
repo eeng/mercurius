@@ -10,7 +10,6 @@
 - Trigger events, like when a trade is made. Then remove the "trade made" logging.
 - Think about aggregate's invariants and transactions.
 - Store some trx-id in deposits/withdraws related to transfers
-- Track current ticker prices
 - Simulator, place orders around current price
 - Add simulation test invariant: Users without pending orders should have reserved 0 in their wallets
-- Handle event handlers failures
+- Transaction middleware
