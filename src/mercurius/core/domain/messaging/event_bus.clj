@@ -2,7 +2,8 @@
   (:require [clojure.spec.alpha :as s]
             [tick.alpha.api :as t]
             [mercurius.util.uuid :refer [uuid]]
-            [clojure.core.async :refer [chan go-loop <!]]))
+            [clojure.core.async :refer [chan go-loop <!]]
+            [taoensso.timbre :as log]))
 
 (defrecord Event [type id created-at data])
 
@@ -40,7 +41,11 @@
   (if on-event
     (go-loop []
       (when-let [event (<! out-chan)]
-        (on-event event)
+        (try
+          (on-event event)
+          (catch Exception e
+            (log/error e)
+            (throw e)))
         (recur)))
     out-chan))
 
