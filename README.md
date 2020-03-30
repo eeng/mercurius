@@ -13,3 +13,4 @@
 - Simulator, place orders around current price
 - Add simulation test invariant: Users without pending orders should have reserved 0 in their wallets
 - Transaction middleware
+- In the event handlers pass through the mediator so those use cases get logged and retried as well

@@ -4,6 +4,7 @@
             [mercurius.core.adapters.configuration.config :refer [read-config]]
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
+            [mercurius.core.adapters.controllers.mediator.middleware.retrier :refer [retrier]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
             [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
@@ -109,7 +110,7 @@
                                  :execute-trades execute-trades-use-case
                                  :calculate-monetary-base calculate-monetary-base-use-case
                                  :get-tickers get-tickers-use-case}
-                                [logger])]
+                                [logger retrier])]
 
      {:dispatch (partial dispatch mediator)
       :order-book-repo order-book-repo

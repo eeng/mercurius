@@ -1,9 +1,9 @@
 (ns mercurius.core.domain.messaging.event-bus
   (:require [clojure.spec.alpha :as s]
-            [tick.alpha.api :as t]
-            [mercurius.util.uuid :refer [uuid]]
             [clojure.core.async :refer [chan go-loop <!]]
-            [taoensso.timbre :as log]))
+            [tick.alpha.api :as t]
+            [taoensso.timbre :as log]
+            [mercurius.util.uuid :refer [uuid]]))
 
 (defrecord Event [type id created-at data])
 
@@ -32,6 +32,16 @@
   (->> (new-event event-type event-data)
        (dispatch bus)))
 
+(defn- start-callback-process [out-chan on-event]
+  (go-loop []
+    (when-let [event (<! out-chan)]
+      (try
+        (on-event event)
+        (catch Exception e
+          (log/error e)
+          (throw e)))
+      (recur))))
+
 (defn subscribe-to
   "Allows to subscribe to specific event types.
   If the `on-event` callback is provided, it'll called with each event received in the channel.
@@ -39,14 +49,7 @@
   [bus event-type & {:keys [out-chan on-event] :or {out-chan (chan)}}]
   (subscribe bus event-type out-chan)
   (if on-event
-    (go-loop []
-      (when-let [event (<! out-chan)]
-        (try
-          (on-event event)
-          (catch Exception e
-            (log/error e)
-            (throw e)))
-        (recur)))
+    (start-callback-process out-chan on-event)
     out-chan))
 
 (s/def ::event-type #{:order-placed :trade-made})

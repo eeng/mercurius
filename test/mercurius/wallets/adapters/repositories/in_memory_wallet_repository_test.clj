@@ -41,6 +41,6 @@
           w1 (fetch-wallet repo 9 "USD")
           w2 (fetch-wallet repo 9 "USD")]
       (save-wallet repo (update w1 :balance + 10))
-      (is (thrown? IllegalStateException
-                   (save-wallet repo (update w2 :balance + 11))))
+      (is (thrown-match? clojure.lang.ExceptionInfo {:type :stale-object-error}
+                         (save-wallet repo (update w2 :balance + 11))))
       (is (match? {:balance 10M} (fetch-wallet repo 9 "USD"))))))

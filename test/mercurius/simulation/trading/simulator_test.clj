@@ -5,8 +5,8 @@
 
 (deftest ^:integration ^:slow run-simulation-test
   (with-system [{:keys [dispatch] :as system} {}]
-    (let [n-traders 10
-          n-orders-per-trader 10
+    (let [n-traders 20
+          n-orders-per-trader 5
           initial-price 250.0
           usd-funds 1000M
           btc-funds (bigdec (/ usd-funds initial-price))

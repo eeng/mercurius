@@ -4,7 +4,7 @@
             [mercurius.support.fixtures :refer [with-system]]))
 
 (deftest ^:integration start-test
-  (testing "Assembles the system and allows to execute the use cases"
+  (testing "assembles the system and allows to execute the use cases"
     (with-system [{:keys [dispatch] :as system} {}]
       (is (map? system))
 
