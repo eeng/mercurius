@@ -103,6 +103,7 @@
         ;; Controllers
          mediator (new-mediator {:deposit deposit-use-case
                                  :withdraw withdraw-use-case
+                                 :transfer transfer-use-case
                                  :get-wallet get-wallet-use-case
                                  :get-wallets get-wallets-use-case
                                  :place-order place-order-use-case
