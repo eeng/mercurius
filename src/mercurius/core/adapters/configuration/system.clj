@@ -7,6 +7,7 @@
             [mercurius.core.adapters.controllers.mediator.middleware.retrier :refer [retrier]]
             [mercurius.core.adapters.controllers.mediator.middleware.stm :refer [stm]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
+            [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
@@ -110,13 +111,14 @@
                                  :get-tickers get-tickers-use-case}
                                 [logger retrier stm])
 
-         dispatch (partial dispatch mediator)
+         dispatch (partial dispatch mediator)]
 
-         ;; Background Processes
-         _ (new-trade-finder {:event-bus event-bus
-                              :execute-trades (partial dispatch :execute-trades)})
-         _ (new-ticker-updater {:event-bus event-bus
-                                :update-ticker (partial dispatch :update-ticker)})]
+     ;; Event Handlers
+     (new-trade-finder {:event-bus event-bus
+                        :execute-trades (partial dispatch :execute-trades)})
+     (new-ticker-updater {:event-bus event-bus
+                          :update-ticker (partial dispatch :update-ticker)})
+     (new-activity-logger {:event-bus event-bus})
 
      {:dispatch dispatch
       :order-book-repo order-book-repo
