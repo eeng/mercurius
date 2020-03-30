@@ -13,3 +13,6 @@
 
 (defn optimistic-assoc [m k new-val]
   (update m k (partial inc-version-if-same new-val)))
+
+(defn optimistic-assoc-in [m ks new-val]
+  (update-in m ks (partial inc-version-if-same new-val)))

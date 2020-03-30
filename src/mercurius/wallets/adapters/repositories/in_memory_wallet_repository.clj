@@ -1,23 +1,23 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository
   (:require [mercurius.wallets.domain.repositories.wallet-repository :refer [WalletRepository find-wallet]]
             [mercurius.util.collections :refer [map-vals sum-by]]
-            [mercurius.util.optimistic-concurrency :refer [optimistic-assoc]]))
+            [mercurius.util.optimistic-concurrency :refer [optimistic-assoc-in]]))
 
 (defrecord InMemoryWalletRepository [db]
   WalletRepository
 
   (save-wallet [this {:keys [user-id currency] :as wallet}]
-    (alter db optimistic-assoc [user-id currency] wallet)
+    (alter db optimistic-assoc-in [user-id currency] wallet)
     (find-wallet this user-id currency))
 
   (find-wallet [this user-id currency]
-    (@db [user-id currency]))
+    (get-in @db [user-id currency]))
 
   (get-user-wallets [_ user-id]
-    (->> @db vals (filter #(= user-id (:user-id %)))))
+    (-> @db (get user-id) vals))
 
   (calculate-monetary-base [_]
-    (->> (vals @db)
+    (->> @db vals (mapcat vals)
          (group-by :currency)
          (map-vals #(sum-by :balance %)))))
 

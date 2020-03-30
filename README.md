@@ -9,4 +9,3 @@
 - Handle market orders
 - Store some trx-id in deposits/withdraws related to transfers
 - Simulator, place orders around current price
-- Add simulation test invariant: Users without pending orders should have reserved 0 in their wallets
