@@ -1,9 +1,12 @@
 (ns mercurius.trading.adapters.repositories.in-memory-order-book-repository-test
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require [clojure.test :refer [deftest testing is use-fixtures]]
             [matcher-combinators.test]
+            [mercurius.support.helpers :refer [ref-trx]]
             [mercurius.support.factory :refer [build-order]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bids-asks update-order remove-order]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]))
+
+(use-fixtures :each ref-trx)
 
 (deftest insert-order-test
   (testing "should add the order to the corresponding side"

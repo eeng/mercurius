@@ -1,8 +1,11 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository-test
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require [clojure.test :refer [deftest testing is use-fixtures]]
             [mercurius.support.factory :refer [build-wallet]]
+            [mercurius.support.helpers :refer [ref-trx]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]))
+
+(use-fixtures :each ref-trx)
 
 (deftest in-memory-wallet-repository-test
   (testing "save-wallet should create or update the wallet"

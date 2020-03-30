@@ -10,3 +10,7 @@
           (recur (conj recorded call) (inc actual-count))
           recorded))
       recorded)))
+
+(defn ref-trx [f]
+  (dosync
+   (f)))

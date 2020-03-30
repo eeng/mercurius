@@ -22,15 +22,15 @@
   OrderBookRepository
 
   (insert-order [_ {:keys [ticker] :as order}]
-    (swap! db update-in [ticker (book-side order)] conj order)
+    (alter db update-in [ticker (book-side order)] conj order)
     order)
 
   (update-order [_ {:keys [ticker id] :as order}]
-    (swap! db update-in [ticker (book-side order)] replace-order order)
+    (alter db update-in [ticker (book-side order)] replace-order order)
     order)
 
   (remove-order [_ {:keys [ticker id] :as order}]
-    (swap! db update-in [ticker (book-side order)] remove-order order)
+    (alter db update-in [ticker (book-side order)] remove-order order)
     order)
 
   (get-order-book [_ ticker]
@@ -47,5 +47,5 @@
 
 (defn new-in-memory-order-book-repo []
   (InMemoryOrderBookRepository.
-   (atom (zipmap available-tickers
-                 (repeat (count available-tickers) (new-order-book))))))
+   (ref (zipmap available-tickers
+                (repeat (count available-tickers) (new-order-book))))))

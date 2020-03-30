@@ -5,6 +5,7 @@
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.core.adapters.controllers.mediator.middleware.retrier :refer [retrier]]
+            [mercurius.core.adapters.controllers.mediator.middleware.stm :refer [stm]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
             [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
@@ -55,11 +56,11 @@
          update-ticker (partial update-ticker ticker-repo)
          get-tickers (partial get-tickers ticker-repo)
 
-        ;; Event Bus
+         ;; Event Bus
          event-bus (new-channel-based-event-bus)
          publish-event (partial publish-event event-bus)
 
-        ;; Use Cases
+         ;; Use Cases
          deposit-use-case (new-deposit-use-case
                            {:load-wallet load-wallet
                             :save-wallet save-wallet})
@@ -94,13 +95,7 @@
          get-tickers-use-case (new-get-tickers-use-case
                                {:get-tickers get-tickers})
 
-        ;; Background Processes
-         _ (new-trade-finder {:event-bus event-bus
-                              :execute-trades execute-trades-use-case})
-         _ (new-ticker-updater {:event-bus event-bus
-                                :update-ticker update-ticker-use-case})
-
-        ;; Controllers
+         ;; Controllers
          mediator (new-mediator {:deposit deposit-use-case
                                  :withdraw withdraw-use-case
                                  :transfer transfer-use-case
@@ -109,11 +104,20 @@
                                  :place-order place-order-use-case
                                  :get-order-book get-order-book-use-case
                                  :execute-trades execute-trades-use-case
+                                 :update-ticker update-ticker-use-case
                                  :calculate-monetary-base calculate-monetary-base-use-case
                                  :get-tickers get-tickers-use-case}
-                                [logger retrier])]
+                                [logger retrier stm])
 
-     {:dispatch (partial dispatch mediator)
+         dispatch (partial dispatch mediator)
+
+         ;; Background Processes
+         _ (new-trade-finder {:event-bus event-bus
+                              :execute-trades (partial dispatch :execute-trades)})
+         _ (new-ticker-updater {:event-bus event-bus
+                                :update-ticker (partial dispatch :update-ticker)})]
+
+     {:dispatch dispatch
       :order-book-repo order-book-repo
       :wallet-repo wallet-repo
       :event-bus event-bus})))

@@ -18,15 +18,14 @@
       (let [{:keys [buying]} (dispatch :get-order-book {:ticker "BTCUSD"})]
         (is (match? [{:amount 0.2M}] buying)))))
 
-  ;; TODO reactivate
-  #_(testing "transfering between wallets should not have concurrency issues"
-      (with-system [{:keys [dispatch]} {}]
-        (let [concurrency 10
-              amount (bigdec concurrency)]
-          (dispatch :deposit {:user-id 1 :amount amount :currency "USD"})
-          (->> #(dispatch :transfer {:from 1 :to 2 :transfer-amount 1 :currency "USD"})
-               (repeat concurrency)
-               (apply pcalls)
-               (dorun))
-          (is (match? {:balance 0M} (dispatch :get-wallet {:user-id 1 :currency "USD"})))
-          (is (match? {:balance amount} (dispatch :get-wallet {:user-id 2 :currency "USD"})))))))
+  (testing "transfering between wallets should not have concurrency issues"
+    (with-system [{:keys [dispatch]} {}]
+      (let [concurrency 100
+            amount (bigdec concurrency)]
+        (dispatch :deposit {:user-id 1 :amount amount :currency "USD"})
+        (->> #(dispatch :transfer {:from 1 :to 2 :transfer-amount 1 :currency "USD"})
+             (repeat concurrency)
+             (apply pcalls)
+             (dorun))
+        (is (match? {:balance 0M} (dispatch :get-wallet {:user-id 1 :currency "USD"})))
+        (is (match? {:balance amount} (dispatch :get-wallet {:user-id 2 :currency "USD"})))))))

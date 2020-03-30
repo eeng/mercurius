@@ -7,7 +7,7 @@
   WalletRepository
 
   (save-wallet [_ {:keys [id] :as wallet}]
-    (swap! db optimistic-assoc id wallet)
+    (alter db optimistic-assoc id wallet)
     (@db id))
 
   (find-wallet [this user-id currency]
@@ -23,4 +23,4 @@
          (map-vals #(sum-by :balance %)))))
 
 (defn new-in-memory-wallet-repo []
-  (InMemoryWalletRepository. (atom {})))
+  (InMemoryWalletRepository. (ref {})))
