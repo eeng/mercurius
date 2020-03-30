@@ -91,7 +91,8 @@
                                    :transfer transfer-use-case
                                    :publish-event publish-event})
          update-ticker-use-case (new-update-ticker-use-case
-                                 {:update-ticker update-ticker})
+                                 {:update-ticker update-ticker
+                                  :publish-event publish-event})
          get-tickers-use-case (new-get-tickers-use-case
                                {:get-tickers get-tickers})
 

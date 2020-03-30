@@ -7,5 +7,4 @@
   (subscribe-to event-bus
                 :trade-made
                 :on-event (fn [{trade :data}]
-                            (log/debug "Trade made:" trade)
                             (update-ticker trade))))

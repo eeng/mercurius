@@ -28,7 +28,6 @@
   The event must be in the form [event-type event-data]. 
   It builds the event wrapper and dispatches it to the bus."
   [bus [event-type event-data]]
-  (s/assert ::event-type event-type)
   (->> (new-event event-type event-data)
        (dispatch bus)))
 
@@ -51,5 +50,3 @@
   (if on-event
     (start-callback-process out-chan on-event)
     out-chan))
-
-(s/def ::event-type #{:order-placed :trade-made})

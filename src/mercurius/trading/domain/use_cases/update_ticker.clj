@@ -10,7 +10,8 @@
 
 (defn new-update-ticker-use-case
   "Updates a ticker stats from a trade."
-  [{:keys [update-ticker]}]
+  [{:keys [update-ticker publish-event]}]
   (fn [command]
     (s/assert ::command command)
-    (update-ticker command)))
+    (let [ticker-stats (update-ticker command)]
+      (publish-event [:ticker-changed ticker-stats]))))

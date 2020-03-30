@@ -8,12 +8,14 @@
   (update-ticker [_ {:keys [ticker price amount]}]
     (swap! db #(-> %
                    (assoc-in [ticker :last-price] price)
-                   (update-in [ticker :volume] + amount))))
+                   (update-in [ticker :volume] + amount)))
+    (@db ticker))
 
   (get-tickers [_]
     @db))
 
 (defn new-in-memory-ticker-repo []
   (InMemoryTickerRepository.
-   (atom (zipmap available-tickers
-                 (repeat (count available-tickers) {:last-price 0 :volume 0M})))))
+   (atom (->> available-tickers
+              (map (fn [t] [t {:ticker t :last-price 0 :volume 0M}]))
+              (into {})))))
