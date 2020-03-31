@@ -7,6 +7,6 @@
   [{:keys [event-bus]}]
   (log/info "Starting activity logger")
   (subscribe-to event-bus
-                :ticker-changed
+                :ticker-updated
                 :on-event (fn [{:keys [type data]}]
                             (log/info "New event:" [type data]))))

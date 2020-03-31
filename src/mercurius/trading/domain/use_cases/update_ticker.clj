@@ -14,4 +14,4 @@
   (fn [command]
     (s/assert ::command command)
     (let [ticker-stats (update-ticker command)]
-      (publish-event [:ticker-changed ticker-stats]))))
+      (publish-event [:ticker-updated ticker-stats]))))
