@@ -1,7 +1,7 @@
 (ns mercurius.trading.domain.entities.trade-test
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
-            [mercurius.support.factory :refer [build-order]]
+            [mercurius.support.factory :refer [build-order build-user-id]]
             [mercurius.trading.domain.entities.trade :refer [generate-trade match-orders build-transfers new-trade]]
             [tick.alpha.api :as t]))
 
@@ -48,8 +48,9 @@
       (is (nil? (generate-trade bid ask)))))
 
   (testing "if the bid and ask are for the same user, returns nil"
-    (let [bid (build-order {:user-id 1 :price 100})
-          ask (build-order {:user-id 1 :price 100})]
+    (let [bob (build-user-id)
+          bid (build-order {:user-id bob :price 100})
+          ask (build-order {:user-id bob :price 100})]
       (is (nil? (generate-trade bid ask))))))
 
 (deftest match-orders-test
@@ -87,8 +88,8 @@
                    {:ask {:id "b"}}]
                   (match-orders bids asks))))))
 
-(def buyer 1)
-(def seller 2)
+(def buyer (build-user-id))
+(def seller (build-user-id))
 
 (deftest build-transfers-test
   (testing "returns a map with the data necessary to make the transfers corresponding to a trade"

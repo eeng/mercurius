@@ -1,11 +1,14 @@
 (ns mercurius.wallets.adapters.repositories.in-memory-wallet-repository-test
   (:require [clojure.test :refer [deftest testing is use-fixtures]]
-            [mercurius.support.factory :refer [build-wallet]]
+            [mercurius.support.factory :refer [build-wallet build-user-id]]
             [mercurius.support.helpers :refer [ref-trx]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]))
 
 (use-fixtures :each ref-trx)
+
+(def u1 (build-user-id))
+(def u2 (build-user-id))
 
 (deftest in-memory-wallet-repository-test
   (testing "save-wallet should create or update the wallet"
@@ -32,9 +35,9 @@
 
   (testing "calculate-monetary-base should create or update the wallet"
     (let [repo (new-in-memory-wallet-repo)]
-      (save-wallet repo {:id 1 :user-id 1 :currency "USD" :balance 5.5M})
-      (save-wallet repo {:id 2 :user-id 2 :currency "USD" :balance 4M})
-      (save-wallet repo {:id 3 :user-id 1 :currency "BTC" :balance 3M})
+      (save-wallet repo {:id 1 :user-id u1 :currency "USD" :balance 5.5M})
+      (save-wallet repo {:id 2 :user-id u2 :currency "USD" :balance 4M})
+      (save-wallet repo {:id 3 :user-id u1 :currency "BTC" :balance 3M})
       (is (match? {"USD" 9.5M "BTC" 3M}
                   (calculate-monetary-base repo)))))
 

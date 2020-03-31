@@ -3,11 +3,11 @@
             [matcher-combinators.test]
             [spy.core :as spy]
             [spy.assert :as assert]
-            [mercurius.support.factory :refer [build-order]]
+            [mercurius.support.factory :refer [build-user-id build-order]]
             [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]))
 
-(def buyer 1)
-(def seller 2)
+(def buyer (build-user-id))
+(def seller (build-user-id))
 
 (defn- build-use-case
   [{:keys [get-bids-asks remove-order update-order transfer publish-event]
