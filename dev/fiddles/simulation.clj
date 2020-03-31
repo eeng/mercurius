@@ -6,7 +6,8 @@
   (do
     (reset)
     (time (run-simulation system
-                          :tickers {"BTCUSD" {:initial-price 5000 :initial-funds 10000}}
+                          :tickers {"BTCUSD" {:initial-price 5000}}
+                          :initial-funds {"USD" 10000 "BTC" 2}
                           :n-traders 100
                           :n-orders-per-trader 5
                           :max-ms-between-orders 10

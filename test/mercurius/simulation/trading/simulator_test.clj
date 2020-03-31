@@ -14,7 +14,8 @@
             expected-monetary-base {"USD" (* n-traders usd-funds)
                                     "BTC" (* n-traders btc-funds)}]
         (run-simulation system
-                        :tickers {"BTCUSD" {:initial-price initial-price :initial-funds usd-funds}}
+                        :tickers {"BTCUSD" {:initial-price initial-price}}
+                        :initial-funds {"USD" usd-funds "BTC" btc-funds}
                         :n-traders n-traders
                         :n-orders-per-trader n-orders-per-trader
                         :max-ms-between-orders 10)

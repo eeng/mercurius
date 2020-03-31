@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [roul.random :as rr]
             [mercurius.trading.domain.entities.ticker :as ticker]
-            [mercurius.wallets.domain.entities.wallet :refer [available-balance]]
+            [mercurius.wallets.domain.entities.wallet :as wallet :refer [available-balance]]
             [mercurius.util.number :refer [round-to-significant-figures]]))
 
 (defn user-id-gen []
@@ -13,15 +13,11 @@
 (defn- make-trader [gen-user-id]
   (gen-user-id))
 
-(defn- fund-accounts [trader tickers-opts dispatch]
-  (doseq [[ticker {:keys [initial-funds initial-price]}] tickers-opts
-          :let [[first-cur second-cur] (ticker/currencies ticker)]]
+(defn- fund-accounts [trader initial-funds dispatch]
+  (doseq [[currency funds] initial-funds]
     (dispatch :deposit {:user-id trader
-                        :amount (/ (float initial-funds) initial-price)
-                        :currency first-cur})
-    (dispatch :deposit {:user-id trader
-                        :amount initial-funds
-                        :currency second-cur})))
+                        :amount funds
+                        :currency currency})))
 
 (defn- pick-side []
   (rand-nth [:buy :sell]))
@@ -70,11 +66,11 @@
                             :price price
                             :type :limit})))
 
-(defn- start-trading [trader dispatch {:keys [tickers n-orders-per-trader max-ms-between-orders]
+(defn- start-trading [trader dispatch {:keys [initial-funds n-orders-per-trader max-ms-between-orders]
                                        :or {n-orders-per-trader 1
                                             max-ms-between-orders 0}
                                        :as config}]
-  (fund-accounts trader tickers dispatch)
+  (fund-accounts trader initial-funds dispatch)
   (doseq [_ (range n-orders-per-trader)]
     (Thread/sleep (rand max-ms-between-orders))
     (place-order trader dispatch config)))
@@ -87,8 +83,8 @@
 
 (s/def ::percent (s/and number? #(<= 0 % 1)))
 (s/def ::initial-price (s/and number? pos?))
-(s/def ::initial-funds (s/and number? pos?))
-(s/def ::tickers (s/map-of ::ticker/ticker (s/keys :req-un [::initial-price ::initial-funds])))
+(s/def ::initial-funds (s/map-of ::wallet/currency number?))
+(s/def ::tickers (s/map-of ::ticker/ticker (s/keys :req-un [::initial-price])))
 (s/def ::n-traders pos-int?)
 (s/def ::n-orders-per-trader pos-int?)
 (s/def ::max-pos-size-pct ::percent)
@@ -99,4 +95,5 @@
                                  ::n-orders-per-trader]
                         :opt-un [::max-ms-between-orders
                                  ::max-pos-size-pct
-                                 ::spread-around-better-price]))
+                                 ::spread-around-better-price
+                                 ::initial-funds]))
