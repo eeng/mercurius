@@ -14,7 +14,7 @@
           deps)))
 
 (deftest place-order-test
-  (testing "for a buy order, should reserve the corresponding amount in the last currency's wallet"
+  (testing "should make a reservation in the user's wallet"
     (let [wallet (build-wallet {:balance 50 :currency "USD"})
           fetch-wallet (spy/mock (constantly wallet))
           save-wallet (spy/mock identity)
@@ -23,16 +23,6 @@
       (place-order {:user-id 1 :type :limit :side :buy :amount 0.2 :ticker "BTCUSD" :price 100})
       (assert/called-with? fetch-wallet 1 "USD")
       (assert/called-with? save-wallet (assoc wallet :reserved (* 0.2M 100)))))
-
-  (testing "for a sell order, should reserve the amount in the first currency's wallet"
-    (let [wallet (build-wallet {:balance 1 :currency "BTC"})
-          fetch-wallet (spy/mock (constantly wallet))
-          save-wallet (spy/mock identity)
-          place-order (build-use-case {:fetch-wallet fetch-wallet
-                                       :save-wallet save-wallet})]
-      (place-order {:user-id 1 :type :limit :side :sell :amount 0.2 :ticker "BTCUSD" :price 100})
-      (assert/called-with? fetch-wallet 1 "BTC")
-      (assert/called-with? save-wallet (assoc wallet :reserved 0.2M))))
 
   (testing "should insert the order in the order book"
     (let [wallet (build-wallet {:balance 50 :currency "USD"})

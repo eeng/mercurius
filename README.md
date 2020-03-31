@@ -9,3 +9,4 @@
 - Handle market orders
 - Store some trx-id in deposits/withdraws related to transfers
 - Simulator, place orders around current price
+- Sim initial funds should be per currency
