@@ -1,9 +1,8 @@
 (ns mercurius.simulation.trading.simulator
   (:require [clojure.spec.alpha :as s]
-            [roul.random :as rr]
             [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.wallets.domain.entities.wallet :as wallet :refer [available-balance]]
-            [mercurius.util.number :refer [round-to-significant-figures]]))
+            [mercurius.util.number :as n :refer [round-to-significant-figures]]))
 
 (defn user-id-gen []
   (let [last-user-id (atom 0)]
@@ -29,7 +28,7 @@
   (let [buy? (= side :buy)
         min-price (* last-price ((if buy? - +) 1 worse-price-pct))
         max-price (* last-price ((if buy? + -) 1 better-price-pct))]
-    (round-to-significant-figures (rr/rand min-price max-price) 5)))
+    (round-to-significant-figures (n/rand min-price max-price) 5)))
 
 (defn- select-src-currency [ticker side]
   (let [[sell-cur buy-cur] (ticker/currencies ticker)]
