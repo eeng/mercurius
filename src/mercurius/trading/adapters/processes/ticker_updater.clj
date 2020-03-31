@@ -7,4 +7,6 @@
   (subscribe-to event-bus
                 :trade-made
                 :on-event (fn [{trade :data}]
-                            (update-ticker trade))))
+                            (update-ticker trade))
+                :on-close (fn []
+                            (log/info "Stopping ticker updater"))))

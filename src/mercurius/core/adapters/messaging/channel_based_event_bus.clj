@@ -1,6 +1,7 @@
 (ns mercurius.core.adapters.messaging.channel-based-event-bus
   (:require [mercurius.core.domain.messaging.event-bus :refer [EventBus]]
-            [clojure.core.async :refer [put! chan pub sub close!]]))
+            [clojure.core.async :refer [put! chan pub sub close!]]
+            [taoensso.timbre :as log]))
 
 (defrecord ChannelBasedEventBus [in-chan events-pub]
   EventBus
@@ -14,8 +15,10 @@
   java.io.Closeable
 
   (close [_]
+    (log/info "Stopping channel based event bus")
     (close! in-chan)))
 
 (defn new-channel-based-event-bus []
+  (log/info "Starting channel based event bus")
   (let [in-chan (chan)]
     (ChannelBasedEventBus. in-chan (pub in-chan :type))))

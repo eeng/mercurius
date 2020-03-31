@@ -14,4 +14,6 @@
                   :out-chan (chan (sliding-buffer 1))
                   :on-event (fn [{order :data}]
                               (when (= ticker (:ticker order))
-                                (execute-trades {:ticker ticker}))))))
+                                (execute-trades {:ticker ticker})))
+                  :on-close (fn []
+                              (log/info "Stopping trade finder for" ticker)))))

@@ -1,6 +1,5 @@
 (ns mercurius.core.domain.messaging.event-bus
-  (:require [clojure.spec.alpha :as s]
-            [clojure.core.async :refer [chan go-loop <!]]
+  (:require [clojure.core.async :refer [chan go-loop <!]]
             [tick.alpha.api :as t]
             [taoensso.timbre :as log]
             [mercurius.util.uuid :refer [uuid]]))
@@ -31,22 +30,24 @@
   (->> (new-event event-type event-data)
        (dispatch bus)))
 
-(defn- start-callback-process [out-chan on-event]
+(defn- start-callback-process [out-chan on-event on-close]
   (go-loop []
-    (when-let [event (<! out-chan)]
-      (try
-        (on-event event)
-        (catch Exception e
-          (log/error e)
-          (throw e)))
-      (recur))))
+    (if-let [event (<! out-chan)]
+      (do
+        (try
+          (on-event event)
+          (catch Exception e
+            (log/error e)
+            (throw e)))
+        (recur))
+      (when on-close (on-close)))))
 
 (defn subscribe-to
   "Allows to subscribe to specific event types.
   If the `on-event` callback is provided, it'll called with each event received in the channel.
   Otherwise, the channel is return and must be handled by the client."
-  [bus event-type & {:keys [out-chan on-event] :or {out-chan (chan)}}]
+  [bus event-type & {:keys [out-chan on-event on-close] :or {out-chan (chan)}}]
   (subscribe bus event-type out-chan)
   (if on-event
-    (start-callback-process out-chan on-event)
+    (start-callback-process out-chan on-event on-close)
     out-chan))
