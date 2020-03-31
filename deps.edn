@@ -4,7 +4,9 @@
         org.clojure/core.async {:mvn/version "1.0.567"}
         slingshot {:mvn/version "0.12.2"}
         com.taoensso/timbre {:mvn/version "4.10.0"}
-        tick {:mvn/version "0.4.23-alpha"}}
+        tick {:mvn/version "0.4.23-alpha"}
+        http-kit {:mvn/version "2.3.0"}
+        metosin/reitit {:mvn/version "0.4.2"}}
 
  :aliases {:dev {:extra-paths ["dev" "test"]
                  :extra-deps {org.clojure/tools.namespace {:mvn/version "1.0.0"}}}

@@ -9,6 +9,7 @@
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [new-channel-based-event-bus]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
+            [mercurius.core.adapters.web.server :refer [new-web-server]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -34,9 +35,9 @@
   Returns a map containing the components needed to drive the system.
   The resources that need to be freed when stopping the system should also be there."
   ([] (start (read-config)))
-  ([config]
+  ([{:keys [port] :as config}]
    (configure-logger config)
-   (log/info "Starting system")
+   (log/info "Starting system with config" (pr-str config))
 
    (let [;; Repositories
          wallet-repo (new-in-memory-wallet-repo)
@@ -113,7 +114,11 @@
                                  :get-tickers get-tickers-use-case}
                                 [logger retrier stm])
 
-         dispatch (partial dispatch mediator)]
+         dispatch (partial dispatch mediator)
+
+         ;; Presentation
+         web-server (new-web-server {:port port
+                                     :dispatch dispatch})]
 
      ;; Event Handlers
      (new-trade-finder {:event-bus event-bus
@@ -125,10 +130,12 @@
      {:dispatch dispatch
       :order-book-repo order-book-repo
       :wallet-repo wallet-repo
-      :event-bus event-bus})))
+      :event-bus event-bus
+      :web-server web-server})))
 
-(defn stop [{:keys [event-bus] :as system}]
+(defn stop [{:keys [web-server event-bus] :as system}]
   (when system
     (log/info "Stopping system")
+    (.close web-server)
     (.close event-bus))
   nil)

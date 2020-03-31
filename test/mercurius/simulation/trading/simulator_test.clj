@@ -1,6 +1,6 @@
 (ns mercurius.simulation.trading.simulator-test
   (:require [clojure.test :refer [deftest is testing]]
-            [mercurius.support.fixtures :refer [with-system]]
+            [mercurius.support.helpers :refer [with-system]]
             [mercurius.simulation.trading.simulator :refer [run-simulation]]))
 
 (deftest ^:integration ^:slow run-simulation-test

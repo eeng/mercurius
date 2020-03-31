@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
             [mercurius.support.factory :refer [build-user-id]]
-            [mercurius.support.fixtures :refer [with-system]]))
+            [mercurius.support.helpers :refer [with-system]]))
 
 (def u1 (build-user-id))
 (def u2 (build-user-id))

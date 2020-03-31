@@ -1,3 +1,3 @@
 {:linters
  {:unresolved-symbol {:exclude [(clojure.test/is [match? thrown-match?])]}}
- :lint-as {mercurius.support.fixtures/with-system clojure.core/let}}
+ :lint-as {mercurius.support.helpers/with-system clojure.core/let}}
