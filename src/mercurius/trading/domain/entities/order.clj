@@ -8,14 +8,13 @@
 
 (s/def ::id string?)
 (s/def ::user-id ::user/id)
-(s/def ::type #{:market :limit})
 (s/def ::side #{:buy :sell})
 (s/def ::ticker ::ticker/ticker)
 (s/def ::amount (s/and number? pos?))
 (s/def ::price (s/and number? pos?))
 (s/def ::placed-at any?)
 (s/def ::remaining number?)
-(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::amount ::price ::placed-at ::remaining]))
+(s/def ::order (s/keys :req-un [::id ::user-id ::type ::side ::ticker ::price ::amount ::placed-at ::remaining]))
 
 (defrecord Order [id user-id type side ticker amount price placed-at remaining])
 
@@ -56,6 +55,14 @@
   [{:keys [side amount ticker price]}]
   {:amount (amount-paid side amount price)
    :currency (currency-paid side ticker)})
+
+(defn calculate-price
+  "Calculates the order price corresponding to the order type."
+  [{:keys [type side price ticker]} get-bid-ask]
+  (case type
+    :limit price
+    :market (let [{:keys [bid ask]} (get-bid-ask ticker)]
+              (case side :buy ask :sell bid))))
 
 (defn fill-order [{:keys [remaining] :as order} fill-amount]
   {:pre [(<= fill-amount remaining)]}

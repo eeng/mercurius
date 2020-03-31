@@ -21,7 +21,7 @@
             [mercurius.trading.adapters.repositories.in-memory-ticker-repository :refer [new-in-memory-ticker-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]
             [mercurius.trading.adapters.processes.ticker-updater :refer [new-ticker-updater]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-order-book]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-bid-ask get-order-book]]
             [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
@@ -51,6 +51,7 @@
          update-order (partial update-order order-book-repo)
          remove-order (partial remove-order order-book-repo)
          get-bids-asks (partial get-bids-asks order-book-repo)
+         get-bid-ask (partial get-bid-ask order-book-repo)
          get-order-book (partial get-order-book order-book-repo)
 
          ticker-repo (new-in-memory-ticker-repo)
@@ -81,6 +82,7 @@
          place-order-use-case (new-place-order-use-case
                                {:fetch-wallet fetch-wallet
                                 :save-wallet save-wallet
+                                :get-bid-ask get-bid-ask
                                 :insert-order insert-order
                                 :publish-event publish-event})
          get-order-book-use-case (new-get-order-book-use-case

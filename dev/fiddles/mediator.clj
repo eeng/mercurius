@@ -9,7 +9,7 @@
 
   (dispatch :place-order {:user-id 1 :side :buy :amount 3 :ticker "BTCUSD" :price 100 :type :limit})
   (dispatch :place-order {:user-id 2 :side :sell :amount 2 :ticker "BTCUSD" :price 90 :type :limit})
-  (dispatch :place-order {:user-id 2 :side :sell :amount 4 :ticker "BTCUSD" :price 100 :type :limit})
+  (dispatch :place-order {:user-id 2 :side :sell :amount 4 :ticker "BTCUSD" :type :market})
 
   #_(dispatch :execute-trades {:ticker "BTCUSD"})
   (dispatch :get-tickers {})

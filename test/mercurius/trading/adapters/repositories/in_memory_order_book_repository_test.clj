@@ -3,7 +3,7 @@
             [matcher-combinators.test]
             [mercurius.support.helpers :refer [ref-trx]]
             [mercurius.support.factory :refer [build-order]]
-            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bids-asks update-order remove-order]]
+            [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order get-order-book get-bids-asks update-order remove-order get-bid-ask]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]))
 
 (use-fixtures :each ref-trx)
@@ -74,3 +74,13 @@
       (insert-order repo (build-order {:ticker "BTCUSD" :side :sell :price 5.1}))
       (is (= {:bids [] :asks []}
              (get-bids-asks repo "BTCUSD"))))))
+
+(deftest get-bid-ask-test
+  (testing "should return the best buying and selling order prices"
+    (let [repo (new-in-memory-order-book-repo)]
+      (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5.0}))
+      (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5.2}))
+      (insert-order repo (build-order {:ticker "BTCUSD" :side :buy :price 5.1}))
+      (insert-order repo (build-order {:ticker "BTCUSD" :side :sell :price 5.9}))
+      (is (match? {:bid 5.2 :ask 5.9}
+                  (get-bid-ask repo "BTCUSD"))))))

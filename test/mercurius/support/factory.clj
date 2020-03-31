@@ -29,9 +29,9 @@
                 {:user-id (build-user-id)
                  :type :limit
                  :side :buy
-                 :amount 0.2
+                 :amount 0.2M
                  :ticker "BTCUSD"
-                 :price 100})))
+                 :price 100.0})))
 
 (def build-trade
   (build-with new-trade {:ticker "BTCUSD" :amount 1M :price 100.0}))
