@@ -19,4 +19,4 @@
                         :n-traders n-traders
                         :n-orders-per-trader n-orders-per-trader
                         :max-ms-between-orders 10)
-        (is (= expected-monetary-base (dispatch :calculate-monetary-base {})))))))
+        (is (= expected-monetary-base (dispatch :calculate-monetary-base)))))))

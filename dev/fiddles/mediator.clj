@@ -12,9 +12,9 @@
   (dispatch :place-order {:user-id 2 :side :sell :amount 4 :ticker "BTCUSD" :type :market})
 
   #_(dispatch :execute-trades {:ticker "BTCUSD"})
-  (dispatch :get-tickers {})
+  (dispatch :get-tickers)
 
   (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id 1})
   (dispatch :get-wallets {:user-id 2})
-  (dispatch :calculate-monetary-base {}))
+  (dispatch :calculate-monetary-base))
