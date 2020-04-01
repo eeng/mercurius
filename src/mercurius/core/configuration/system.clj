@@ -5,7 +5,6 @@
             [mercurius.core.configuration.config :refer [read-config]]
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
-            [mercurius.core.adapters.controllers.mediator.middleware.retrier :refer [retrier]]
             [mercurius.core.adapters.controllers.mediator.middleware.stm :refer [stm]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [start-channel-based-event-bus stop-channel-based-event-bus]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
@@ -63,7 +62,7 @@
                                      :execute-trades (ig/ref :use-cases/execute-trades)
                                      :update-ticker (ig/ref :use-cases/update-ticker)
                                      :get-tickers (ig/ref :use-cases/get-tickers)}
-                          :middleware [logger retrier stm]}
+                          :middleware [logger stm]}
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
                             :dispatch (ig/ref :controllers/dispatch)}
    :processes/ticker-updater {:event-bus (ig/ref :adapters/event-bus)

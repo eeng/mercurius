@@ -39,14 +39,4 @@
       (save-wallet repo {:id 2 :user-id u2 :currency "USD" :balance 4M})
       (save-wallet repo {:id 3 :user-id u1 :currency "BTC" :balance 3M})
       (is (match? {"USD" 9.5M "BTC" 3M}
-                  (calculate-monetary-base repo)))))
-
-  (testing "optimistic concurrency"
-    (let [repo (new-in-memory-wallet-repo)
-          _ (save-wallet repo (build-wallet {:user-id 9 :currency "USD" :balance 0}))
-          w1 (fetch-wallet repo 9 "USD")
-          w2 (fetch-wallet repo 9 "USD")]
-      (save-wallet repo (update w1 :balance + 10))
-      (is (thrown-match? clojure.lang.ExceptionInfo {:type :stale-object-error}
-                         (save-wallet repo (update w2 :balance + 11))))
-      (is (match? {:balance 10M} (fetch-wallet repo 9 "USD"))))))
+                  (calculate-monetary-base repo))))))
