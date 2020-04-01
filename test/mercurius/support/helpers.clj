@@ -20,7 +20,7 @@
   "Starts the system and makes sure it's stopped afterward.
   The bindings works like let where the second argument are passed to start (not implemented yet)."
   [bindings & body]
-  `(let [system# (start)]
+  `(let [system# (start ~(last bindings))]
      (try
        (let [~(first bindings) system#]
          ~@body)

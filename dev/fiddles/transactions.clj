@@ -2,7 +2,7 @@
   (:require [user :refer [system]]))
 
 (comment
-  (def dispatch (:dispatch system))
+  (def dispatch (:controllers/dispatch system))
   (dispatch :deposit {:user-id 1 :amount 100 :currency "USD"})
   (->> #(dispatch :transfer {:from 1 :to 2 :transfer-amount 1 :currency "USD"})
        (repeat 100)

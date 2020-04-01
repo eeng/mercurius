@@ -74,7 +74,7 @@
     (Thread/sleep (rand max-ms-between-orders))
     (place-order trader dispatch config)))
 
-(defn run-simulation [{:keys [dispatch]} & {:keys [n-traders] :as config}]
+(defn run-simulation [dispatch & {:keys [n-traders] :as config}]
   (s/assert ::config config)
   (let [traders (repeatedly n-traders (partial make-trader (user-id-gen)))]
     (doall (pmap #(start-trading % dispatch config) traders)))

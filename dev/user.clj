@@ -3,13 +3,12 @@
             [clojure.tools.namespace.repl :as repl]
             [clojure.spec.test.alpha :as stest]))
 
-(stest/instrument)
-
 (def system nil)
 
 (defn start []
   (when-not system
-    (alter-var-root #'system (constantly (s/start))))
+    (alter-var-root #'system (constantly (s/start)))
+    (stest/instrument))
   :started)
 
 (defn stop []

@@ -10,15 +10,13 @@
     (put! in-chan event))
 
   (subscribe [_ event-type out-chan]
-    (sub events-pub event-type out-chan))
+    (sub events-pub event-type out-chan)))
 
-  java.io.Closeable
-
-  (close [_]
-    (log/info "Stopping channel based event bus")
-    (close! in-chan)))
-
-(defn new-channel-based-event-bus []
+(defn start-channel-based-event-bus []
   (log/info "Starting channel based event bus")
   (let [in-chan (chan)]
     (ChannelBasedEventBus. in-chan (pub in-chan :type))))
+
+(defn stop-channel-based-event-bus [{:keys [in-chan]}]
+  (log/info "Stopping channel based event bus")
+  (close! in-chan))
