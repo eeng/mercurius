@@ -1,6 +1,6 @@
 #kaocha/v1
  {:kaocha/fail-fast? false
   :kaocha/plugins [:kaocha.plugin/notifier]
-  :bindings {mercurius.core.adapters.configuration.config/*config-overrides*
+  :bindings {mercurius.core.configuration.config/*config-overrides*
              {:log-level :warn
               :port 3003}}}

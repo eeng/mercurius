@@ -1,4 +1,4 @@
-(ns mercurius.core.adapters.configuration.config)
+(ns mercurius.core.configuration.config)
 
 (def default-config {:log-level :info
                      :port 3000})

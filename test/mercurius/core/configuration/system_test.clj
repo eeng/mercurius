@@ -1,4 +1,4 @@
-(ns mercurius.core.adapters.configuration.system-test
+(ns mercurius.core.configuration.system-test
   (:require [clojure.test :refer [deftest testing is]]
             [matcher-combinators.test]
             [mercurius.support.factory :refer [build-user-id]]

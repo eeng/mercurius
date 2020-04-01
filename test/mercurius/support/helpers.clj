@@ -1,6 +1,6 @@
 (ns mercurius.support.helpers
   (:require [clojure.core.async :refer [timeout alts!!]]
-            [mercurius.core.adapters.configuration.system :refer [start stop]]))
+            [mercurius.core.configuration.system :refer [start stop]]))
 
 (defn recorded-calls [calls-chan expected-count & {:keys [wait-for] :or {wait-for 500}}]
   (loop [recorded []

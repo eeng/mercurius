@@ -1,5 +1,5 @@
 (ns user
-  (:require [mercurius.core.adapters.configuration.system :as s]
+  (:require [mercurius.core.configuration.system :as s]
             [clojure.tools.namespace.repl :as repl]
             [clojure.spec.test.alpha :as stest]))
 

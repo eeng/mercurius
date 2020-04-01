@@ -1,7 +1,7 @@
-(ns mercurius.core.adapters.configuration.system
+(ns mercurius.core.configuration.system
   (:require [taoensso.timbre :as log]
-            [mercurius.core.adapters.configuration.logging :refer [configure-logger]]
-            [mercurius.core.adapters.configuration.config :refer [read-config]]
+            [mercurius.core.configuration.logging :refer [configure-logger]]
+            [mercurius.core.configuration.config :refer [read-config]]
             [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
             [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
             [mercurius.core.adapters.controllers.mediator.middleware.retrier :refer [retrier]]

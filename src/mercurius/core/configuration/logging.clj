@@ -1,4 +1,4 @@
-(ns mercurius.core.adapters.configuration.logging
+(ns mercurius.core.configuration.logging
   (:require [taoensso.timbre :as log]
             [clojure.string :as str]))
 
