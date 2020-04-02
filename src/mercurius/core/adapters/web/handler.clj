@@ -31,4 +31,5 @@
       (wrap-session {:store (cookie-store {:key session-key})})))
 
 (comment
-  ((handler identity) {:request-method :get :uri "/"}))
+  ((handler {:sente {:ring-ajax-get-or-ws-handshake identity :ring-ajax-post identity}})
+   {:request-method :get :uri "/"}))

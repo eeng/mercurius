@@ -7,11 +7,11 @@
 (defn- start-router!
   "Receives Sente events and if they correspond to a mediator's request, it's dispatched.
   In addition, if the client provides a reply-fn, it's called with the request's response."
-  [{:keys [active ch-chsk dispatch]}]
+  [{:keys [active ch-recv dispatch]}]
   (go-loop []
     (when @active
-      (when-let [{[event-type event-data :as event] :event reply-fn :?reply-fn} (<! ch-chsk)]
-        (log/debug "Received" event)
+      (when-let [{[event-type event-data :as event] :event reply-fn :?reply-fn} (<! ch-recv)]
+        (log/trace "Received" event)
         (when (= event-type :backend/request)
           (cond-> (apply dispatch event-data)
             reply-fn reply-fn))
@@ -25,7 +25,7 @@
         active (atom true)]
     (start-router! {:active active
                     :dispatch dispatch
-                    :ch-chsk ch-recv
+                    :ch-recv ch-recv
                     :chsk-send! send-fn
                     :connected-uids connected-uids})
     {:active active
