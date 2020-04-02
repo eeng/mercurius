@@ -1,13 +1,15 @@
 (ns mercurius.core.presentation.api
   (:require [taoensso.sente :as sente]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [clojure.core.async :refer [go-loop <!]]))
 
 (defn- csrf-token []
   (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
 
-(let [{:keys [send-fn]}
+(let [{:keys [send-fn ch-recv]}
       (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto})]
-  (def chsk-send! send-fn))
+  (def chsk-send! send-fn)
+  (def ch-recv ch-recv))
 
 (def timeout 5000)
 
@@ -21,6 +23,15 @@
                     (case status
                       :ok (on-success data)
                       :error (on-error data)))))))
+
+(defn start-remote-events-processor [on-ws-open]
+  (go-loop []
+    (when-let [{[event-id event-data] :event} (<! ch-recv)]
+      (when (and (= event-id :chsk/state)
+                 (-> event-data last :open?))
+        (on-ws-open)))))
+
+;;;; Higher level functions
 
 (defn use-query
   "Similar to Apollo GraphQL useQuery.
