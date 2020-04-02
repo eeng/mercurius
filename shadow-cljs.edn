@@ -7,4 +7,5 @@
  :builds {:app {:target :browser
                 :output-dir "resources/public/js"
                 :asset-path "/js"
-                :modules {:main {:entries [mercurius.core.presentation.app]}}}}}
+                :modules {:main {:entries [mercurius.core.presentation.main]}}
+                :devtools {:after-load mercurius.core.presentation.main/main}}}}
