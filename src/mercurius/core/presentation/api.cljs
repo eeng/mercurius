@@ -3,25 +3,33 @@
             [reagent.core :as r]
             [clojure.core.async :refer [go-loop <!]]))
 
+(defonce sente-client (atom nil))
 (defonce ws-state (r/atom {:open false}))
 
 (defn- csrf-token []
   (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
 
-(let [{:keys [send-fn ch-recv]}
-      (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto})]
-  (def chsk-send! send-fn)
+(defn connected? []
+  (:open? @ws-state))
 
+(defn start-ws-connection-monitor []
   (go-loop []
-    (when-let [{[event-type event-data] :event} (<! ch-recv)]
+    (when-let [{[event-type event-data] :event} (<! (:ch-recv @sente-client))]
       (when (= :chsk/state event-type)
         (let [[_ new-state] event-data]
           (reset! ws-state new-state))))))
 
-(defn connected? []
-  (:open? @ws-state))
+(defn connect! []
+  (when-not (connected?)
+    (reset! sente-client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto}))
+    (start-ws-connection-monitor)))
 
 (def timeout 5000)
+
+(defn chsk-send! [& args]
+  (if @sente-client
+    (apply (:send-fn @sente-client) args)
+    (throw (js/Error. "Connect to Sente before send!"))))
 
 (defn send-request [request & {:keys [on-success on-error]
                                :or {on-success identity on-error identity}}]
