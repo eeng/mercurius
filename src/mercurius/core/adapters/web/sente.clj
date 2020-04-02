@@ -4,6 +4,14 @@
             [clojure.core.async :refer [go-loop <!]]
             [taoensso.timbre :as log]))
 
+(defn- dispatch-request [dispatch request]
+  (try
+    [:ok (apply dispatch request)]
+    (catch clojure.lang.ExceptionInfo e
+      [:error (ex-data e)])
+    (catch Exception e
+      [:error (.getMessage e)])))
+
 (defn- start-router!
   "Receives Sente events and if they correspond to a mediator's request, it's dispatched.
   In addition, if the client provides a reply-fn, it's called with the request's response."
@@ -13,7 +21,7 @@
       (when-let [{[event-type event-data :as event] :event reply-fn :?reply-fn} (<! ch-recv)]
         (log/trace "Received" event)
         (when (= event-type :backend/request)
-          (cond-> (apply dispatch event-data)
+          (cond-> (dispatch-request dispatch event-data)
             reply-fn reply-fn))
         (recur)))))
 
