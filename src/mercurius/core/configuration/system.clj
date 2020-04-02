@@ -30,7 +30,7 @@
             [mercurius.trading.domain.use-cases.update-ticker :refer [new-update-ticker-use-case]]
             [mercurius.trading.domain.use-cases.get-tickers :refer [new-get-tickers-use-case]]))
 
-(defn build-assembly [{:keys [port]}]
+(defn build-assembly [{:keys [port session-key]}]
   {:adapters/wallet-repo nil
    :adapters/order-book-repo nil
    :adapters/ticker-repo nil
@@ -69,7 +69,8 @@
                               :dispatch (ig/ref :controllers/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
    :adapters/web-server {:dispatch (ig/ref :controllers/dispatch)
-                         :port port}})
+                         :port port
+                         :session-key session-key}})
 
 (defmethod ig/init-key :adapters/wallet-repo [_ _]
   (new-in-memory-wallet-repo))

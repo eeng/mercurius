@@ -1,7 +1,8 @@
 (ns mercurius.core.configuration.config)
 
 (def default-config {:log-level :info
-                     :port 5000})
+                     :port 5000
+                     :session-key "adOzRKX&KWFK)rJ5"})
 
 (def ^:dynamic *config-overrides* {})
 
