@@ -1,7 +1,7 @@
 (ns mercurius.core.presentation.app
   (:require [reagent.dom :as rd]
             [mercurius.core.presentation.api :as api]
-            [mercurius.core.presentation.components.tickers :refer [tickers-panel]]))
+            [mercurius.trading.presentation.components.tickers :refer [tickers-panel]]))
 
 (defn app []
   [:div

@@ -1,4 +1,4 @@
-(ns mercurius.core.presentation.components.tickers
+(ns mercurius.trading.presentation.components.tickers
   (:require [mercurius.core.presentation.api :as api]))
 
 (defn tickers-panel []
