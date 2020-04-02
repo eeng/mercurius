@@ -4,9 +4,18 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run tests watcher",
+      "label": "Kaocha Test Watch",
       "type": "shell",
       "command": "bin/kaocha --watch",
+      "presentation": {
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Shadow-cljs Watch",
+      "type": "shell",
+      "command": "npx shadow-cljs watch app",
       "presentation": {
         "clear": true
       },

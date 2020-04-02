@@ -1,7 +1,7 @@
 (ns mercurius.core.configuration.config)
 
 (def default-config {:log-level :info
-                     :port 3000})
+                     :port 5000})
 
 (def ^:dynamic *config-overrides* {})
 

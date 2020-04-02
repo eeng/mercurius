@@ -3,4 +3,4 @@
   :kaocha/plugins [:kaocha.plugin/notifier]
   :bindings {mercurius.core.configuration.config/*config-overrides*
              {:log-level :warn
-              :port 3003}}}
+              :port 5001}}}

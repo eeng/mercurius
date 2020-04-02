@@ -1,0 +1,8 @@
+{:source-paths ["src"]
+
+ :dependencies [[reagent "0.10.0"]]
+
+ :builds {:app {:target :browser
+                :output-dir "resources/public/js"
+                :asset-path "/js"
+                :modules {:main {:entries [mercurius.core.presentation.app]}}}}}

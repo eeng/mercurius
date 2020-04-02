@@ -6,3 +6,7 @@
 /.nrepl-history
 /.nrepl-port
 /.clj-kondo/.cache
+/node_modules
+/public/js
+/resources/public/js
+/.shadow-cljs
