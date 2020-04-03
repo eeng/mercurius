@@ -13,10 +13,13 @@
   (go-loop []
     (when-let [{[event-type event-data :as event] :event} (<! (:ch-recv @sente-client))]
       (js/console.log event)
-      (case event-type
-        :chsk/state (>evt event)
-        :chsk/recv (>evt event-data)
-        nil))
+      (cond
+        (= event-type :chsk/state)
+        (>evt event)
+
+        (and (= event-type :chsk/recv)
+             (not= event-data [:chsk/ws-ping]))
+        (>evt event-data)))
     (recur)))
 
 (defn connect! []
