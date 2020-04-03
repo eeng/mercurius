@@ -2,6 +2,7 @@
   (:require [mercurius.core.presentation.util :refer [<sub]]
             [mercurius.core.presentation.events]
             [mercurius.trading.presentation.subs]
+            [mercurius.trading.presentation.events]
             [mercurius.trading.presentation.views.tickers :refer [tickers-panel]]))
 
 (defn- initializing []

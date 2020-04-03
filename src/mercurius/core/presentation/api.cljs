@@ -5,27 +5,27 @@
             [mercurius.core.presentation.util :refer [>evt]]))
 
 (defonce sente-client (atom nil))
-(defonce ws-state (r/atom {:open false}))
 
 (defn- csrf-token []
   (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
 
-(defn connected? []
-  (:open? @ws-state))
-
-(defn start-ws-connection-monitor []
+(defn start-events-processor []
   (go-loop []
-    (when-let [{[event-type event-data] :event} (<! (:ch-recv @sente-client))]
-      (when (= :chsk/state event-type)
-        (>evt [event-type event-data])))))
+    (when-let [{[event-type event-data :as event] :event} (<! (:ch-recv @sente-client))]
+      (js/console.log event)
+      (case event-type
+        :chsk/state (>evt event)
+        :chsk/recv (>evt event-data)
+        nil))
+    (recur)))
 
 (defn connect! []
   (reset! sente-client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto}))
-  (start-ws-connection-monitor))
+  (start-events-processor))
 
 (def timeout 5000)
 
-(defn chsk-send! [& args]
+(defn- chsk-send! [& args]
   (if @sente-client
     (apply (:send-fn @sente-client) args)
     (throw (js/Error. "Connect to Sente before send!"))))
@@ -53,13 +53,3 @@
                   :on-success #(reset! result {:loading false :data %})
                   :on-error #(reset! result {:loading false :error %}))
     result))
-
-#_(defn use-subscription [event-type]
-    (let [result (r/atom nil)
-          out-chan (chan)]
-      (sub received-events event-type out-chan)
-      (go-loop []
-        (when-let [{[_ event-data] :event :as event} (<! out-chan)]
-          (println "use-sub" event-data)
-          (reset! result event-data)))
-      result))

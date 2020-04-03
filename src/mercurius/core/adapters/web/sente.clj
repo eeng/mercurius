@@ -38,8 +38,14 @@
                     :connected-uids connected-uids})
     {:active active
      :ring-ajax-post ajax-post-fn
-     :ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn}))
+     :ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn
+     :chsk-send! send-fn
+     :connected-uids connected-uids}))
 
 (defn stop-sente-comms [{:keys [active]}]
   (log/info "Stopping Sente comms")
   (reset! active false))
+
+(defn broadcast! [{:keys [chsk-send! connected-uids]} message]
+  (doseq [uid (:any @connected-uids)]
+    (chsk-send! uid message)))
