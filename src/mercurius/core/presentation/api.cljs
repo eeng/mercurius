@@ -1,7 +1,7 @@
 (ns mercurius.core.presentation.api
   (:require [taoensso.sente :as sente]
             [clojure.core.async :refer [go-loop <!]]
-            [mercurius.core.presentation.util :refer [>evt]]))
+            [mercurius.core.presentation.util.reframe :refer [>evt]]))
 
 (defonce sente-client (atom nil))
 

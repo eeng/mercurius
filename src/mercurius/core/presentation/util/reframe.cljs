@@ -1,4 +1,4 @@
-(ns mercurius.core.presentation.util
+(ns mercurius.core.presentation.util.reframe
   (:require [re-frame.core :as rf]))
 
 (def >evt rf/dispatch)

@@ -1,5 +1,5 @@
 (ns mercurius.core.presentation.app
-  (:require [mercurius.core.presentation.util :refer [<sub]]
+  (:require [mercurius.core.presentation.util.reframe :refer [<sub]]
             [mercurius.core.presentation.flow]
             [mercurius.trading.presentation.flow]
             [mercurius.trading.presentation.views.tickers :refer [tickers-panel]]))

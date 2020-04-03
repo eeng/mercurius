@@ -8,3 +8,4 @@
 
 - Store some trx-id in deposits/withdraws related to transfers
 - Simulator, place orders around current price
+- Volume in USD

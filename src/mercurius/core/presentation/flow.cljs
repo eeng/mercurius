@@ -2,7 +2,7 @@
   (:require [re-frame.core :refer [reg-sub]]
             [reagent.ratom :refer [reaction]]
             [mercurius.core.presentation.api :refer [send-request]]
-            [mercurius.core.presentation.util :refer [reg-event-db >evt]]))
+            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
 
 ;;;; Events 
 
@@ -18,7 +18,10 @@
 
 ;;;; Subscriptions
 
-(defn remote-query-sub [app-db request db-path]
+(defn remote-query-sub
+  "Generic subscription to retrieve data from the backend.
+  A map is stored at `db-path` representing the different network states."
+  [app-db request db-path]
   (send-request request
                 :on-success #(>evt [:write-to db-path {:loading? false :data %}])
                 :on-error #(>evt [:write-to db-path {:loading? false :error %}]))
