@@ -11,7 +11,6 @@
 (defn start-events-processor []
   (go-loop []
     (when-let [{[event-type event-data :as event] :event} (<! (:ch-recv @sente-client))]
-      (js/console.log "Remote event:" event)
       (cond
         (= event-type :chsk/state)
         (>evt event)

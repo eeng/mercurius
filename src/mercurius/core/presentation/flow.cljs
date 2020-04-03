@@ -1,7 +1,8 @@
 (ns mercurius.core.presentation.flow
-  (:require [re-frame.core :refer [reg-event-db reg-sub dispatch]]
+  (:require [re-frame.core :refer [reg-sub]]
             [reagent.ratom :refer [reaction]]
-            [mercurius.core.presentation.api :refer [send-request]]))
+            [mercurius.core.presentation.api :refer [send-request]]
+            [mercurius.core.presentation.util :refer [reg-event-db >evt]]))
 
 ;;;; Events 
 
@@ -19,8 +20,8 @@
 
 (defn remote-query-sub [app-db request db-path]
   (send-request request
-                :on-success #(dispatch [:write-to db-path {:loading? false :data %}])
-                :on-error #(dispatch [:write-to db-path {:loading? false :error %}]))
+                :on-success #(>evt [:write-to db-path {:loading? false :data %}])
+                :on-error #(>evt [:write-to db-path {:loading? false :error %}]))
   (reaction (get-in @app-db db-path {:loading? true})))
 
 (reg-sub
