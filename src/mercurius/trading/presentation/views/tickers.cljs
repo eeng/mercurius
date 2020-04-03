@@ -1,5 +1,5 @@
 (ns mercurius.trading.presentation.views.tickers
-  (:require [mercurius.core.presentation.util.reframe :refer [<sub]]
+  (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.util.format :refer [format-money]]))
 
 (defn tickers-panel []
@@ -9,12 +9,13 @@
      (when data
        [:table
         [:thead>tr
-         [:td "Name"]
-         [:td "Last Price"]
-         [:td "Volume"]]
+         [:th "Name"]
+         [:th "Last Price"]
+         [:th "Volume"]]
         [:tbody
          (for [{:keys [ticker last-price volume]} (vals data)]
-           [:tr {:key ticker}
+           [:tr {:key ticker
+                 :on-click #(>evt [:trading/ticker-selected ticker])}
             [:td ticker]
             [:td {:align "right"} (format-money last-price)]
             [:td {:align "right"} volume]])]])]))
