@@ -3,9 +3,11 @@
             [mercurius.core.presentation.api :as api]
             [mercurius.core.presentation.app :refer [app]]))
 
-(defn main []
-  (api/connect!)
+(defn start []
   (rd/render [app]
              (.getElementById js/document "app")))
 
-(main)
+(defn init []
+  (println "Starting app...")
+  (api/connect!)
+  (start))

@@ -3,7 +3,6 @@
             [mercurius.trading.presentation.components.tickers :refer [tickers-panel]]))
 
 (defn app []
-  (if (api/connected?)
+  (when (api/connected?)
     [:div
-     [tickers-panel]]
-    [:div "Oops, WebSocket disconnected!"]))
+     [tickers-panel]]))

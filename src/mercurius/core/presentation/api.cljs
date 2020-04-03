@@ -20,9 +20,8 @@
           (reset! ws-state new-state))))))
 
 (defn connect! []
-  (when-not (connected?)
-    (reset! sente-client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto}))
-    (start-ws-connection-monitor)))
+  (reset! sente-client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto}))
+  (start-ws-connection-monitor))
 
 (def timeout 5000)
 
