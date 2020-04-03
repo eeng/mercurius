@@ -1,8 +1,14 @@
 (ns mercurius.core.presentation.app
-  (:require [mercurius.core.presentation.api :as api]
-            [mercurius.trading.presentation.components.tickers :refer [tickers-panel]]))
+  (:require [mercurius.core.presentation.util :refer [<sub]]
+            [mercurius.core.presentation.events]
+            [mercurius.trading.presentation.subs]
+            [mercurius.trading.presentation.views.tickers :refer [tickers-panel]]))
+
+(defn- initializing []
+  [:div "Loading..."])
 
 (defn app []
-  (when (api/connected?)
+  (if (<sub [:initialized?])
     [:div
-     [tickers-panel]]))
+     [tickers-panel]]
+    [initializing]))

@@ -1,7 +1,8 @@
 (ns mercurius.core.presentation.api
   (:require [taoensso.sente :as sente]
             [reagent.core :as r]
-            [clojure.core.async :refer [go-loop <!]]))
+            [clojure.core.async :refer [go-loop <!]]
+            [mercurius.core.presentation.util :refer [>evt]]))
 
 (defonce sente-client (atom nil))
 (defonce ws-state (r/atom {:open false}))
@@ -16,8 +17,7 @@
   (go-loop []
     (when-let [{[event-type event-data] :event} (<! (:ch-recv @sente-client))]
       (when (= :chsk/state event-type)
-        (let [[_ new-state] event-data]
-          (reset! ws-state new-state))))))
+        (>evt [event-type event-data])))))
 
 (defn connect! []
   (reset! sente-client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto}))

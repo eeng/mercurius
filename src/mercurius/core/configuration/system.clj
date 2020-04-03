@@ -166,20 +166,21 @@
 (defn start
   "Injects all the dependencies into the respective components and starts the system.
   Returns a map containing all the components."
-  ([] (start {}))
-  ([{:keys [only]}]
-   (let [config (read-config)
-         assembly (build-assembly config)]
-     (configure-logger config)
-     (log/info "Starting system with config" (pr-str config))
-     (if only
-       (ig/init assembly only)
-       (ig/init assembly)))))
+  [& [{:keys [only]}]]
+  (let [config (read-config)
+        assembly (build-assembly config)]
+    (configure-logger config)
+    (log/info "Starting system with config" (pr-str config))
+    (if only
+      (ig/init assembly only)
+      (ig/init assembly))))
 
-(defn stop [system]
+(defn stop [system & [{:keys [only]}]]
   (when system
     (log/info "Stopping system")
-    (ig/halt! system))
+    (if only
+      (ig/halt! system only)
+      (ig/halt! system)))
   nil)
 
 (comment
