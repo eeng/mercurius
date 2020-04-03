@@ -1,5 +1,6 @@
 (ns mercurius.trading.presentation.flow
-  (:require [re-frame.core :refer [reg-sub reg-event-db]]))
+  (:require [re-frame.core :refer [reg-sub-raw reg-event-db]]
+            [mercurius.core.presentation.flow :refer [remote-query-sub]]))
 
 ;;;; Events 
 
@@ -11,7 +12,7 @@
 
 ;;;; Subscriptions
 
-(reg-sub
+(reg-sub-raw
  :trading/tickers
- (fn [db _]
-   [{:ticker "BTCUSD"}]))
+ (fn [app-db _]
+   (remote-query-sub app-db [:get-tickers] [:tickers])))

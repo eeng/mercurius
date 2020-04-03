@@ -1,6 +1,5 @@
 (ns mercurius.core.presentation.api
   (:require [taoensso.sente :as sente]
-            [reagent.core :as r]
             [clojure.core.async :refer [go-loop <!]]
             [mercurius.core.presentation.util :refer [>evt]]))
 
@@ -12,7 +11,7 @@
 (defn start-events-processor []
   (go-loop []
     (when-let [{[event-type event-data :as event] :event} (<! (:ch-recv @sente-client))]
-      (js/console.log event)
+      (js/console.log "Remote event:" event)
       (cond
         (= event-type :chsk/state)
         (>evt event)
@@ -43,16 +42,3 @@
                     (case status
                       :ok (on-success data)
                       :error (on-error data)))))))
-
-;;;; Higher-level functions
-
-(defn use-query
-  "Similar to Apollo GraphQL useQuery.
-  Returns a reagent atom that represents the different network request's states: 
-  When it's loading, when the response finish successfully, and when an error occours."
-  [request]
-  (let [result (r/atom {:loading true})]
-    (send-request request
-                  :on-success #(reset! result {:loading false :data %})
-                  :on-error #(reset! result {:loading false :error %}))
-    result))
