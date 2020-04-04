@@ -7,6 +7,11 @@
 ;;;; Events 
 
 (reg-event-db
+ :core/initialize
+ (fn [_ [_ _]]
+   {:order-book-precision "P0"}))
+
+(reg-event-db
  :chsk/state
  (fn [db [_ [_ {:keys [open?]}]]]
    (assoc db :ws-connected? open?)))

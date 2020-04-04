@@ -1,5 +1,5 @@
 (ns mercurius.trading.presentation.views.order-book
-  (:require [mercurius.core.presentation.util.reframe :refer [<sub]]))
+  (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]))
 
 (defn- buying-table [orders]
   [:div {:style {:display "inline-block"}}
@@ -31,20 +31,30 @@
         [:td amount]
         [:td count]])]]])
 
+(defn- increase-precision-btn []
+  [:button {:on-click #(>evt [:trading/increase-book-precision])
+            :disabled (<sub [:trading/cant-increase-book-precision])}
+   "+"])
+
+(defn- decrease-precision-btn []
+  [:button {:on-click #(>evt [:trading/decrease-book-precision])
+            :disabled (<sub [:trading/cant-decrease-book-precision])}
+   "-"])
+
 (defn order-book-panel []
-  (let [filters (<sub [:trading/order-book-filters])
-        {:keys [data loading?]} (when filters
-                                  (<sub [:trading/order-book filters]))]
-    [:div.panel
-     [:div "Order Book"]
-     (cond
-       (not filters)
-       [:div "Select a ticker"]
+  (let [{:keys [ticker] :as filters} (<sub [:trading/order-book-filters])]
+    (when ticker
+      (let [{:keys [data loading?]} (<sub [:trading/order-book filters])]
+        [:div.panel
+         [:div "Order Book for " ticker
+          [increase-precision-btn]
+          [decrease-precision-btn]]
 
-       loading?
-       [:div "Loading..."]
+         (cond
+           loading?
+           [:div "Loading..."]
 
-       data
-       [:div
-        [buying-table (:buying data)]
-        [selling-table (:selling data)]])]))
+           data
+           [:div
+            [buying-table (:buying data)]
+            [selling-table (:selling data)]])]))))

@@ -1,6 +1,6 @@
 (ns mercurius.core.presentation.main
   (:require [reagent.dom :as rd]
-            [re-frame.core :as re-frame]
+            [re-frame.core :as re-frame :refer [dispatch-sync]]
             [mercurius.core.presentation.api :as api]
             [mercurius.core.presentation.app :refer [app]]))
 
@@ -11,5 +11,6 @@
 
 (defn init []
   (println "Starting app...")
+  (dispatch-sync [:core/initialize])
   (api/connect!)
   (start))
