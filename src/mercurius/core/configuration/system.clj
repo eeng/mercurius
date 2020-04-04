@@ -171,9 +171,13 @@
         assembly (build-assembly config)]
     (configure-logger config)
     (log/info "Starting system with config" (pr-str config))
-    (if only
-      (ig/init assembly only)
-      (ig/init assembly))))
+    (try
+      (if only
+        (ig/init assembly only)
+        (ig/init assembly))
+      (catch clojure.lang.ExceptionInfo ex
+        (ig/halt! (:system (ex-data ex)))
+        (throw (.getCause ex))))))
 
 (defn stop [system & [{:keys [only]}]]
   (when system
