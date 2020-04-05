@@ -33,7 +33,7 @@
 
 (defn send-request [request & {:keys [on-success on-error]
                                :or {on-success identity on-error identity}}]
-  (chsk-send! [:backend/request request]
+  (chsk-send! [:frontend/request request]
               timeout
               (fn [reply]
                 (when (sente/cb-success? reply)

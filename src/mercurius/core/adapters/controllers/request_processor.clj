@@ -15,7 +15,7 @@
 (defn start-request-processor [{:keys [pub-sub dispatch]}]
   (log/info "Starting request processor")
   (subscribe pub-sub
-             :backend/request
+             :frontend/request
              (fn [[_ msg-data]]
                (log/trace "Received" msg-data)
                (dispatch-request dispatch msg-data))))
