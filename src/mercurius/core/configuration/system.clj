@@ -74,7 +74,8 @@
    :infraestructure/web-server {:port port
                                 :session-key session-key
                                 :sente (ig/ref :infraestructure/sente)}
-   :infraestructure/sente {:request-processor (ig/ref :controllers/request-processor)}})
+   :infraestructure/sente {:request-processor (ig/ref :controllers/request-processor)
+                           :event-bus (ig/ref :adapters/event-bus)}})
 
 (defmethod ig/init-key :adapters/wallet-repo [_ _]
   (new-in-memory-wallet-repo))
