@@ -8,6 +8,7 @@
             [mercurius.core.domain.use-cases.mediator.middleware.stm :refer [stm]]
             [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [start-channel-based-event-bus stop-channel-based-event-bus]]
+            [mercurius.core.adapters.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.adapters.controllers.request-processor :refer [new-request-processor]]
             [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
@@ -37,6 +38,7 @@
    :adapters/order-book-repo nil
    :adapters/ticker-repo nil
    :adapters/event-bus nil
+   :adapters/pub-sub nil
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
@@ -85,6 +87,12 @@
 
 (defmethod ig/init-key :adapters/ticker-repo [_ _]
   (new-in-memory-ticker-repo))
+
+(defmethod ig/init-key :adapters/pub-sub [_ _]
+  (start-channel-based-pub-sub))
+
+(defmethod ig/halt-key! :adapters/pub-sub [_ pub-sub]
+  (stop-channel-based-pub-sub pub-sub))
 
 (defmethod ig/init-key :adapters/event-bus [_ _]
   (start-channel-based-event-bus))

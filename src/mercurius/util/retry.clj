@@ -2,6 +2,11 @@
   (:require [slingshot.slingshot :refer [try+ throw+]]
             [taoensso.timbre :as log]))
 
+(defn- should-retry? [on]
+  (fn [e]
+    (or (= on (:type e))
+        (instance? on e))))
+
 (defn retry
   [f {:keys [on times delay-ms jitter-factor]
       :or {on Exception delay-ms 0 times 1 jitter-factor 0}
@@ -10,7 +15,7 @@
     (f)
     (try+
      (f)
-     (catch [:type on] e
+     (catch (should-retry? on) e
        (let [jitter-sign (rand-nth [-1 1])
              delay (+ delay-ms (rand (* delay-ms jitter-factor jitter-sign)))]
          (log/warn (format "Retrying after %.0f ms due to %s" delay e))
@@ -29,4 +34,8 @@
 (comment
   (with-retry {:times 2 :on :stale-object-error :delay-ms 500 :jitter-factor 0.1}
     (log/info ">>> DOING")
-    (throw+ {:type :stale-object-error})))
+    (throw+ {:type :stale-object-error}))
+
+  (with-retry {:times 2 :delay-ms 500 :jitter-factor 0.1}
+    (log/info ">>> DOING")
+    (throw (IllegalArgumentException. "nooo"))))
