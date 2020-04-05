@@ -5,4 +5,4 @@
     "Sends the `message` to the specified `topic`.")
 
   (subscribe [this topic callback]
-    "When a message is send to the `topic`, it calls the callback with the message."))
+    "When a message is sent to the topic, the callback will be called with the meesage."))
