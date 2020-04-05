@@ -3,12 +3,12 @@
             [taoensso.timbre :as log]
             [mercurius.core.configuration.logging :refer [configure-logger]]
             [mercurius.core.configuration.config :refer [read-config]]
-            [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]
-            [mercurius.core.adapters.controllers.mediator.middleware.logger :refer [logger]]
-            [mercurius.core.adapters.controllers.mediator.middleware.stm :refer [stm]]
+            [mercurius.core.domain.use-cases.mediator :refer [new-mediator dispatch]]
+            [mercurius.core.domain.use-cases.mediator.middleware.logger :refer [logger]]
+            [mercurius.core.domain.use-cases.mediator.middleware.stm :refer [stm]]
+            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [start-channel-based-event-bus stop-channel-based-event-bus]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
-            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
             [mercurius.core.adapters.controllers.request-processor :refer [start-request-processor]]
             [mercurius.core.adapters.web.server :refer [start-web-server stop-web-server]]
             [mercurius.core.adapters.web.sente :refer [start-sente stop-sente]]
@@ -53,29 +53,29 @@
    :use-cases/update-ticker {:ticker-repo (ig/ref :adapters/ticker-repo)
                              :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/get-tickers {:ticker-repo (ig/ref :adapters/ticker-repo)}
-   :controllers/dispatch {:handlers {:deposit (ig/ref :use-cases/deposit)
-                                     :withdraw (ig/ref :use-cases/withdraw)
-                                     :transfer (ig/ref :use-cases/transfer)
-                                     :get-wallet (ig/ref :use-cases/get-wallet)
-                                     :get-wallets (ig/ref :use-cases/get-wallets)
-                                     :calculate-monetary-base (ig/ref :use-cases/calculate-monetary-base)
-                                     :place-order (ig/ref :use-cases/place-order)
-                                     :get-order-book (ig/ref :use-cases/get-order-book)
-                                     :execute-trades (ig/ref :use-cases/execute-trades)
-                                     :update-ticker (ig/ref :use-cases/update-ticker)
-                                     :get-tickers (ig/ref :use-cases/get-tickers)}
-                          :middleware [logger stm]}
+   :use-cases/dispatch {:handlers {:deposit (ig/ref :use-cases/deposit)
+                                   :withdraw (ig/ref :use-cases/withdraw)
+                                   :transfer (ig/ref :use-cases/transfer)
+                                   :get-wallet (ig/ref :use-cases/get-wallet)
+                                   :get-wallets (ig/ref :use-cases/get-wallets)
+                                   :calculate-monetary-base (ig/ref :use-cases/calculate-monetary-base)
+                                   :place-order (ig/ref :use-cases/place-order)
+                                   :get-order-book (ig/ref :use-cases/get-order-book)
+                                   :execute-trades (ig/ref :use-cases/execute-trades)
+                                   :update-ticker (ig/ref :use-cases/update-ticker)
+                                   :get-tickers (ig/ref :use-cases/get-tickers)}
+                        :middleware [logger stm]}
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
-                            :dispatch (ig/ref :controllers/dispatch)}
+                            :dispatch (ig/ref :use-cases/dispatch)}
    :processes/ticker-updater {:event-bus (ig/ref :adapters/event-bus)
-                              :dispatch (ig/ref :controllers/dispatch)}
+                              :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
-   :adapters/sente nil
    :controllers/request-processor {:pub-sub (ig/ref :adapters/sente)
-                                   :dispatch (ig/ref :controllers/dispatch)}
+                                   :dispatch (ig/ref :use-cases/dispatch)}
    :adapters/web-server {:port port
                          :session-key session-key
-                         :sente (ig/ref :adapters/sente)}})
+                         :sente (ig/ref :adapters/sente)}
+   :adapters/sente nil})
 
 (defmethod ig/init-key :adapters/wallet-repo [_ _]
   (new-in-memory-wallet-repo))
@@ -139,7 +139,7 @@
 (defmethod ig/init-key :use-cases/get-tickers [_ {:keys [ticker-repo]}]
   (new-get-tickers-use-case {:get-tickers (partial get-tickers ticker-repo)}))
 
-(defmethod ig/init-key :controllers/dispatch [_ {:keys [handlers middleware]}]
+(defmethod ig/init-key :use-cases/dispatch [_ {:keys [handlers middleware]}]
   (let [mediator (new-mediator handlers middleware)]
     (partial dispatch mediator)))
 
@@ -194,5 +194,5 @@
   nil)
 
 (comment
-  (def system (start {:only [:controllers/dispatch]}))
+  (def system (start {:only [:use-cases/dispatch]}))
   (stop system))

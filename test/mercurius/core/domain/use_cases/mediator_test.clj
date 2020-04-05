@@ -1,6 +1,6 @@
-(ns mercurius.core.adapters.controllers.mediator-test
+(ns mercurius.core.domain.use-cases.mediator-test
   (:require [clojure.test :refer [deftest testing is]]
-            [mercurius.core.adapters.controllers.mediator :refer [new-mediator dispatch]]))
+            [mercurius.core.domain.use-cases.mediator :refer [new-mediator dispatch]]))
 
 (deftest dispatch-test
   (testing "should route the request to the appropiate handler"

@@ -1,4 +1,4 @@
-(ns mercurius.core.adapters.controllers.mediator.middleware.logger
+(ns mercurius.core.domain.use-cases.mediator.middleware.logger
   (:require [taoensso.timbre :as log]))
 
 (defn logger [next-handler]

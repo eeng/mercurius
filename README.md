@@ -9,8 +9,7 @@
 - Store some trx-id in deposits/withdraws related to transfers
 - Simulator, place orders around current price
 - Volume in USD
-- Move mediator to core.domain.use-cases
 - Rename presentation to ui
 - Rename repositories ns to gateways
 - Rename processes ns to controllers
-- Make the mediator explicit? I don't like passing a dispatch function
+- Sente and the web server don't belong to the adapters layer

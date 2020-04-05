@@ -5,7 +5,7 @@
 (comment
   (do
     (reset)
-    (def dispatch (:controllers/dispatch system))
+    (def dispatch (:use-cases/dispatch system))
     (time (run-simulation dispatch
                           :tickers {"BTCUSD" {:initial-price 5000}}
                           :initial-funds {"USD" 10000 "BTC" 2}

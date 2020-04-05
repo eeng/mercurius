@@ -9,7 +9,7 @@
 
 (deftest ^:integration start-test
   (testing "assembles the system and allows to execute the use cases"
-    (with-system [{:controllers/keys [dispatch] :as system} {}]
+    (with-system [{:use-cases/keys [dispatch] :as system} {}]
       (is (map? system))
 
       (dispatch :deposit {:user-id u1 :amount 100 :currency "USD"})
@@ -23,7 +23,7 @@
         (is (match? [{:amount 0.2M}] buying)))))
 
   (testing "transfering between wallets should not have concurrency issues"
-    (with-system [{:controllers/keys [dispatch]} {:only [:controllers/dispatch]}]
+    (with-system [{:use-cases/keys [dispatch]} {:only [:use-cases/dispatch]}]
       (let [concurrency 100
             amount (bigdec concurrency)]
         (dispatch :deposit {:user-id u1 :amount amount :currency "USD"})

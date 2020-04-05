@@ -5,7 +5,7 @@
 
 (deftest ^:integration ^:slow run-simulation-test
   (testing "should not have concurrency issues"
-    (with-system [{:controllers/keys [dispatch]} {}]
+    (with-system [{:use-cases/keys [dispatch]} {}]
       (let [n-traders 20
             n-orders-per-trader 5
             initial-price 250.0
