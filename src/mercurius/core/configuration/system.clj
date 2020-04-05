@@ -9,8 +9,9 @@
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [start-channel-based-event-bus stop-channel-based-event-bus]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
+            [mercurius.core.adapters.controllers.request-processor :refer [start-request-processor]]
             [mercurius.core.adapters.web.server :refer [start-web-server stop-web-server]]
-            [mercurius.core.adapters.web.sente :refer [start-sente-comms stop-sente-comms]]
+            [mercurius.core.adapters.web.sente :refer [start-sente stop-sente]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -69,7 +70,9 @@
    :processes/ticker-updater {:event-bus (ig/ref :adapters/event-bus)
                               :dispatch (ig/ref :controllers/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
-   :adapters/sente {:dispatch (ig/ref :controllers/dispatch)}
+   :adapters/sente nil
+   :controllers/request-processor {:pub-sub (ig/ref :adapters/sente)
+                                   :dispatch (ig/ref :controllers/dispatch)}
    :adapters/web-server {:port port
                          :session-key session-key
                          :sente (ig/ref :adapters/sente)}})
@@ -157,11 +160,14 @@
 (defmethod ig/halt-key! :adapters/web-server [_ server]
   (stop-web-server server))
 
-(defmethod ig/init-key :adapters/sente [_ deps]
-  (start-sente-comms deps))
+(defmethod ig/init-key :controllers/request-processor [_ deps]
+  (start-request-processor deps))
 
-(defmethod ig/halt-key! :adapters/sente [_ deps]
-  (stop-sente-comms deps))
+(defmethod ig/init-key :adapters/sente [_ _]
+  (start-sente))
+
+(defmethod ig/halt-key! :adapters/sente [_ sente]
+  (stop-sente sente))
 
 (defn start
   "Injects all the dependencies into the respective components and starts the system.

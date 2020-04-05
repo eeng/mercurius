@@ -2,50 +2,41 @@
   (:require [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
             [clojure.core.async :refer [go-loop <!]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [mercurius.core.adapters.controllers.pub-sub :refer [PubSub]]))
 
-(defn- dispatch-request [dispatch request]
-  (try
-    [:ok (apply dispatch request)]
-    (catch clojure.lang.ExceptionInfo e
-      [:error (ex-data e)])
-    (catch Exception e
-      [:error (.getMessage e)])))
+(defrecord Sente [ring-ajax-post ring-ajax-get-or-ws-handshake
+                  active ch-recv chsk-send! connected-uids]
+  PubSub
 
-(defn- start-router!
-  "Receives Sente events and if they correspond to a mediator's request, it's dispatched.
-  In addition, if the client provides a reply-fn, it's called with the request's response."
-  [{:keys [active ch-recv dispatch]}]
-  (go-loop []
-    (when @active
-      (when-let [{[event-type event-data :as event] :event reply-fn :?reply-fn} (<! ch-recv)]
-        (log/trace "Received" event)
-        (when (= event-type :backend/request)
-          (cond-> (dispatch-request dispatch event-data)
-            reply-fn reply-fn))
-        (recur)))))
+  ;; This implementation is a bit naive, only works for one subscriber!
+  ;; But that's all I need for know.
+  (subscribe [_ msg-type callback]
+    (go-loop []
+      (when @active
+        (when-let [{[event-type :as event] :event reply-fn :?reply-fn} (<! ch-recv)]
+          (when (= event-type msg-type)
+            (cond-> (callback event)
+              reply-fn reply-fn))
+          (recur)))))
 
-(defn start-sente-comms [{:keys [dispatch]}]
-  (log/info "Starting Sente comms")
+  (broadcast! [_ msg]
+    (doseq [uid (:any @connected-uids)]
+      (chsk-send! uid msg))))
+
+(defn start-sente []
+  (log/info "Starting Sente")
   (let [{:keys [ch-recv send-fn connected-uids
                 ajax-post-fn ajax-get-or-ws-handshake-fn]}
-        (sente/make-channel-socket! (get-sch-adapter) {})
-        active (atom true)]
-    (start-router! {:active active
-                    :dispatch dispatch
-                    :ch-recv ch-recv
-                    :chsk-send! send-fn
-                    :connected-uids connected-uids})
-    {:active active
-     :ring-ajax-post ajax-post-fn
-     :ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn
-     :chsk-send! send-fn
-     :connected-uids connected-uids}))
+        (sente/make-channel-socket! (get-sch-adapter) {})]
+    (map->Sente
+     {:active (atom true)
+      :ring-ajax-post ajax-post-fn
+      :ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn
+      :ch-recv ch-recv
+      :chsk-send! send-fn
+      :connected-uids connected-uids})))
 
-(defn stop-sente-comms [{:keys [active]}]
-  (log/info "Stopping Sente comms")
+(defn stop-sente [{:keys [active]}]
+  (log/info "Stopping Sente")
   (reset! active false))
-
-(defn broadcast! [{:keys [chsk-send! connected-uids]} message]
-  (doseq [uid (:any @connected-uids)]
-    (chsk-send! uid message)))
