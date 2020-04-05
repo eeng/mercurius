@@ -5,7 +5,7 @@
             [matcher-combinators.matchers :as m]
             [mercurius.support.helpers :refer [with-system recorded-calls]]
             [mercurius.support.factory :refer [build-order]]
-            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
+            [mercurius.core.domain.messaging.event-bus :refer [emit]]
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]))
 
 ;; TODO fragil test
@@ -14,7 +14,7 @@
     (with-system [{:adapters/keys [event-bus]} {:only [:adapters/event-bus]}]
       (let [calls (chan)]
         (new-trade-finder {:event-bus event-bus :execute-trades #(>!! calls %)})
-        (publish-event event-bus [:order-placed (build-order {:ticker "BTCUSD"})])
-        (publish-event event-bus [:order-placed (build-order {:ticker "ETHUSD"})])
+        (emit event-bus [:order-placed (build-order {:ticker "BTCUSD"})])
+        (emit event-bus [:order-placed (build-order {:ticker "ETHUSD"})])
         (is (match? (m/in-any-order [{:ticker "BTCUSD"} {:ticker "ETHUSD"}])
                     (recorded-calls calls 2)))))))

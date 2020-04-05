@@ -25,12 +25,12 @@
       (recur))))
 
 (defn start-channel-based-pub-sub []
-  (log/info "Starting ChannelBasedPubSub")
+  (log/info "Starting channel based pubsub")
   (let [in-chan (chan)
         subscribers (atom [])]
     (start-listener in-chan subscribers)
     (ChannelBasedPubSub. in-chan subscribers)))
 
 (defn stop-channel-based-pub-sub [{:keys [in-chan]}]
-  (log/info "Stopping channel based pub sub")
+  (log/info "Stopping channel based pubsub")
   (close! in-chan))

@@ -3,7 +3,7 @@
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
             [clojure.core.async :refer [go-loop <!]]
             [taoensso.timbre :as log]
-            [mercurius.core.domain.messaging.event-bus :refer [subscribe-to]]))
+            [mercurius.core.domain.messaging.event-bus :refer [listen]]))
 
 (defn- start-frontend-request-router
   "Receives events from the clients and dispatch the ones that are requests to the processor. 
@@ -25,11 +25,11 @@
   (go-loop []
     (when @active
       ; TODO this is notifying only one event, it should work for all and not refer to them
-      (subscribe-to event-bus
-                    :ticker-updated
-                    :on-event (fn [{:keys [data]}]
-                                (doseq [uid (:any @connected-uids)]
-                                  (send-fn uid [:trading/ticker-updated data])))))))
+      (listen event-bus
+              :ticker-updated
+              (fn [{:keys [data]}]
+                (doseq [uid (:any @connected-uids)]
+                  (send-fn uid [:trading/ticker-updated data])))))))
 
 (defn start-sente [{:keys [request-processor event-bus]}]
   (log/info "Starting Sente")

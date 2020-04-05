@@ -6,8 +6,8 @@
             [mercurius.core.domain.use-cases.mediator :refer [new-mediator dispatch]]
             [mercurius.core.domain.use-cases.mediator.middleware.logger :refer [logger]]
             [mercurius.core.domain.use-cases.mediator.middleware.stm :refer [stm]]
-            [mercurius.core.domain.messaging.event-bus :refer [publish-event]]
-            [mercurius.core.adapters.messaging.channel-based-event-bus :refer [start-channel-based-event-bus stop-channel-based-event-bus]]
+            [mercurius.core.domain.messaging.event-bus :refer [emit]]
+            [mercurius.core.adapters.messaging.pub-sub-event-bus :refer [new-pub-sub-event-bus]]
             [mercurius.core.adapters.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.adapters.controllers.request-processor :refer [new-request-processor]]
@@ -37,8 +37,8 @@
   {:adapters/wallet-repo nil
    :adapters/order-book-repo nil
    :adapters/ticker-repo nil
-   :adapters/event-bus nil
    :adapters/pub-sub nil
+   :adapters/event-bus {:pub-sub (ig/ref :adapters/pub-sub)}
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
@@ -94,11 +94,8 @@
 (defmethod ig/halt-key! :adapters/pub-sub [_ pub-sub]
   (stop-channel-based-pub-sub pub-sub))
 
-(defmethod ig/init-key :adapters/event-bus [_ _]
-  (start-channel-based-event-bus))
-
-(defmethod ig/halt-key! :adapters/event-bus [_ event-bus]
-  (stop-channel-based-event-bus event-bus))
+(defmethod ig/init-key :adapters/event-bus [_ deps]
+  (new-pub-sub-event-bus deps))
 
 (defmethod ig/init-key :use-cases/deposit [_ {:keys [wallet-repo]}]
   (new-deposit-use-case {:load-wallet (partial load-wallet wallet-repo)
@@ -128,7 +125,7 @@
                              :save-wallet (partial save-wallet wallet-repo)
                              :get-bid-ask (partial get-bid-ask order-book-repo)
                              :insert-order (partial insert-order order-book-repo)
-                             :publish-event (partial publish-event event-bus)}))
+                             :publish-event (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/get-order-book [_ {:keys [order-book-repo]}]
   (new-get-order-book-use-case {:get-order-book (partial get-order-book order-book-repo)}))
@@ -138,11 +135,11 @@
                                 :update-order (partial update-order order-book-repo)
                                 :remove-order (partial remove-order order-book-repo)
                                 :transfer transfer-use-case
-                                :publish-event (partial publish-event event-bus)}))
+                                :publish-event (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/update-ticker [_ {:keys [ticker-repo event-bus]}]
   (new-update-ticker-use-case {:update-ticker (partial update-ticker ticker-repo)
-                               :publish-event (partial publish-event event-bus)}))
+                               :publish-event (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/get-tickers [_ {:keys [ticker-repo]}]
   (new-get-tickers-use-case {:get-tickers (partial get-tickers ticker-repo)}))
