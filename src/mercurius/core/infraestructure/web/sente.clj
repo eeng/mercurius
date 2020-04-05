@@ -1,4 +1,4 @@
-(ns mercurius.core.adapters.web.sente
+(ns mercurius.core.infraestructure.web.sente
   (:require [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
             [clojure.core.async :refer [go-loop <!]]

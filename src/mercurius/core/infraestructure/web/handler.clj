@@ -1,12 +1,12 @@
-(ns mercurius.core.adapters.web.handler
+(ns mercurius.core.infraestructure.web.handler
   (:require [reitit.ring :as ring]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
-            [mercurius.core.adapters.web.helpers :refer [ok]]
-            [mercurius.core.adapters.web.index :refer [index]]))
+            [mercurius.core.infraestructure.web.helpers :refer [ok]]
+            [mercurius.core.infraestructure.web.index :refer [index]]))
 
 (defn status [_req]
   (ok "System is online!"))

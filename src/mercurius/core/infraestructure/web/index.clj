@@ -1,6 +1,6 @@
-(ns mercurius.core.adapters.web.index
+(ns mercurius.core.infraestructure.web.index
   (:require [hiccup.page :as page]
-            [mercurius.core.adapters.web.helpers :refer [ok]]))
+            [mercurius.core.infraestructure.web.helpers :refer [ok]]))
 
 (defn index [{:keys [anti-forgery-token]}]
   (ok

@@ -12,4 +12,3 @@
 - Rename presentation to ui
 - Rename repositories ns to gateways
 - Rename processes ns to controllers
-- Sente and the web server don't belong to the adapters layer

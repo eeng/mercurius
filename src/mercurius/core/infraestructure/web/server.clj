@@ -1,6 +1,6 @@
-(ns mercurius.core.adapters.web.server
+(ns mercurius.core.infraestructure.web.server
   (:require [org.httpkit.server :refer [run-server]]
-            [mercurius.core.adapters.web.handler :refer [handler]]
+            [mercurius.core.infraestructure.web.handler :refer [handler]]
             [taoensso.timbre :as log]))
 
 (defn start-web-server [{:keys [port] :or {port 3000} :as deps}]

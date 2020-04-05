@@ -10,8 +10,8 @@
             [mercurius.core.adapters.messaging.channel-based-event-bus :refer [start-channel-based-event-bus stop-channel-based-event-bus]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.adapters.controllers.request-processor :refer [start-request-processor]]
-            [mercurius.core.adapters.web.server :refer [start-web-server stop-web-server]]
-            [mercurius.core.adapters.web.sente :refer [start-sente stop-sente]]
+            [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
+            [mercurius.core.infraestructure.web.sente :refer [start-sente stop-sente]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -70,12 +70,12 @@
    :processes/ticker-updater {:event-bus (ig/ref :adapters/event-bus)
                               :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
-   :controllers/request-processor {:pub-sub (ig/ref :adapters/sente)
+   :controllers/request-processor {:pub-sub (ig/ref :infraestructure/sente)
                                    :dispatch (ig/ref :use-cases/dispatch)}
-   :adapters/web-server {:port port
-                         :session-key session-key
-                         :sente (ig/ref :adapters/sente)}
-   :adapters/sente nil})
+   :infraestructure/web-server {:port port
+                                :session-key session-key
+                                :sente (ig/ref :infraestructure/sente)}
+   :infraestructure/sente nil})
 
 (defmethod ig/init-key :adapters/wallet-repo [_ _]
   (new-in-memory-wallet-repo))
@@ -154,19 +154,19 @@
 (defmethod ig/init-key :processes/activity-logger [_ {:keys [event-bus]}]
   (new-activity-logger {:event-bus event-bus}))
 
-(defmethod ig/init-key :adapters/web-server [_ deps]
+(defmethod ig/init-key :infraestructure/web-server [_ deps]
   (start-web-server deps))
 
-(defmethod ig/halt-key! :adapters/web-server [_ server]
+(defmethod ig/halt-key! :infraestructure/web-server [_ server]
   (stop-web-server server))
 
 (defmethod ig/init-key :controllers/request-processor [_ deps]
   (start-request-processor deps))
 
-(defmethod ig/init-key :adapters/sente [_ _]
+(defmethod ig/init-key :infraestructure/sente [_ _]
   (start-sente))
 
-(defmethod ig/halt-key! :adapters/sente [_ sente]
+(defmethod ig/halt-key! :infraestructure/sente [_ sente]
   (stop-sente sente))
 
 (defn start
