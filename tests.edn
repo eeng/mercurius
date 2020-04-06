@@ -1,7 +1,8 @@
 #kaocha/v1
  {:tests [{:kaocha.filter/skip-meta []}]
   :kaocha/fail-fast? false
-  :kaocha/plugins [:kaocha.plugin/notifier]
+  :kaocha/plugins [:kaocha.plugin/hooks :kaocha.plugin/notifier]
+  :kaocha.hooks/pre-test [mercurius.support.helpers/check-specs]
   :bindings {mercurius.core.configuration.config/*config-overrides*
              {:log-level :warn
               :port 5001}}}

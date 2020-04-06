@@ -1,8 +1,13 @@
 (ns mercurius.support.helpers
   (:require [clojure.core.async :refer [timeout alts!!]]
-            [clojure.test :refer [assert-expr do-report is]]
-            [mercurius.util.retry :refer [with-retry]]
+            [clojure.spec.test.alpha :as stest]
             [mercurius.core.configuration.system :refer [start stop]]))
+
+(defn check-specs
+  "Kaocha hook to check fdef specs."
+  [test _test-plan]
+  (stest/instrument)
+  test)
 
 (defn recorded-calls [calls-chan expected-count & {:keys [wait-for] :or {wait-for 500}}]
   (loop [recorded []
