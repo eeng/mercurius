@@ -16,5 +16,4 @@ Backend
 
 Frontend
 
-- Spec the db
 - Debugging of reg-event-fx
