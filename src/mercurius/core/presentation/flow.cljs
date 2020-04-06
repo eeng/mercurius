@@ -1,5 +1,5 @@
 (ns mercurius.core.presentation.flow
-  (:require [re-frame.core :refer [reg-sub]]
+  (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [reagent.ratom :refer [reaction]]
             [mercurius.core.presentation.api :refer [send-request]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
@@ -20,6 +20,15 @@
  :write-to
  (fn [db [_ path data]]
    (assoc-in db path data)))
+
+(def domain-event-type-to-reframe
+  {:ticker-updated :trading/ticker-updated})
+
+;; Receives push notifications from the backend and routes them to the corresponding re-frame event handler.
+(reg-event-fx
+ :backend/push
+ (fn [_cofx [_ [event-type event-data]]]
+   {:dispatch [(domain-event-type-to-reframe event-type) event-data]}))
 
 ;;;; Subscriptions
 

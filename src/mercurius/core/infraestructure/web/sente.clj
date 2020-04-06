@@ -3,7 +3,7 @@
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
             [clojure.core.async :refer [go-loop <!]]
             [taoensso.timbre :as log]
-            [mercurius.core.domain.messaging.event-bus :refer [listen]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [subscribe]]))
 
 (defn- start-frontend-request-router
   "Receives events from the clients and dispatch the ones that are requests to the processor. 
@@ -17,21 +17,20 @@
             reply-fn reply-fn))
         (recur)))))
 
-(defn- start-backend-event-notifier
-  "Listens to domain events and notifies them to the clients.
-  In a complex application we'll have to make clients join specific topics,
-  and then here notify only those interested."
-  [active send-fn connected-uids event-bus]
+(defn- start-backend-event-pusher
+  "Subscribes to the topic 'push.*' and pushes those messages to all the clients.
+  In a real-life application we'd have clients join specific topics,
+  and then here we would notify only those interested."
+  [active send-fn connected-uids pub-sub]
   (go-loop []
     (when @active
-      ; TODO this is notifying only one event, it should work for all and not refer to them
-      (listen event-bus
-              :ticker-updated
-              (fn [{:keys [data]}]
-                (doseq [uid (:any @connected-uids)]
-                  (send-fn uid [:trading/ticker-updated data])))))))
+      (subscribe pub-sub
+                 "push.*"
+                 (fn [message]
+                   (doseq [uid (:any @connected-uids)]
+                     (send-fn uid [:backend/push message])))))))
 
-(defn start-sente [{:keys [request-processor event-bus]}]
+(defn start-sente [{:keys [request-processor pub-sub]}]
   (log/info "Starting Sente")
   (let [{:keys [ch-recv send-fn connected-uids
                 ajax-post-fn ajax-get-or-ws-handshake-fn]}
@@ -39,7 +38,7 @@
         active (atom true)]
 
     (start-frontend-request-router active ch-recv request-processor)
-    (start-backend-event-notifier active send-fn connected-uids event-bus)
+    (start-backend-event-pusher active send-fn connected-uids pub-sub)
 
     {:active active
      :ring-ajax-post ajax-post-fn

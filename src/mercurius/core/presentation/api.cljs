@@ -11,12 +11,13 @@
 (defn start-events-processor []
   (go-loop []
     (when-let [{[event-type event-data :as event] :event} (<! (:ch-recv @sente-client))]
+      (js/console.log "Received" event)
       (cond
         (= event-type :chsk/state)
         (>evt event)
 
         (and (= event-type :chsk/recv)
-             (not= event-data [:chsk/ws-ping]))
+             (= (first event-data) :backend/push))
         (>evt event-data)))
     (recur)))
 

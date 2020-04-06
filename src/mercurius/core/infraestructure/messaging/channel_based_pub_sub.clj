@@ -8,6 +8,7 @@
   PubSub
 
   (publish [_ topic message]
+    (log/debug "Publish" [topic message])
     (put! in-chan [topic message]))
 
   (subscribe [_ topic-pattern callback]

@@ -11,6 +11,7 @@
             [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.adapters.controllers.request-processor :refer [new-request-processor]]
+            [mercurius.core.adapters.controllers.event-notifier :refer [start-event-notifier]]
             [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
             [mercurius.core.infraestructure.web.sente :refer [start-sente stop-sente]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
@@ -73,11 +74,13 @@
                               :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
    :controllers/request-processor {:dispatch (ig/ref :use-cases/dispatch)}
+   :controllers/event-notifier {:event-bus (ig/ref :adapters/event-bus)
+                                :pub-sub (ig/ref :infraestructure/pub-sub)}
    :infraestructure/web-server {:port port
                                 :session-key session-key
                                 :sente (ig/ref :infraestructure/sente)}
    :infraestructure/sente {:request-processor (ig/ref :controllers/request-processor)
-                           :event-bus (ig/ref :adapters/event-bus)}})
+                           :pub-sub (ig/ref :infraestructure/pub-sub)}})
 
 (defmethod ig/init-key :adapters/wallet-repo [_ _]
   (new-in-memory-wallet-repo))
@@ -167,6 +170,9 @@
 
 (defmethod ig/init-key :controllers/request-processor [_ deps]
   (new-request-processor deps))
+
+(defmethod ig/init-key :controllers/event-notifier [_ deps]
+  (start-event-notifier deps))
 
 (defmethod ig/init-key :infraestructure/sente [_ deps]
   (start-sente deps))

@@ -12,3 +12,4 @@
 - Rename presentation to ui
 - Rename repositories ns to gateways
 - Rename processes ns to controllers
+- Spec the domain events, and add asserts to the notifier
