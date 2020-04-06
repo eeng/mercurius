@@ -1,4 +1,4 @@
-(ns mercurius.core.domain.messaging.pub-sub)
+(ns mercurius.core.adapters.messaging.pub-sub)
 
 (defprotocol PubSub
   (publish [this topic message]

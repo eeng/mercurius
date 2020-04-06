@@ -11,6 +11,8 @@
                :created-at (t/now)}))
 
 (defprotocol EventBus
+  "Allows to move domain events through the application."
+
   (-emit [this event]
     "Publishes an event to the bus. 
     NOTE: For protocols implementers only, clients should use `emit` instead.")

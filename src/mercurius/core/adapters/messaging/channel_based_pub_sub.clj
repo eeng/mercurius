@@ -2,7 +2,7 @@
   (:require [clojure.core.async :refer [put! chan close! go-loop <!]]
             [clojure.string :as str]
             [taoensso.timbre :as log]
-            [mercurius.core.domain.messaging.pub-sub :refer [PubSub]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [PubSub]]))
 
 (defrecord ChannelBasedPubSub [in-chan subscribers]
   PubSub

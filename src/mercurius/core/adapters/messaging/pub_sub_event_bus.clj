@@ -1,6 +1,6 @@
 (ns mercurius.core.adapters.messaging.pub-sub-event-bus
   (:require [mercurius.core.domain.messaging.event-bus :refer [EventBus]]
-            [mercurius.core.domain.messaging.pub-sub :refer [publish subscribe]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]))
 
 (defn- event-type-to-topic [event-type]
   (str "events." (.-sym event-type)))

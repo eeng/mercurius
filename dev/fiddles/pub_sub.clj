@@ -1,6 +1,6 @@
 (ns fiddles.pub-sub
   (:require [mercurius.core.adapters.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
-            [mercurius.core.domain.messaging.pub-sub :refer [publish subscribe]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]))
 
 (comment
   (def bus (start-channel-based-pub-sub))
