@@ -31,6 +31,16 @@
           :on-success [:ok-response [:order-book]]
           :on-failure [:bad-response [:order-book]]}}))
 
+(defn- order-book-filters [{:keys [ticker-selected tickers order-book-precision]}]
+  {:ticker (or ticker-selected (-> tickers :data keys first))
+   :precision order-book-precision
+   :limit 20})
+
+(reg-event-fx
+ :trading/refresh-order-book
+ (fn [{:keys [db]} _]
+   {:dispatch [:trading/get-order-book (order-book-filters db)]}))
+
 (def precisions ["P0" "P1" "P2" "P3" "P4"])
 
 (defn calculate-new-precision [{:keys [order-book-precision]} direction]
@@ -63,10 +73,8 @@
 
 (reg-sub
  :trading/order-book-filters
- (fn [{:keys [ticker-selected tickers order-book-precision]} _]
-   {:ticker (or ticker-selected (-> tickers :data keys first))
-    :precision order-book-precision
-    :limit 20}))
+ (fn [db _]
+   (order-book-filters db)))
 
 (reg-sub-raw
  :trading/order-book

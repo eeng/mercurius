@@ -37,13 +37,16 @@
    {:db (assoc-in db db-path {:loading? false :error result})}))
 
 (def domain-event-type-to-reframe
-  {:ticker-updated :trading/ticker-updated})
+  {:ticker-updated :trading/ticker-updated
+   :order-book-updated :trading/refresh-order-book})
 
 ;; Receives push notifications from the backend and routes them to the corresponding re-frame event handler.
 (reg-event-fx
  :backend/push
- (fn [_cofx [_ [event-type event-data]]]
-   {:dispatch [(domain-event-type-to-reframe event-type) event-data]}))
+ (fn [_cofx [_ [be-event-type event-data]]]
+   (let [event-type (or (get domain-event-type-to-reframe be-event-type)
+                        (throw (js/Error. (str "Backend event not supported: " be-event-type))))]
+     {:dispatch [event-type event-data]})))
 
 ;;;; Subscriptions
 
