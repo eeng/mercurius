@@ -1,15 +1,15 @@
-(ns mercurius.core.adapters.messaging.channel-based-pub-sub-test
+(ns mercurius.core.infraestructure.messaging.channel-based-pub-sub-test
   (:require [clojure.test :refer [deftest testing is]]
             [clojure.core.async :refer [chan >!!]]
             [matcher-combinators.test]
             [matcher-combinators.matchers :as m]
             [mercurius.support.helpers :refer [with-system recorded-calls]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]
-            [mercurius.core.adapters.messaging.channel-based-pub-sub :refer [match-topic?]]))
+            [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [match-topic?]]))
 
 (deftest pub-sub-test
   (testing "one subscriber to a specific topic"
-    (with-system [{:adapters/keys [pub-sub]} {:only [:adapters/pub-sub]}]
+    (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [calls (chan)]
         (subscribe pub-sub "t1" #(>!! calls %))
         (publish pub-sub "t1" "m1")
@@ -18,7 +18,7 @@
         (is (match? ["m1" "m2"] (recorded-calls calls 2))))))
 
   (testing "multiple subscribers to the same specific topic"
-    (with-system [{:adapters/keys [pub-sub]} {:only [:adapters/pub-sub]}]
+    (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [topic "some topic"
             calls (chan)]
         (subscribe pub-sub topic #(>!! calls ["s1" %]))
@@ -28,7 +28,7 @@
                     (recorded-calls calls 2))))))
 
   (testing "subscribing with a pattern"
-    (with-system [{:adapters/keys [pub-sub]} {:only [:adapters/pub-sub]}]
+    (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [calls (chan)]
         (subscribe pub-sub "events.*" #(>!! calls %))
         (publish pub-sub "events.orders" "m1")

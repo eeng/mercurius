@@ -1,4 +1,4 @@
-(ns mercurius.core.adapters.messaging.channel-based-pub-sub
+(ns mercurius.core.infraestructure.messaging.channel-based-pub-sub
   (:require [clojure.core.async :refer [put! chan close! go-loop <!]]
             [clojure.string :as str]
             [taoensso.timbre :as log]

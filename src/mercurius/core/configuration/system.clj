@@ -8,7 +8,7 @@
             [mercurius.core.domain.use-cases.mediator.middleware.stm :refer [stm]]
             [mercurius.core.domain.messaging.event-bus :refer [emit]]
             [mercurius.core.adapters.messaging.pub-sub-event-bus :refer [new-pub-sub-event-bus]]
-            [mercurius.core.adapters.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
+            [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.adapters.controllers.request-processor :refer [new-request-processor]]
             [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
@@ -34,11 +34,11 @@
             [mercurius.trading.domain.use-cases.get-tickers :refer [new-get-tickers-use-case]]))
 
 (defn build-assembly [{:keys [port session-key]}]
-  {:adapters/wallet-repo nil
+  {:infraestructure/pub-sub nil
+   :adapters/wallet-repo nil
    :adapters/order-book-repo nil
    :adapters/ticker-repo nil
-   :adapters/pub-sub nil
-   :adapters/event-bus {:pub-sub (ig/ref :adapters/pub-sub)}
+   :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
@@ -88,10 +88,10 @@
 (defmethod ig/init-key :adapters/ticker-repo [_ _]
   (new-in-memory-ticker-repo))
 
-(defmethod ig/init-key :adapters/pub-sub [_ _]
+(defmethod ig/init-key :infraestructure/pub-sub [_ _]
   (start-channel-based-pub-sub))
 
-(defmethod ig/halt-key! :adapters/pub-sub [_ pub-sub]
+(defmethod ig/halt-key! :infraestructure/pub-sub [_ pub-sub]
   (stop-channel-based-pub-sub pub-sub))
 
 (defmethod ig/init-key :adapters/event-bus [_ deps]

@@ -1,5 +1,5 @@
 (ns fiddles.pub-sub
-  (:require [mercurius.core.adapters.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
+  (:require [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]))
 
 (comment
