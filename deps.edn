@@ -13,8 +13,7 @@
 
  :aliases {:dev {:extra-paths ["dev" "test"]
                  :extra-deps {org.clojure/tools.namespace {:mvn/version "1.0.0"}}}
-           :test {:extra-paths ["test"]
-                  :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-597"}
+           :test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-597"}
                                tortue/spy {:mvn/version "2.0.0"}
                                nubank/matcher-combinators {:mvn/version "1.5.1"}}
                   :jvm-opts ["-Dclojure.spec.check-asserts=true"]}}}

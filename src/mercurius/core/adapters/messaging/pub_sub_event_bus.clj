@@ -11,8 +11,12 @@
   (-emit [_ {:keys [type] :as event}]
     (publish pub-sub (event-type-to-topic type) event))
 
-  (listen [_ event-type callback]
-    (subscribe pub-sub (event-type-to-topic event-type) callback)))
+  (listen [_ selector callback]
+    (if (keyword? selector)
+      (subscribe pub-sub (event-type-to-topic selector) callback)
+      (subscribe pub-sub "*" (fn [{:keys [type] :as event}]
+                               (when (selector type)
+                                 (callback event)))))))
 
 (defn new-pub-sub-event-bus [{:keys [pub-sub]}]
   (PubSubEventBus. pub-sub))
