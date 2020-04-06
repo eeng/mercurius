@@ -1,15 +1,24 @@
 (ns mercurius.core.presentation.flow
-  (:require [re-frame.core :refer [reg-sub reg-event-fx]]
-            [reagent.ratom :refer [reaction]]
+  (:require [re-frame.core :refer [reg-sub reg-event-fx reg-fx]]
+            [mercurius.core.presentation.db :refer [default-db]]
             [mercurius.core.presentation.api :refer [send-request]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
+
+;;;; Effects
+
+(reg-fx
+ :api
+ (fn [{:keys [request on-success on-failure]}]
+   (send-request request
+                 :on-success #(>evt (conj on-success %))
+                 :on-error #(>evt (conj on-failure %)))))
 
 ;;;; Events 
 
 (reg-event-db
  :core/initialize
  (fn [_ [_ _]]
-   {:order-book-precision "P0"}))
+   default-db))
 
 (reg-event-db
  :chsk/state
@@ -17,9 +26,15 @@
    (assoc db :ws-connected? open?)))
 
 (reg-event-db
- :write-to
- (fn [db [_ path data]]
-   (assoc-in db path data)))
+ :ok-response
+ (fn [db [_ db-path result]]
+   (assoc-in db db-path {:loading? false :data result})))
+
+(reg-event-fx
+ :bad-response
+ (fn [{:keys [db]} [_ db-path result]]
+   (js/console.error "Backend returned error:" result)
+   {:db (assoc-in db db-path {:loading? false :error result})}))
 
 (def domain-event-type-to-reframe
   {:ticker-updated :trading/ticker-updated})
@@ -31,15 +46,6 @@
    {:dispatch [(domain-event-type-to-reframe event-type) event-data]}))
 
 ;;;; Subscriptions
-
-(defn remote-query-sub
-  "Generic subscription to retrieve data from the backend.
-  A map is stored at `db-path` representing the different network states."
-  [app-db request db-path]
-  (send-request request
-                :on-success #(>evt [:write-to db-path {:loading? false :data %}])
-                :on-error #(>evt [:write-to db-path {:loading? false :error %}]))
-  (reaction (get-in @app-db db-path {:loading? true})))
 
 (reg-sub
  :core/initialized?

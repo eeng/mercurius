@@ -4,5 +4,5 @@
 
 (comment
   (let [bus (:adapters/event-bus system)]
-    #_(listen bus :ticker-updated println)
+    (listen bus :ticker-updated println)
     (emit bus [:ticker-updated {:ticker "BTCUSD" :last-price 100M :volume 90M}])))

@@ -1,9 +1,16 @@
 (ns mercurius.trading.presentation.flow
-  (:require [re-frame.core :refer [reg-sub-raw reg-sub]]
-            [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
-            [mercurius.core.presentation.flow :refer [remote-query-sub]]))
+  (:require [re-frame.core :refer [reg-sub-raw reg-sub reg-event-fx]]
+            [reagent.ratom :refer [reaction]]
+            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
 
 ;;;; Events 
+
+(reg-event-fx
+ :trading/get-tickers
+ (fn [_ _]
+   {:api {:request [:get-tickers]
+          :on-success [:ok-response [:tickers]]
+          :on-failure [:bad-response [:tickers]]}}))
 
 (reg-event-db
  :trading/ticker-updated
@@ -15,7 +22,14 @@
 (reg-event-db
  :trading/ticker-selected
  (fn [db [_ ticker]]
-   (assoc db :current-ticker ticker)))
+   (assoc db :ticker-selected ticker)))
+
+(reg-event-fx
+ :trading/get-order-book
+ (fn [_ [_ filters]]
+   {:api {:request [:get-order-book filters]
+          :on-success [:ok-response [:order-book]]
+          :on-failure [:bad-response [:order-book]]}}))
 
 (def precisions ["P0" "P1" "P2" "P3" "P4"])
 
@@ -44,20 +58,21 @@
 (reg-sub-raw
  :trading/tickers
  (fn [app-db _]
-   (remote-query-sub app-db [:get-tickers] [:tickers])))
+   (>evt [:trading/get-tickers])
+   (reaction (get @app-db :tickers {:loading? true}))))
 
 (reg-sub
  :trading/order-book-filters
- (fn [{:keys [current-ticker order-book-precision]} _]
-   (when current-ticker
-     {:ticker current-ticker
-      :precision order-book-precision
-      :limit 20})))
+ (fn [{:keys [ticker-selected tickers order-book-precision]} _]
+   {:ticker (or ticker-selected (-> tickers :data keys first))
+    :precision order-book-precision
+    :limit 20}))
 
 (reg-sub-raw
  :trading/order-book
  (fn [app-db [_ filters]]
-   (remote-query-sub app-db [:get-order-book filters] [:order-book])))
+   (>evt [:trading/get-order-book filters])
+   (reaction (get @app-db :order-book {:loading? true}))))
 
 (reg-sub
  :trading/cant-increase-book-precision
