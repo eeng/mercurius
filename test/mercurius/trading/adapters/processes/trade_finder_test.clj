@@ -8,7 +8,6 @@
             [mercurius.core.domain.messaging.event-bus :refer [emit]]
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]))
 
-;; TODO fragil test
 (deftest trade-finder-test
   (testing "runs a process that calls the execute-trades use case when an order is placed"
     (with-system [{:adapters/keys [event-bus]} {:only [:adapters/event-bus]}]

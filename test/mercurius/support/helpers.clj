@@ -6,10 +6,12 @@
   (loop [recorded []
          actual-count 0]
     (if (< actual-count expected-count)
-      (let [[call _] (alts!! [calls-chan (timeout wait-for)])]
+      (let [[call ch] (alts!! [calls-chan (timeout wait-for)])]
         (if call
           (recur (conj recorded call) (inc actual-count))
-          recorded))
+          (if (= ch calls-chan)
+            recorded
+            (throw (Exception. (str "Timeout on recorded-calls. So far we have: " (pr-str recorded)))))))
       recorded)))
 
 (defn ref-trx [f]

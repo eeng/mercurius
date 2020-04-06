@@ -13,7 +13,7 @@
         (emit event-bus [:events/e2 "ignored"])
         (emit event-bus [:events/e1 "e1"])
         (is (match? [{:type :events/e1 :data "e1"}]
-                    (recorded-calls calls 2))))))
+                    (recorded-calls calls 1))))))
 
   (testing "allows to listen with a predicate selector"
     (with-system [{:adapters/keys [event-bus]} {:only [:adapters/event-bus]}]
