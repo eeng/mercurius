@@ -20,6 +20,14 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "css-watch",
+      "problemMatcher": [
+        "$node-sass"
+      ],
+      "group": "build"
     }
   ]
 }

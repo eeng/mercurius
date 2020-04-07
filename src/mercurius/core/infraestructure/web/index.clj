@@ -10,6 +10,8 @@
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
      [:meta {:name "csrf-token" :content anti-forgery-token}]
      [:title "Mercurius"]
-     [:body
-      [:div#app]
-      [:script {:src "js/main.js"}]]])))
+     [:link {:rel "stylesheet" :href "/css/main.css"}]
+     [:script {:src "https://kit.fontawesome.com/2b86c42320.js" :crossorigin "anonymous"}]]
+    [:body
+     [:div#app]
+     [:script {:src "js/main.js"}]])))

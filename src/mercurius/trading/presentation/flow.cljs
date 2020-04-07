@@ -31,8 +31,11 @@
           :on-success [:ok-response [:order-book]]
           :on-failure [:bad-response [:order-book]]}}))
 
-(defn- order-book-filters [{:keys [ticker-selected tickers order-book-precision]}]
-  {:ticker (or ticker-selected (-> tickers :data keys first))
+(defn- ticker-selected [{:keys [tickers] :as db}]
+  (or (:ticker-selected db) (-> tickers :data keys first)))
+
+(defn- order-book-filters [{:keys [order-book-precision] :as db}]
+  {:ticker (ticker-selected db)
    :precision order-book-precision
    :limit 20})
 
@@ -70,6 +73,11 @@
  (fn [app-db _]
    (>evt [:trading/get-tickers])
    (reaction (get @app-db :tickers {:loading? true}))))
+
+(reg-sub
+ :trading/ticker-selected
+ (fn [db _]
+   (ticker-selected db)))
 
 (reg-sub
  :trading/order-book-filters

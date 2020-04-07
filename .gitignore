@@ -7,6 +7,6 @@
 /.nrepl-port
 /.clj-kondo/.cache
 /node_modules
-/public/js
 /resources/public/js
+/resources/public/css/*.css
 /.shadow-cljs

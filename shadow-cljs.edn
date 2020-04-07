@@ -10,4 +10,5 @@
                 :asset-path "/js"
                 :modules {:main {:entries [mercurius.core.presentation.main]
                                  :init-fn mercurius.core.presentation.main/init}}
-                :devtools {:after-load mercurius.core.presentation.main/start}}}}
+                :devtools {:after-load mercurius.core.presentation.main/start
+                           :watch-dir "resources/public"}}}}

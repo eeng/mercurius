@@ -3,6 +3,8 @@
             [mercurius.trading.presentation.views.order-book :refer [order-book-panel]]))
 
 (defn trading-page []
-  [:<>
-   [tickers-panel]
-   [order-book-panel]])
+  [:div.columns.trading-page
+   [:div.column.is-narrow
+    [tickers-panel]]
+   [:div.column
+    [order-book-panel]]])

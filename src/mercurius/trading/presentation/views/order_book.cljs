@@ -3,44 +3,44 @@
             [mercurius.core.presentation.views.components :refer [panel]]))
 
 (defn- buying-table [orders]
-  [:div {:style {:display "inline-block"}}
-   [:div "Buying"]
-   [:table
-    [:thead>tr
-     [:th "Count"]
-     [:th "Amount"]
-     [:th "Price"]]
-    [:tbody
-     (for [{:keys [count amount price]} orders]
-       [:tr {:key price}
-        [:td count]
-        [:td amount]
-        [:td price]])]]])
+  [:table.table.is-narrow.is-fullwidth
+   [:thead>tr
+    [:th {:align "right"} "Count"]
+    [:th {:align "right"} "Amount"]
+    [:th {:align "right"} "Price"]]
+   [:tbody
+    (for [{:keys [count amount price]} orders]
+      [:tr {:key price}
+       [:td {:align "right"} count]
+       [:td {:align "right"} amount]
+       [:td {:align "right"} price]])]])
 
 (defn- selling-table [orders]
-  [:div {:style {:display "inline-block"}}
-   [:div "Selling"]
-   [:table
-    [:thead>tr
-     [:th "Price"]
-     [:th "Amount"]
-     [:th "Count"]]
-    [:tbody
-     (for [{:keys [count amount price]} orders]
-       [:tr {:key price}
-        [:td price]
-        [:td amount]
-        [:td count]])]]])
-
-(defn- increase-precision-btn []
-  [:button {:on-click #(>evt [:trading/increase-book-precision])
-            :disabled (<sub [:trading/cant-increase-book-precision])}
-   "+"])
+  [:table.table.is-narrow.is-fullwidth
+   [:thead>tr
+    [:th "Price"]
+    [:th "Amount"]
+    [:th "Count"]]
+   [:tbody
+    (for [{:keys [count amount price]} orders]
+      [:tr {:key price}
+       [:td price]
+       [:td amount]
+       [:td count]])]])
 
 (defn- decrease-precision-btn []
-  [:button {:on-click #(>evt [:trading/decrease-book-precision])
-            :disabled (<sub [:trading/cant-decrease-book-precision])}
-   "-"])
+  [:button.button.is-small
+   {:on-click #(>evt [:trading/decrease-book-precision])
+    :disabled (<sub [:trading/cant-decrease-book-precision])}
+   [:span.icon.is-small
+    [:i.fas.fa-minus]]])
+
+(defn- increase-precision-btn []
+  [:button.button.is-small
+   {:on-click #(>evt [:trading/increase-book-precision])
+    :disabled (<sub [:trading/cant-increase-book-precision])}
+   [:span.icon.is-small
+    [:i.fas.fa-plus]]])
 
 (defn order-book-panel []
   (let [{:keys [ticker] :as filters} (<sub [:trading/order-book-filters])]
@@ -48,10 +48,12 @@
       (let [{:keys [data loading?]} (<sub [:trading/order-book filters])]
         [panel
          {:header (str "Order Book for " ticker)
-          :actions [[increase-precision-btn]
-                    [decrease-precision-btn]]
-          :loading? loading?}
-         (when data
-           [:div
-            [buying-table (:buying data)]
-            [selling-table (:selling data)]])]))))
+          :actions [[decrease-precision-btn]
+                    [increase-precision-btn]]
+          :loading? loading?
+          :class "order-book"}
+         (if (or (seq (:buying data)) (seq (:selling data)))
+           [:div.level
+            [:div.level-left [buying-table (:buying data)]]
+            [:div.level-right [selling-table (:selling data)]]]
+           [:div "Nothing to show here."])]))))
