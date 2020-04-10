@@ -1,5 +1,6 @@
 (ns mercurius.trading.presentation.views.order-book
-  (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]))
+  (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
+            [mercurius.core.presentation.views.components :refer [panel]]))
 
 (defn- buying-table [orders]
   [:div {:style {:display "inline-block"}}
@@ -45,16 +46,12 @@
   (let [{:keys [ticker] :as filters} (<sub [:trading/order-book-filters])]
     (when ticker
       (let [{:keys [data loading?]} (<sub [:trading/order-book filters])]
-        [:div.panel
-         [:div "Order Book for " ticker
-          [increase-precision-btn]
-          [decrease-precision-btn]]
-
-         (cond
-           loading?
-           [:div "Loading..."]
-
-           data
+        [panel
+         {:header (str "Order Book for " ticker)
+          :actions [[increase-precision-btn]
+                    [decrease-precision-btn]]
+          :loading? loading?}
+         (when data
            [:div
             [buying-table (:buying data)]
             [selling-table (:selling data)]])]))))

@@ -10,7 +10,6 @@
     (log/info "Starting trade finder for" ticker)
     (listen event-bus
             :order-placed
-            ;; TODO we should throttle this function
             (fn [{order :data}]
               (when (= ticker (:ticker order))
                 (execute-trades {:ticker ticker}))))))

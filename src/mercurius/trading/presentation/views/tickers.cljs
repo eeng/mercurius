@@ -1,11 +1,13 @@
 (ns mercurius.trading.presentation.views.tickers
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.util.format :refer [format-money]]))
+            [mercurius.core.presentation.util.format :refer [format-money]]
+            [mercurius.core.presentation.views.components :refer [panel]]))
 
 (defn tickers-panel []
-  (let [{:keys [data]} (<sub [:trading/tickers])]
-    [:div.panel
-     [:div "Tickers"]
+  (let [{:keys [data loading?]} (<sub [:trading/tickers])]
+    [panel
+     {:header "Tickers"
+      :loading? loading?}
      (when data
        [:table
         [:thead>tr
