@@ -1,5 +1,6 @@
 (ns mercurius.trading.presentation.views.trades
   (:require [mercurius.core.presentation.util.reframe :refer [<sub]]
+            [mercurius.core.presentation.util.format :refer [format-time]]
             [mercurius.core.presentation.views.components :refer [panel]]))
 
 (defn trades-panel []
@@ -13,9 +14,9 @@
          [:th {:align "right"} "Price"]
          [:th {:align "right"} "Amount"]]
         [:tbody
-         (for [{:keys [id price amount]} data]
+         (for [{:keys [id price amount created-at]} data]
            [:tr {:key id}
-            [:td  "TODO time"]
+            [:td (format-time created-at)]
             [:td {:align "right"} price]
             [:td {:align "right"} amount]])]]
        [:div "Nothing to show here."])]))

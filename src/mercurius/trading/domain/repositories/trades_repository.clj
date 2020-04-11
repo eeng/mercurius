@@ -7,7 +7,7 @@
   (get-trades [this ticker]
     "Returns all the trades for the `ticker`."))
 
-(defn adapt-for-storage [trade {:keys [id]}]
+(defn adapt-for-storage [trade {:keys [id created-at]}]
   (-> trade
       (dissoc :bid :ask)
-      (assoc :id id)))
+      (assoc :id id :created-at created-at)))

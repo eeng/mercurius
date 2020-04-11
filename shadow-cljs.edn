@@ -3,6 +3,7 @@
  :dependencies [[reagent "0.10.0"]
                 [re-frame "0.12.0"]
                 [com.taoensso/sente "1.15.0"]
+                [tick "0.4.23-alpha"]
                 [binaryage/devtools "1.0.0"]]
 
  :builds {:app {:target :browser
