@@ -1,10 +1,8 @@
 .trading-page {
-  margin: 0.5em;
+  margin: 1em;
 
   .order-book {
-    .level,
-    .level-left,
-    .level-right {
+    .panel-block .columns {
       flex: 1;
     }
   }

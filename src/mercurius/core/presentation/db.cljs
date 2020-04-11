@@ -16,9 +16,11 @@
 
 (s/def ::tickers ::remote-data)
 (s/def ::order-book ::remote-data)
+(s/def ::trades (s/coll-of map? :kind seq?))
 (s/def ::ticker-selected string?)
 (s/def ::order-book-precision (set precisions))
 (s/def :app/db (s/keys :req-un [::order-book-precision]
                        :opt-un [::tickers
                                 ::ticker-selected
-                                ::order-book]))
+                                ::order-book
+                                ::trades]))

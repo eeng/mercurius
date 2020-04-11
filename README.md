@@ -16,4 +16,5 @@ Backend
 
 Frontend
 
-- Debugging of reg-event-fx
+- Add created-at to trades
+- Add a change indicator to trades

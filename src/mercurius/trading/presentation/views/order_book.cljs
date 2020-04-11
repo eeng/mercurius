@@ -53,7 +53,7 @@
           :loading? loading?
           :class "order-book"}
          (if (or (seq (:buying data)) (seq (:selling data)))
-           [:div.level
-            [:div.level-left [buying-table (:buying data)]]
-            [:div.level-right [selling-table (:selling data)]]]
+           [:div.columns
+            [:div.column [buying-table (:buying data)]]
+            [:div.column [selling-table (:selling data)]]]
            [:div "Nothing to show here."])]))))

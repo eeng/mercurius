@@ -66,6 +66,11 @@
      (assoc db :order-book-precision new-precision)
      db)))
 
+(reg-event-db
+ :trading/trade-made
+ (fn [db [_ trade]]
+   (update db :trades (comp (partial take 100) conj) trade)))
+
 ;;;; Subscriptions
 
 (reg-sub-raw
@@ -99,3 +104,8 @@
  :trading/cant-decrease-book-precision
  (fn [{:keys [order-book-precision]} _]
    (= order-book-precision (last precisions))))
+
+(reg-sub
+ :trading/trades
+ (fn [{:keys [trades]}]
+   trades))

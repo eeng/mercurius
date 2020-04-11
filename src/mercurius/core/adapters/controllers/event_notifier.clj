@@ -5,6 +5,15 @@
 
 (defn start-event-notifier [{:keys [event-bus pub-sub]}]
   (listen event-bus
+          :trade-made
+          (fn [{:keys [type data id]}]
+            (let [topic (str "push.trade-made." (:ticker data))
+                  data (-> data
+                           (select-keys [:ticker :price :amount])
+                           (assoc :id id))]
+              (publish pub-sub topic [type data]))))
+
+  (listen event-bus
           :ticker-updated
           (fn [{:keys [type data]}]
             (let [topic (str "push.ticker-updated." (:ticker data))]
