@@ -47,7 +47,8 @@
     (when ticker
       (let [{:keys [data loading?]} (<sub [:trading/order-book filters])]
         [panel
-         {:header (str "Order Book for " ticker)
+         {:header "Order Book"
+          :subheader ticker
           :actions [[decrease-precision-btn]
                     [increase-precision-btn]]
           :loading? loading?

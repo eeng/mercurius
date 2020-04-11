@@ -3,8 +3,9 @@
             [mercurius.core.presentation.views.components :refer [panel]]))
 
 (defn trades-panel []
-  (let [trades (<sub [:trading/trades])]
-    [panel {:header "Trades"}
+  (let [ticker (<sub [:trading/ticker-selected])
+        trades (<sub [:trading/trades])]
+    [panel {:header "Trades" :subheader ticker}
      (if (seq trades)
        [:table.table.is-narrow.is-fullwidth
         [:thead>tr

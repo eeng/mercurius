@@ -22,7 +22,7 @@
 (reg-event-db
  :trading/ticker-selected
  (fn [db [_ ticker]]
-   (assoc db :ticker-selected ticker)))
+   (assoc db :ticker-selected ticker :trades '())))
 
 (reg-event-fx
  :trading/get-order-book
