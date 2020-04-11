@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+
+$family-sans-serif: "Nunito", sans-serif;
+$size-normal: 0.95rem;
+
+@import "../../node_modules/bulma/bulma.sass";
+
+.is-hoverable {
+  cursor: pointer;
+}
