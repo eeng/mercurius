@@ -24,21 +24,25 @@
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.repositories.in-memory-ticker-repository :refer [new-in-memory-ticker-repo]]
+            [mercurius.trading.adapters.repositories.in-memory-trades-repository :refer [new-in-memory-trades-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]
             [mercurius.trading.adapters.processes.ticker-updater :refer [new-ticker-updater]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-bid-ask get-order-book]]
             [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers]]
+            [mercurius.trading.domain.repositories.trades-repository :refer [add-trade get-trades]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
             [mercurius.trading.domain.use-cases.execute-trades :refer [new-execute-trades-use-case]]
-            [mercurius.trading.domain.use-cases.update-ticker :refer [new-update-ticker-use-case]]
-            [mercurius.trading.domain.use-cases.get-tickers :refer [new-get-tickers-use-case]]))
+            [mercurius.trading.domain.use-cases.process-trade :refer [new-process-trade-use-case]]
+            [mercurius.trading.domain.use-cases.get-tickers :refer [new-get-tickers-use-case]]
+            [mercurius.trading.domain.use-cases.get-trades :refer [new-get-trades-use-case]]))
 
 (defn build-assembly [{:keys [port session-key]}]
   {:infraestructure/pub-sub nil
    :adapters/wallet-repo nil
    :adapters/order-book-repo nil
    :adapters/ticker-repo nil
+   :adapters/trades-repo nil
    :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
@@ -53,9 +57,11 @@
    :use-cases/execute-trades {:order-book-repo (ig/ref :adapters/order-book-repo)
                               :transfer-use-case (ig/ref :use-cases/transfer)
                               :event-bus (ig/ref :adapters/event-bus)}
-   :use-cases/update-ticker {:ticker-repo (ig/ref :adapters/ticker-repo)
+   :use-cases/process-trade {:ticker-repo (ig/ref :adapters/ticker-repo)
+                             :trades-repo (ig/ref :adapters/trades-repo)
                              :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/get-tickers {:ticker-repo (ig/ref :adapters/ticker-repo)}
+   :use-cases/get-trades {:trades-repo (ig/ref :adapters/trades-repo)}
    :use-cases/dispatch {:handlers {:deposit (ig/ref :use-cases/deposit)
                                    :withdraw (ig/ref :use-cases/withdraw)
                                    :transfer (ig/ref :use-cases/transfer)
@@ -65,8 +71,9 @@
                                    :place-order (ig/ref :use-cases/place-order)
                                    :get-order-book (ig/ref :use-cases/get-order-book)
                                    :execute-trades (ig/ref :use-cases/execute-trades)
-                                   :update-ticker (ig/ref :use-cases/update-ticker)
-                                   :get-tickers (ig/ref :use-cases/get-tickers)}
+                                   :process-trade (ig/ref :use-cases/process-trade)
+                                   :get-tickers (ig/ref :use-cases/get-tickers)
+                                   :get-trades (ig/ref :use-cases/get-trades)}
                         :middleware [logger stm]}
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
                             :dispatch (ig/ref :use-cases/dispatch)}
@@ -90,6 +97,9 @@
 
 (defmethod ig/init-key :adapters/ticker-repo [_ _]
   (new-in-memory-ticker-repo))
+
+(defmethod ig/init-key :adapters/trades-repo [_ _]
+  (new-in-memory-trades-repo))
 
 (defmethod ig/init-key :infraestructure/pub-sub [_ _]
   (start-channel-based-pub-sub))
@@ -140,12 +150,16 @@
                                 :transfer transfer-use-case
                                 :publish-event (partial emit event-bus)}))
 
-(defmethod ig/init-key :use-cases/update-ticker [_ {:keys [ticker-repo event-bus]}]
-  (new-update-ticker-use-case {:update-ticker (partial update-ticker ticker-repo)
+(defmethod ig/init-key :use-cases/process-trade [_ {:keys [trades-repo ticker-repo event-bus]}]
+  (new-process-trade-use-case {:add-trade (partial add-trade trades-repo)
+                               :update-ticker (partial update-ticker ticker-repo)
                                :publish-event (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/get-tickers [_ {:keys [ticker-repo]}]
   (new-get-tickers-use-case {:get-tickers (partial get-tickers ticker-repo)}))
+
+(defmethod ig/init-key :use-cases/get-trades [_ {:keys [trades-repo]}]
+  (new-get-trades-use-case {:get-trades (partial get-trades trades-repo)}))
 
 (defmethod ig/init-key :use-cases/dispatch [_ {:keys [handlers middleware]}]
   (let [mediator (new-mediator handlers middleware)]
@@ -157,7 +171,7 @@
 
 (defmethod ig/init-key :processes/ticker-updater [_ {:keys [event-bus dispatch]}]
   (new-ticker-updater {:event-bus event-bus
-                       :update-ticker (partial dispatch :update-ticker)}))
+                       :process-trade (partial dispatch :process-trade)}))
 
 (defmethod ig/init-key :processes/activity-logger [_ {:keys [event-bus]}]
   (new-activity-logger {:event-bus event-bus}))

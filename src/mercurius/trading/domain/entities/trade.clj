@@ -56,3 +56,4 @@
     :currency (currency-paid :sell ticker)
     :transfer-amount (amount-paid :sell amount price)
     :cancel-amount (amount-paid :sell amount ask-limit-price)}])
+

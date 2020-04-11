@@ -22,7 +22,7 @@
 (reg-event-db
  :trading/ticker-selected
  (fn [db [_ ticker]]
-   (assoc db :ticker-selected ticker :trades '())))
+   (assoc db :ticker-selected ticker)))
 
 (reg-event-fx
  :trading/get-order-book
@@ -66,10 +66,17 @@
      (assoc db :order-book-precision new-precision)
      db)))
 
+(reg-event-fx
+ :trading/get-trades
+ (fn [_ [_ ticker]]
+   {:api {:request [:get-trades {:ticker ticker}]
+          :on-success [:ok-response [:trades]]
+          :on-failure [:bad-response [:trades]]}}))
+
 (reg-event-db
  :trading/trade-made
  (fn [db [_ trade]]
-   (update db :trades (comp (partial take 100) conj) trade)))
+   (update-in db [:trades :data] (comp (partial take 100) conj) trade)))
 
 ;;;; Subscriptions
 
@@ -105,7 +112,8 @@
  (fn [{:keys [order-book-precision]} _]
    (= order-book-precision (last precisions))))
 
-(reg-sub
+(reg-sub-raw
  :trading/trades
- (fn [{:keys [trades]}]
-   trades))
+ (fn [app-db [_ ticker]]
+   (>evt [:trading/get-trades ticker])
+   (reaction (get @app-db :trades {:loading? true}))))

@@ -4,16 +4,16 @@
 
 (defn trades-panel []
   (let [ticker (<sub [:trading/ticker-selected])
-        trades (<sub [:trading/trades])]
-    [panel {:header "Trades" :subheader ticker}
-     (if (seq trades)
+        {:keys [data loading?]} (<sub [:trading/trades ticker])]
+    [panel {:header "Trades" :subheader ticker :loading? loading?}
+     (if (seq data)
        [:table.table.is-narrow.is-fullwidth
         [:thead>tr
          [:th "Time"]
          [:th {:align "right"} "Price"]
          [:th {:align "right"} "Amount"]]
         [:tbody
-         (for [{:keys [id price amount]} trades]
+         (for [{:keys [id price amount]} data]
            [:tr {:key id}
             [:td  "TODO time"]
             [:td {:align "right"} price]

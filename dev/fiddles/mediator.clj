@@ -13,6 +13,7 @@
 
   #_(dispatch :execute-trades {:ticker "BTCUSD"})
   (dispatch :get-tickers)
+  (dispatch :get-trades {:ticker "BTCUSD"})
 
   (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id 1})

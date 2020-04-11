@@ -1,6 +1,6 @@
 (ns mercurius.core.configuration.config)
 
-(def default-config {:log-level :info
+(def default-config {:log-level :warn
                      :port 5000
                      :session-key "adOzRKX&KWFK)rJ5"})
 

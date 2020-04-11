@@ -22,7 +22,11 @@
     (when-some [[topic msg] (<! in-chan)]
       (doseq [[topic-pattern callback] @subscribers
               :when (match-topic? topic-pattern topic)]
-        (callback msg))
+        (try
+          (callback msg)
+          (catch Exception e
+            (log/error "Error processing" {:msg msg :topic-pattern topic-pattern :callback callback})
+            (log/error e))))
       (recur))))
 
 (defn start-channel-based-pub-sub []

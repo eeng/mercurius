@@ -1,16 +1,15 @@
 (ns mercurius.core.adapters.controllers.event-notifier
   "Listens to domain events and publishes them to topics so they can be pushed to the interested clients."
   (:require [mercurius.core.domain.messaging.event-bus :refer [listen]]
-            [mercurius.core.adapters.messaging.pub-sub :refer [publish]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [publish]]
+            [mercurius.trading.domain.repositories.trades-repository :as trades-repo]))
 
 (defn start-event-notifier [{:keys [event-bus pub-sub]}]
   (listen event-bus
           :trade-made
-          (fn [{:keys [type data id]}]
+          (fn [{:keys [type data] :as event}]
             (let [topic (str "push.trade-made." (:ticker data))
-                  data (-> data
-                           (select-keys [:ticker :price :amount])
-                           (assoc :id id))]
+                  data (trades-repo/adapt-for-storage data event)]
               (publish pub-sub topic [type data]))))
 
   (listen event-bus
