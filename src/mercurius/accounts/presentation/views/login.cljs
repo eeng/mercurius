@@ -37,10 +37,9 @@
 (defn login-page []
   [:section.hero.is-dark.is-bold.is-fullheight
    [:div.hero-head
-    [:div.container
-     [:nav.navbar
-      [:div.navbar-brand
-       [:div.navbar-item.is-uppercase.has-text-weight-bold "Mercurius"]]]]]
+    [:nav.navbar
+     [:div.navbar-brand
+      [:div.navbar-item.is-uppercase.has-text-weight-bold "Mercurius"]]]]
    [:div.hero-body.has-text-centered
     [:div.container
      [:h1.title "Sign In"]
@@ -49,7 +48,6 @@
       [:div.column.is-4.has-text-dark
        [login-form]]]]]
    [:div.hero-foot
-    [:div.container
-     [:div.navbar
-      [:div.navbar-end
-       [:div.navbar-item "Developed by Emmanuel Nicolau"]]]]]])
+    [:div.navbar
+     [:div.navbar-end
+      [:div.navbar-item "Developed by Emmanuel Nicolau"]]]]])

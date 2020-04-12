@@ -29,8 +29,33 @@
 (reg-event-db
  :login-failure
  (fn [db [_ result]]
+   ;; TODO handle login failure
    (println "FAILED" result)
    (assoc db :auth {:loading? false :user nil})))
+
+(reg-event-fx
+ :logout
+ (fn [_ _]
+   {:http-xhrio {:method :post
+                 :uri "/logout"
+                 :on-success [:logout-success]
+                 :on-failure [:logout-failure]
+                 :headers {"X-CSRF-Token" (csrf-token)}
+                 :timeout 5000
+                 :format (edn/edn-request-format)
+                 :response-format (edn/edn-response-format)}}))
+
+(reg-event-db
+ :logout-success
+ (fn [db [_ _]]
+   (assoc-in db [:auth :user] nil)))
+
+(reg-event-db
+ :logout-failure
+ (fn [db [_ result]]
+   ;; TODO handle logout failure
+   (println "LOGOUT failed" result)
+   db))
 
 ;;;; Subscriptions
 

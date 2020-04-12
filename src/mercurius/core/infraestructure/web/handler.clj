@@ -20,9 +20,9 @@
     (-> (ok {:user user})
         (assoc :session session))))
 
-(defn logout [_]
-  (-> (ok "signed out")
-      (assoc :session nil)))
+(defn logout [{:keys [session]}]
+  (-> (ok nil)
+      (assoc :session (assoc session :uid nil))))
 
 (defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente}]
   (ring/router
@@ -30,7 +30,7 @@
     ["/login" {:post {:handler login
                       :muuntaja m/instance
                       :middleware [muuntaja/format-middleware]}}]
-    ["/logout" {:delete {:handler logout}}]
+    ["/logout" {:post {:handler logout}}]
     ["/status" {:get status}]
     ["/chsk" {:get ring-ajax-get-or-ws-handshake
               :post ring-ajax-post}]]))
@@ -40,6 +40,7 @@
                          (ring/routes
                           (ring/create-resource-handler {:path "/"})
                           (ring/create-default-handler)))
+      ;; TODO this are only needed for sente, check if we can use reitit middleware to apply them only to the /chsk route
       ;; Required for Sente comms
       wrap-keyword-params
       wrap-params
