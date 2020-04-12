@@ -22,8 +22,8 @@
 
 (reg-event-db
  :chsk/state
- (fn [db [_ [_ {:keys [open?]}]]]
-   (assoc db :ws-connected? open?)))
+ (fn [db [_ [_ {:keys [open? uid]}]]]
+   (assoc db :ws-connected? open? :auth {:loading? false :logged-in? (not= uid :taoensso.sente/nil-uid)})))
 
 (reg-event-db
  :ok-response

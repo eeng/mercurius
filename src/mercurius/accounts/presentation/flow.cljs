@@ -23,15 +23,15 @@
 
 (reg-event-db
  :login-success
- (fn [db [_ {:keys [user]}]]
-   (assoc db :auth {:loading? false :user user})))
+ (fn [db [_ _]]
+   (assoc db :auth {:loading? false :logged-in? true})))
 
 (reg-event-db
  :login-failure
  (fn [db [_ result]]
    ;; TODO handle login failure
    (println "FAILED" result)
-   (assoc db :auth {:loading? false :user nil})))
+   (assoc db :auth {:loading? false :logged-in? false})))
 
 (reg-event-fx
  :logout
@@ -48,7 +48,7 @@
 (reg-event-db
  :logout-success
  (fn [db [_ _]]
-   (assoc-in db [:auth :user] nil)))
+   (assoc-in db [:auth :logged-in?] false)))
 
 (reg-event-db
  :logout-failure
@@ -62,6 +62,6 @@
 (reg-sub
  :logged-in?
  (fn [db _]
-   (some? (get-in db [:auth :user]))))
+   (get-in db [:auth :logged-in?])))
 
 (reg-sub :auth :auth)

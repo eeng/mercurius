@@ -16,7 +16,7 @@
 
 (s/def ::logged-in? boolean?)
 (s/def ::user? map?)
-(s/def ::auth (s/keys :req-un [::loading?] :opt-un [::user]))
+(s/def ::auth (s/keys :req-un [::loading?] :opt-un [::logged-in?]))
 (s/def ::tickers ::remote-data)
 (s/def ::order-book ::remote-data)
 (s/def ::trades ::remote-data)
