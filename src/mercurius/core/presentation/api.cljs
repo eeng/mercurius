@@ -5,7 +5,7 @@
 
 (defonce sente-client (atom nil))
 
-(defn- csrf-token []
+(defn csrf-token []
   (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
 
 (defn start-events-processor []

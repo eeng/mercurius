@@ -1,35 +1,38 @@
 (ns mercurius.accounts.presentation.views.login
   (:require [reagent.core :as r]
-            [mercurius.core.presentation.util.reframe :refer [>evt]]))
+            [mercurius.core.presentation.util.reframe :refer [>evt <sub]]))
 
 (defn- login-form []
   (let [credentials (r/atom {:username "" :password ""})
         on-submit (fn [ev]
-                    (>evt [:accounts/login @credentials])
+                    (>evt [:login @credentials])
                     (.preventDefault ev))]
     (fn []
-      [:form {:on-submit on-submit}
-       [:div.field
-        [:div.control.has-icons-left
-         [:input.input
-          {:type "text"
-           :placeholder "Username"
-           :auto-focus true
-           :value (:username @credentials)
-           :on-change #(swap! credentials assoc :username (-> % .-target .-value))}]
-         [:span.icon.is-small.is-left
-          [:i.fas.fa-user]]]]
-       [:div.field
-        [:div.control.has-icons-left
-         [:input.input
-          {:type "password"
-           :placeholder "Password"
-           :value (:password @credentials)
-           :on-change #(swap! credentials assoc :password (-> % .-target .-value))}]
-         [:span.icon.is-small.is-left
-          [:i.fas.fa-lock]]]]
-       [:div.field
-        [:button.button.is-fullwidth.is-info {:type "submit"} "ENTER"]]])))
+      (let [{:keys [loading?]} (<sub [:auth])]
+        [:form {:on-submit on-submit}
+         [:div.field
+          [:div.control.has-icons-left
+           [:input.input
+            {:type "text"
+             :placeholder "Username"
+             :auto-focus true
+             :value (:username @credentials)
+             :on-change #(swap! credentials assoc :username (-> % .-target .-value))}]
+           [:span.icon.is-small.is-left
+            [:i.fas.fa-user]]]]
+         [:div.field
+          [:div.control.has-icons-left
+           [:input.input
+            {:type "password"
+             :placeholder "Password"
+             :value (:password @credentials)
+             :on-change #(swap! credentials assoc :password (-> % .-target .-value))}]
+           [:span.icon.is-small.is-left
+            [:i.fas.fa-lock]]]]
+         [:div.field
+          [:button.button.is-fullwidth.is-info
+           {:type "submit" :class (when loading? "is-loading")}
+           "ENTER"]]]))))
 
 (defn login-page []
   [:section.hero.is-dark.is-bold.is-fullheight

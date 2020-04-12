@@ -9,7 +9,7 @@
 
 (defn app []
   (if (<sub [:core/initialized?])
-    (if (<sub [:accounts/logged-in?])
+    (if (<sub [:logged-in?])
       [trading-page]
       [login-page])
     [page-loader]))

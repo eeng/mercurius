@@ -11,7 +11,8 @@
   [active ch-recv request-processor]
   (go-loop []
     (when @active
-      (when-let [{[event-type event-data] :event reply-fn :?reply-fn} (<! ch-recv)]
+      (when-let [{[event-type event-data] :event reply-fn :?reply-fn :keys [uid]} (<! ch-recv)]
+        (println "SENTE uid" uid)
         (when (= event-type :frontend/request)
           (cond-> (request-processor event-data)
             reply-fn reply-fn))

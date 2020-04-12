@@ -5,20 +5,32 @@
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.session.cookie :refer [cookie-store]]
+            [reitit.ring.middleware.muuntaja :as muuntaja]
+            [muuntaja.core :as m]
             [mercurius.core.infraestructure.web.helpers :refer [ok]]
             [mercurius.core.infraestructure.web.index :refer [index]]))
 
 (defn status [_req]
   (ok "System is online!"))
 
-(defn login [{:keys [params session]}]
-  (println "LOGIN params" params "session" session)
-  (ok {:user {:id "..."}}))
+(defn login [{:keys [body-params session]}]
+  (println ">>> login" body-params)
+  (let [user {:id (str "user-id for " (:username body-params))}
+        session (assoc session :uid (:id user))]
+    (-> (ok {:user user})
+        (assoc :session session))))
+
+(defn logout [_]
+  (-> (ok "signed out")
+      (assoc :session nil)))
 
 (defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente}]
   (ring/router
    [["/" {:get index}]
-    ["/login" {:post login}]
+    ["/login" {:post {:handler login
+                      :muuntaja m/instance
+                      :middleware [muuntaja/format-middleware]}}]
+    ["/logout" {:delete {:handler logout}}]
     ["/status" {:get status}]
     ["/chsk" {:get ring-ajax-get-or-ws-handshake
               :post ring-ajax-post}]]))
