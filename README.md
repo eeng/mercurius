@@ -13,6 +13,7 @@ Backend
 - Volume in USD
 - Spec the domain events, and add asserts to the notifier
 - The partial publish-event function doesn't allow to spec the events
+- Make TradesRepository singular to match the others
 
 Frontend
 

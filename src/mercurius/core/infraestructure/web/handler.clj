@@ -11,9 +11,14 @@
 (defn status [_req]
   (ok "System is online!"))
 
+(defn login [{:keys [params session]}]
+  (println "LOGIN params" params "session" session)
+  (ok {:user {:id "..."}}))
+
 (defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente}]
   (ring/router
    [["/" {:get index}]
+    ["/login" {:post login}]
     ["/status" {:get status}]
     ["/chsk" {:get ring-ajax-get-or-ws-handshake
               :post ring-ajax-post}]]))
@@ -31,5 +36,6 @@
       (wrap-session {:store (cookie-store {:key session-key})})))
 
 (comment
-  ((handler {:sente {:ring-ajax-get-or-ws-handshake identity :ring-ajax-post identity}})
-   {:request-method :get :uri "/"}))
+  (def handle (handler {:sente {:ring-ajax-get-or-ws-handshake identity :ring-ajax-post identity}}))
+  (handle {:request-method :get :uri "/"})
+  (handle {:request-method :get :uri "/status"}))
