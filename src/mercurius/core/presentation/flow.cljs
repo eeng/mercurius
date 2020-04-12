@@ -2,7 +2,8 @@
   (:require [re-frame.core :refer [reg-sub reg-event-fx reg-fx]]
             [mercurius.core.presentation.db :refer [default-db]]
             [mercurius.core.presentation.api :refer [send-request]]
-            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
+            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
+            [mercurius.accounts.presentation.flow :refer [assoc-auth]]))
 
 ;;;; Effects
 
@@ -21,9 +22,11 @@
    default-db))
 
 (reg-event-db
- :chsk/state
- (fn [db [_ [_ {:keys [open? uid]}]]]
-   (assoc db :ws-connected? open? :auth {:loading? false :logged-in? (not= uid :taoensso.sente/nil-uid)})))
+ :core/socket-connected
+ (fn [db [_ uid]]
+   (-> db
+       (assoc :ws-connected? true)
+       (assoc-auth (some? uid)))))
 
 (reg-event-db
  :ok-response

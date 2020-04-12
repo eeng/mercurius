@@ -5,6 +5,9 @@
             [day8.re-frame.http-fx]
             [ajax.edn :as edn]))
 
+(defn assoc-auth [db logged-in?]
+  (assoc db :auth {:loading? false :logged-in? logged-in?}))
+
 ;;;; Events
 
 (reg-event-fx
@@ -24,14 +27,14 @@
 (reg-event-db
  :login-success
  (fn [db [_ _]]
-   (assoc db :auth {:loading? false :logged-in? true})))
+   (assoc-auth db true)))
 
 (reg-event-db
  :login-failure
  (fn [db [_ result]]
    ;; TODO handle login failure
    (println "FAILED" result)
-   (assoc db :auth {:loading? false :logged-in? false})))
+   (assoc-auth db false)))
 
 (reg-event-fx
  :logout
@@ -48,7 +51,7 @@
 (reg-event-db
  :logout-success
  (fn [db [_ _]]
-   (assoc-in db [:auth :logged-in?] false)))
+   (assoc-auth db false)))
 
 (reg-event-db
  :logout-failure

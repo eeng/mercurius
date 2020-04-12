@@ -8,17 +8,23 @@
 (defn csrf-token []
   (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
 
+(defn- handle-event [[event-type event-data :as event]]
+  (js/console.log "Received" event)
+      ;; TODO refactor with core.match
+  (cond
+    (and (= event-type :chsk/state)
+         (:open? (last event-data)))
+    (let [uid (:uid (last event-data))]
+      (>evt [:core/socket-connected (when (not= uid :taoensso.sente/nil-uid) uid)]))
+
+    (and (= event-type :chsk/recv)
+         (= (first event-data) :backend/push))
+    (>evt event-data)))
+
 (defn start-events-processor []
   (go-loop []
-    (when-let [{[event-type event-data :as event] :event} (<! (:ch-recv @sente-client))]
-      (js/console.log "Received" event)
-      (cond
-        (= event-type :chsk/state)
-        (>evt event)
-
-        (and (= event-type :chsk/recv)
-             (= (first event-data) :backend/push))
-        (>evt event-data)))
+    (when-let [{event :event} (<! (:ch-recv @sente-client))]
+      (handle-event event))
     (recur)))
 
 (defn connect! []
