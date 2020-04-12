@@ -5,8 +5,8 @@
             [day8.re-frame.http-fx]
             [ajax.edn :as edn]))
 
-(defn assoc-auth [db logged-in?]
-  (assoc db :auth {:loading? false :logged-in? logged-in?}))
+(defn assoc-auth [db user-id]
+  (assoc db :auth {:loading? false :user-id user-id}))
 
 ;;;; Events
 
@@ -24,17 +24,19 @@
                  :format (edn/edn-request-format)
                  :response-format (edn/edn-response-format)}}))
 
-(reg-event-db
+(reg-event-fx
  :login-success
- (fn [db [_ _]]
-   (assoc-auth db true)))
+ (fn [_ _]
+   ;; We need to reconnect the ws so Sente picks up the new uid. 
+   ;; When it's done, the :core/socket-connected event handler will update the auth status on the db.
+   {:api {:reconnect true}}))
 
 (reg-event-db
  :login-failure
  (fn [db [_ result]]
    ;; TODO handle login failure
    (println "FAILED" result)
-   (assoc-auth db false)))
+   (assoc-auth db nil)))
 
 (reg-event-fx
  :logout
@@ -51,7 +53,7 @@
 (reg-event-db
  :logout-success
  (fn [db [_ _]]
-   (assoc-auth db false)))
+   (assoc-auth db nil)))
 
 (reg-event-db
  :logout-failure
@@ -65,6 +67,6 @@
 (reg-sub
  :logged-in?
  (fn [db _]
-   (get-in db [:auth :logged-in?])))
+   (some? (get-in db [:auth :user-id]))))
 
 (reg-sub :auth :auth)

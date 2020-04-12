@@ -1,7 +1,7 @@
 (ns mercurius.core.presentation.flow
   (:require [re-frame.core :refer [reg-sub reg-event-fx reg-fx]]
             [mercurius.core.presentation.db :refer [default-db]]
-            [mercurius.core.presentation.api :refer [send-request]]
+            [mercurius.core.presentation.api :as api]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
             [mercurius.accounts.presentation.flow :refer [assoc-auth]]))
 
@@ -9,10 +9,12 @@
 
 (reg-fx
  :api
- (fn [{:keys [request on-success on-failure]}]
-   (send-request request
-                 :on-success #(>evt (conj on-success %))
-                 :on-error #(>evt (conj on-failure %)))))
+ (fn [{:keys [request on-success on-failure reconnect]}]
+   (if reconnect
+     (api/reconnect!)
+     (api/send-request request
+                       :on-success #(>evt (conj on-success %))
+                       :on-error #(>evt (conj on-failure %))))))
 
 ;;;; Events 
 
@@ -26,7 +28,7 @@
  (fn [db [_ uid]]
    (-> db
        (assoc :ws-connected? true)
-       (assoc-auth (some? uid)))))
+       (assoc-auth uid))))
 
 (reg-event-db
  :ok-response

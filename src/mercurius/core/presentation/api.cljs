@@ -31,6 +31,9 @@
   (reset! sente-client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto}))
   (start-events-processor))
 
+(defn reconnect! []
+  (sente/chsk-reconnect! (:chsk @sente-client)))
+
 (def timeout 5000)
 
 (defn- chsk-send! [& args]
