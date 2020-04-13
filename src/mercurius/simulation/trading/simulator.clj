@@ -1,5 +1,6 @@
 (ns mercurius.simulation.trading.simulator
   (:require [clojure.spec.alpha :as s]
+            [mercurius.accounts.domain.entities.user :refer [new-user]]
             [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.wallets.domain.entities.wallet :as wallet :refer [available-balance]]
             [mercurius.util.number :as n :refer [round-to-significant-figures]]))
@@ -9,8 +10,8 @@
     (fn []
       (swap! last-user-id inc))))
 
-(defn- make-trader [gen-user-id]
-  (gen-user-id))
+(defn- make-trader []
+  (:id (new-user)))
 
 (defn- fund-accounts [trader initial-funds dispatch]
   (doseq [[currency funds] initial-funds]
@@ -76,7 +77,7 @@
 
 (defn run-simulation [dispatch & {:keys [n-traders] :as config}]
   (s/assert ::config config)
-  (let [traders (repeatedly n-traders (partial make-trader (user-id-gen)))]
+  (let [traders (repeatedly n-traders make-trader)]
     (doall (pmap #(start-trading % dispatch config) traders)))
   :done)
 

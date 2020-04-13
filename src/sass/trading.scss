@@ -11,5 +11,8 @@
     overflow: auto;
     max-height: 400px;
     align-items: flex-start;
+    .columns {
+      margin: -8px;
+    }
   }
 }

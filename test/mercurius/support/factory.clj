@@ -1,13 +1,10 @@
 (ns mercurius.support.factory
-  (:require [mercurius.wallets.domain.entities.wallet :refer [new-wallet]]
+  (:require [mercurius.accounts.domain.entities.user :refer [new-user]]
+            [mercurius.wallets.domain.entities.wallet :refer [new-wallet]]
             [mercurius.trading.domain.entities.order :refer [new-order]]
             [mercurius.trading.domain.entities.trade :refer [new-trade]]))
 
 ;;;; Helpers
-
-(def last-id (atom 0))
-(defn- next-id! []
-  (swap! last-id inc))
 
 (defn- build-with [entity-fn defaults-fn]
   (fn [& [args]]
@@ -18,7 +15,8 @@
 
 ;;;; Factories 
 
-(def build-user-id next-id!)
+(defn build-user-id []
+  (:id (new-user)))
 
 (def build-wallet
   (build-with new-wallet (fn [_] {:currency "USD" :user-id (build-user-id)})))

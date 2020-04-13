@@ -3,11 +3,11 @@
             [matcher-combinators.test]
             [spy.core :as spy]
             [spy.assert :as assert]
-            [mercurius.support.factory :refer [build-wallet]]
+            [mercurius.support.factory :refer [build-wallet build-user-id]]
             [mercurius.wallets.domain.use-cases.transfer :refer [new-transfer-use-case]]))
 
-(def u1 1)
-(def u2 2)
+(def u1 (build-user-id))
+(def u2 (build-user-id))
 
 (deftest transfer-test
   (testing "should get the two wallets, make the transfer, and save them"
