@@ -2,6 +2,7 @@
   "Handles the communication with the backend via Web Sockets."
   (:require [taoensso.sente :as sente]
             [clojure.core.async :refer [go-loop <!]]
+            [cljs.core.match :refer-macros [match]]
             [mercurius.core.presentation.util.reframe :refer [>evt]]))
 
 (defonce sente-client (atom nil))
@@ -9,18 +10,16 @@
 (defn csrf-token []
   (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
 
-(defn- handle-event [[event-type event-data :as event]]
+(defn- handle-event [event]
   (js/console.log "Received" event)
-      ;; TODO refactor with core.match
-  (cond
-    (and (= event-type :chsk/state)
-         (:open? (last event-data)))
-    (let [uid (:uid (last event-data))]
-      (>evt [:core/socket-connected (when (not= uid :taoensso.sente/nil-uid) uid)]))
+  (match event
+    [:chsk/state [_ {:open? true :uid uid}]]
+    (>evt [:core/socket-connected (when (not= uid :taoensso.sente/nil-uid) uid)])
 
-    (and (= event-type :chsk/recv)
-         (= (first event-data) :backend/push))
-    (>evt event-data)))
+    [:chsk/recv ([:backend/push _] :as backend-event)]
+    (>evt backend-event)
+
+    :else nil))
 
 (defn start-events-processor []
   (go-loop []
