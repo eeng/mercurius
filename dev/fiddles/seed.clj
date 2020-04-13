@@ -1,13 +1,14 @@
 (ns fiddles.seed
   (:require [user :refer [system reset]]
-            [mercurius.accounts.domain.entities.user :refer [new-user]]))
+            [mercurius.accounts.domain.repositories.user-repository :refer [find-by-username]]))
 
 (comment
   (do
     (reset)
     (def dispatch (:use-cases/dispatch system))
-    (def u1 (:id (new-user)))
-    (def u2 (:id (new-user)))
+    (def user-repo (:adapters/user-repo system))
+    (def u1 (:id (find-by-username user-repo "user1")))
+    (def u2 (:id (find-by-username user-repo "user2")))
 
     (dispatch :deposit {:user-id u1 :amount 10000 :currency "USD"})
     (dispatch :deposit {:user-id u2 :amount 100 :currency "BTC"})

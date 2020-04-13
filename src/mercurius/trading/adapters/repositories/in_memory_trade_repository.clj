@@ -11,13 +11,13 @@
   (get-trades [_ ticker]
     (get @db ticker [])))
 
-(defn new-in-memory-trades-repo []
+(defn new-in-memory-trade-repo []
   (InMemoryTradeRepository.
    (atom (zipmap available-tickers
                  (repeat (count available-tickers) '())))))
 
 (comment
-  (def repo (new-in-memory-trades-repo))
+  (def repo (new-in-memory-trade-repo))
   (add-trade repo {:ticker "BTCUSD" :amount 10 :price 200})
   (add-trade repo {:ticker "BTCUSD" :amount 11 :price 200})
   (get-trades repo "BTCUSD"))

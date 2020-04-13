@@ -1,12 +1,13 @@
 (ns fiddles.mediator
   (:require [user :refer [system]]
-            [mercurius.accounts.domain.entities.user :refer [new-user]]))
+            [mercurius.accounts.domain.repositories.user-repository :refer [find-by-username]]))
 
 (comment
   (do
     (def dispatch (:use-cases/dispatch system))
-    (def u1 (:id (new-user)))
-    (def u2 (:id (new-user)))
+    (def user-repo (:adapters/user-repo system))
+    (def u1 (:id (find-by-username user-repo "user1")))
+    (def u2 (:id (find-by-username user-repo "user1")))
 
     (dispatch :deposit {:user-id u1 :amount 1000 :currency "USD"})
     (dispatch :deposit {:user-id u2 :amount 10 :currency "BTC"}))
@@ -22,4 +23,6 @@
   (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})
   (dispatch :get-wallets {:user-id u1})
   (dispatch :get-wallets {:user-id u2})
-  (dispatch :calculate-monetary-base))
+  (dispatch :calculate-monetary-base)
+
+  (dispatch :authenticate {:username "user1" :password "secret"}))

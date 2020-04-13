@@ -13,8 +13,7 @@
     (when @active
       (when-let [{[event-type event-data] :event reply-fn :?reply-fn :keys [uid]} (<! ch-recv)]
         (when (= event-type :frontend/request)
-          (println "SENTE uid" uid)
-          (cond-> (request-processor event-data)
+          (cond-> (request-processor event-data {:user-id uid})
             reply-fn reply-fn))
         (recur)))))
 

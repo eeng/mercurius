@@ -15,6 +15,7 @@
             [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
             [mercurius.core.infraestructure.web.sente :refer [start-sente stop-sente]]
             [mercurius.accounts.domain.use-cases.authenticate :refer [new-authenticate-use-case]]
+            [mercurius.accounts.adapters.repositories.in-memory-user-repository :refer [new-in-memory-user-repo]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -25,7 +26,7 @@
             [mercurius.wallets.domain.use-cases.calculate-monetary-base :refer [new-calculate-monetary-base-use-case]]
             [mercurius.trading.adapters.repositories.in-memory-order-book-repository :refer [new-in-memory-order-book-repo]]
             [mercurius.trading.adapters.repositories.in-memory-ticker-repository :refer [new-in-memory-ticker-repo]]
-            [mercurius.trading.adapters.repositories.in-memory-trade-repository :refer [new-in-memory-trades-repo]]
+            [mercurius.trading.adapters.repositories.in-memory-trade-repository :refer [new-in-memory-trade-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]
             [mercurius.trading.adapters.processes.ticker-updater :refer [new-ticker-updater]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-bid-ask get-order-book]]
@@ -43,9 +44,10 @@
    :adapters/wallet-repo nil
    :adapters/order-book-repo nil
    :adapters/ticker-repo nil
-   :adapters/trades-repo nil
+   :adapters/trade-repo nil
+   :adapters/user-repo nil
    :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
-   :use-cases/authenticate nil
+   :use-cases/authenticate {:user-repo (ig/ref :adapters/user-repo)}
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
@@ -60,10 +62,10 @@
                               :transfer-use-case (ig/ref :use-cases/transfer)
                               :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/process-trade {:ticker-repo (ig/ref :adapters/ticker-repo)
-                             :trades-repo (ig/ref :adapters/trades-repo)
+                             :trades-repo (ig/ref :adapters/trade-repo)
                              :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/get-tickers {:ticker-repo (ig/ref :adapters/ticker-repo)}
-   :use-cases/get-trades {:trades-repo (ig/ref :adapters/trades-repo)}
+   :use-cases/get-trades {:trades-repo (ig/ref :adapters/trade-repo)}
    :use-cases/dispatch {:handlers {:authenticate (ig/ref :use-cases/authenticate)
                                    :deposit (ig/ref :use-cases/deposit)
                                    :withdraw (ig/ref :use-cases/withdraw)
@@ -102,8 +104,11 @@
 (defmethod ig/init-key :adapters/ticker-repo [_ _]
   (new-in-memory-ticker-repo))
 
-(defmethod ig/init-key :adapters/trades-repo [_ _]
-  (new-in-memory-trades-repo))
+(defmethod ig/init-key :adapters/trade-repo [_ _]
+  (new-in-memory-trade-repo))
+
+(defmethod ig/init-key :adapters/user-repo [_ _]
+  (new-in-memory-user-repo))
 
 (defmethod ig/init-key :infraestructure/pub-sub [_ _]
   (start-channel-based-pub-sub))
@@ -114,8 +119,8 @@
 (defmethod ig/init-key :adapters/event-bus [_ deps]
   (new-pub-sub-event-bus deps))
 
-(defmethod ig/init-key :use-cases/authenticate [_ _]
-  (new-authenticate-use-case))
+(defmethod ig/init-key :use-cases/authenticate [_ deps]
+  (new-authenticate-use-case deps))
 
 (defmethod ig/init-key :use-cases/deposit [_ {:keys [wallet-repo]}]
   (new-deposit-use-case {:load-wallet (partial load-wallet wallet-repo)
