@@ -1,9 +1,9 @@
-(ns mercurius.trading.adapters.repositories.in-memory-trades-repository
-  (:require [mercurius.trading.domain.repositories.trades-repository :refer [TradesRepository add-trade get-trades]]
+(ns mercurius.trading.adapters.repositories.in-memory-trade-repository
+  (:require [mercurius.trading.domain.repositories.trade-repository :refer [TradeRepository add-trade get-trades]]
             [mercurius.trading.domain.entities.ticker :refer [available-tickers]]))
 
-(defrecord InMemoryTradesRepository [db]
-  TradesRepository
+(defrecord InMemoryTradeRepository [db]
+  TradeRepository
 
   (add-trade [_ {:keys [ticker] :as trade}]
     (swap! db update ticker conj (dissoc trade :bid :ask)))
@@ -12,7 +12,7 @@
     (get @db ticker [])))
 
 (defn new-in-memory-trades-repo []
-  (InMemoryTradesRepository.
+  (InMemoryTradeRepository.
    (atom (zipmap available-tickers
                  (repeat (count available-tickers) '())))))
 

@@ -2,7 +2,7 @@
   "Listens to domain events and publishes them to topics so they can be pushed to the interested clients."
   (:require [mercurius.core.domain.messaging.event-bus :refer [listen]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish]]
-            [mercurius.trading.domain.repositories.trades-repository :as trades-repo]))
+            [mercurius.trading.domain.repositories.trade-repository :as trades-repo]))
 
 (defn start-event-notifier [{:keys [event-bus pub-sub]}]
   (listen event-bus

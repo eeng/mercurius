@@ -13,10 +13,8 @@ Backend
 - Volume in USD
 - Spec the domain events, and add asserts to the notifier
 - The partial publish-event function doesn't allow to spec the events
-- Make TradesRepository singular to match the others
 
 Frontend
 
-- Add created-at to trades
 - Add a change indicator to trades
 - Manage deps with deps.edn?

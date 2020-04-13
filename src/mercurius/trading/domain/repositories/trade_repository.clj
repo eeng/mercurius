@@ -1,6 +1,6 @@
-(ns mercurius.trading.domain.repositories.trades-repository)
+(ns mercurius.trading.domain.repositories.trade-repository)
 
-(defprotocol TradesRepository
+(defprotocol TradeRepository
   (add-trade [this trade]
     "Adds the trade to the repository.")
 
