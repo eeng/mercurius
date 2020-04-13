@@ -30,7 +30,7 @@
            [:span.icon.is-small.is-left
             [:i.fas.fa-lock]]]]
          [:div.field
-          [:button.button.is-fullwidth.is-info
+          [:button.button.is-fullwidth.is-primary
            {:type "submit" :class (when loading? "is-loading")}
            "ENTER"]]]))))
 
@@ -51,4 +51,4 @@
     [:div.navbar
      [:div.navbar-end
       [:div.navbar-item "Developed by "
-       [:a {:href "https://github.com/eeng"} "eeng"]]]]]])
+       [:a.m-l-xs {:href "https://github.com/eeng"} "eeng"]]]]]])

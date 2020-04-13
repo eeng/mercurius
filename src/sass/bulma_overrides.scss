@@ -2,6 +2,7 @@
 
 $family-sans-serif: "Nunito", sans-serif;
 $size-normal: 0.95rem;
+$primary: #3f92fb;
 
 @import "../../node_modules/bulma/bulma.sass";
 
@@ -9,6 +10,12 @@ $size-normal: 0.95rem;
   cursor: pointer;
 }
 
-.is-dark a:hover {
-  color: $link-visited;
+.is-dark {
+  a:hover {
+    color: $link-visited;
+  }
+
+  ::placeholder {
+    color: $grey !important;
+  }
 }
