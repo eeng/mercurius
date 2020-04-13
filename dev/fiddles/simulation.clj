@@ -11,7 +11,7 @@
                           :initial-funds {"USD" 10000 "BTC" 2}
                           :n-traders 100
                           :n-orders-per-trader 5
-                          :max-ms-between-orders 100
+                          :max-ms-between-orders 1000
                           :max-pos-size-pct 0.3
                           :spread-around-better-price [0.2 0.005]))
     (dispatch :calculate-monetary-base))

@@ -7,4 +7,4 @@
   (gstring/format "$%.2f" num))
 
 (defn format-time [date]
-  (gstring/format "%2d:%2d:%2d" (t/hour date) (t/minute date) (t/second date)))
+  (gstring/format "%02d:%02d:%02d" (t/hour date) (t/minute date) (t/second date)))

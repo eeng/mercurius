@@ -14,7 +14,7 @@
 (defn new-in-memory-trades-repo []
   (InMemoryTradesRepository.
    (atom (zipmap available-tickers
-                 (repeat (count available-tickers) [])))))
+                 (repeat (count available-tickers) '())))))
 
 (comment
   (def repo (new-in-memory-trades-repo))
