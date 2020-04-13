@@ -6,7 +6,7 @@
 (defn trades-panel []
   (let [ticker (<sub [:trading/ticker-selected])
         {:keys [data loading?]} (<sub [:trading/trades ticker])]
-    [panel {:header "Trades" :subheader ticker :loading? loading?}
+    [panel {:header "Trades" :subheader ticker :loading? loading? :class "clipped"}
      (if (seq data)
        [:table.table.is-narrow.is-fullwidth
         [:thead>tr

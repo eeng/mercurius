@@ -52,7 +52,7 @@
           :actions [[decrease-precision-btn]
                     [increase-precision-btn]]
           :loading? loading?
-          :class "order-book"}
+          :class "order-book clipped"}
          (if (or (seq (:buying data)) (seq (:selling data)))
            [:div.columns
             [:div.column [buying-table (:buying data)]]

@@ -6,4 +6,10 @@
       flex: 1;
     }
   }
+
+  .clipped .panel-block {
+    overflow: auto;
+    max-height: 400px;
+    align-items: flex-start;
+  }
 }
