@@ -26,7 +26,6 @@
                          (ring/routes
                           (ring/create-resource-handler {:path "/"})
                           (ring/create-default-handler)))
-      ;; TODO this are only needed for sente, check if we can use reitit middleware to apply them only to the /chsk route
       ;; Required for Sente comms
       wrap-keyword-params
       wrap-params

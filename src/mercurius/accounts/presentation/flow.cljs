@@ -31,12 +31,15 @@
    ;; When it's done, the :core/socket-connected event handler will update the auth status on the db.
    {:api {:reconnect true}}))
 
-(reg-event-db
+(reg-event-fx
  :login-failure
- (fn [db [_ result]]
-   ;; TODO handle login failure
-   (println "FAILED" result)
-   (assoc-auth db nil)))
+ (fn [{:keys [db]} [_ response]]
+   {:db (assoc-auth db nil)
+    :toast {:message (case (:status response)
+                       401 "Invalid username or password."
+                       "There seems to be a network issue.")
+            :type "is-danger faster"
+            :duration 3000}}))
 
 (reg-event-fx
  :logout
@@ -44,7 +47,7 @@
    {:http-xhrio {:method :post
                  :uri "/logout"
                  :on-success [:logout-success]
-                 :on-failure [:logout-failure]
+                 :on-failure [:ajax-error]
                  :headers {"X-CSRF-Token" (csrf-token)}
                  :timeout 5000
                  :format (edn/edn-request-format)
@@ -54,13 +57,6 @@
  :logout-success
  (fn [db [_ _]]
    (assoc-auth db nil)))
-
-(reg-event-db
- :logout-failure
- (fn [db [_ result]]
-   ;; TODO handle logout failure
-   (println "LOGOUT failed" result)
-   db))
 
 ;;;; Subscriptions
 

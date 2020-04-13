@@ -11,6 +11,7 @@
      [:meta {:name "csrf-token" :content anti-forgery-token}]
      [:title "Mercurius"]
      [:link {:rel "stylesheet" :href "/css/main.css"}]
+     [:link {:rel "stylesheet" :href "https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"}]
      [:script {:src "https://kit.fontawesome.com/2b86c42320.js" :crossorigin "anonymous"}]]
     [:body
      [:div#app]

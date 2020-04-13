@@ -3,7 +3,8 @@
             [mercurius.core.presentation.db :refer [default-db]]
             [mercurius.core.presentation.api :as backend]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
-            [mercurius.accounts.presentation.flow :refer [assoc-auth]]))
+            [mercurius.accounts.presentation.flow :refer [assoc-auth]]
+            ["bulma-toast" :refer [toast]]))
 
 ;;;; Effects
 
@@ -15,6 +16,15 @@
      (backend/send-request request
                            :on-success #(>evt (conj on-success %))
                            :on-error #(>evt (conj on-failure %))))))
+
+(reg-fx
+ :toast
+ (fn [opts]
+   (let [defaults {:position "bottom-right"
+                   :duration 4000
+                   :dismissible true
+                   :animate {:in "fadeInUp" :out "fadeOutRight"}}]
+     (toast (clj->js (merge defaults opts))))))
 
 ;;;; Events 
 
@@ -30,6 +40,13 @@
        (assoc :ws-connected? true)
        (assoc-auth uid))))
 
+(reg-event-fx
+ :ajax-error
+ (fn [_ [_ response]]
+   (js/console.error "Ajax Error:" response)
+   {:toast {:message "Oops! Network issues. Check the logs."
+            :type "is-danger faster"}}))
+
 (reg-event-db
  :ok-response
  (fn [db [_ db-path result]]
@@ -38,8 +55,10 @@
 (reg-event-fx
  :bad-response
  (fn [{:keys [db]} [_ db-path result]]
-   (js/console.error "Backend returned error:" result)
-   {:db (assoc-in db db-path {:loading? false :error result})}))
+   (js/console.error "Backend Error:" result)
+   {:db (assoc-in db db-path {:loading? false :error result})
+    :toast {:message (str "Backend Error: " (pr-str result))
+            :type "is-danger faster"}}))
 
 (def domain-event-type-to-reframe
   {:ticker-updated :trading/ticker-updated
