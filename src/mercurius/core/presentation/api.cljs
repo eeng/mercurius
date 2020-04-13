@@ -1,4 +1,4 @@
-(ns mercurius.core.presentation.backend
+(ns mercurius.core.presentation.api
   "Handles the communication with the backend via Web Sockets."
   (:require [taoensso.sente :as sente]
             [clojure.core.async :refer [go-loop <!]]

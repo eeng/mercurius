@@ -1,7 +1,7 @@
 (ns mercurius.accounts.presentation.flow
   (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
-            [mercurius.core.presentation.backend :refer [csrf-token]]
+            [mercurius.core.presentation.api :refer [csrf-token]]
             [day8.re-frame.http-fx]
             [ajax.edn :as edn]))
 

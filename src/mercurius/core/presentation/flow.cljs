@@ -1,7 +1,7 @@
 (ns mercurius.core.presentation.flow
   (:require [re-frame.core :refer [reg-sub reg-event-fx reg-fx]]
             [mercurius.core.presentation.db :refer [default-db]]
-            [mercurius.core.presentation.backend :as backend]
+            [mercurius.core.presentation.api :as backend]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
             [mercurius.accounts.presentation.flow :refer [assoc-auth]]))
 
