@@ -8,12 +8,13 @@
             [reitit.ring.middleware.muuntaja :as muuntaja]
             [muuntaja.core :as m]
             [mercurius.core.infraestructure.web.index :refer [index]]
-            [mercurius.core.adapters.controllers.auth-controller :as auth]))
+            [mercurius.accounts.adapters.controllers.auth-controller :as auth]))
 
-(defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente}]
+(defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente
+               :keys [dispatch]}]
   (ring/router
    [["/" {:get index}]
-    ["/login" {:post {:handler auth/login
+    ["/login" {:post {:handler (partial auth/login {:dispatch dispatch})
                       :muuntaja m/instance
                       :middleware [muuntaja/format-middleware]}}]
     ["/logout" {:post {:handler auth/logout}}]

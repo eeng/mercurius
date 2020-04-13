@@ -19,3 +19,4 @@ Frontend
 
 - Add created-at to trades
 - Add a change indicator to trades
+- Manage deps with deps.edn?

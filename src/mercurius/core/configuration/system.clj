@@ -14,6 +14,7 @@
             [mercurius.core.adapters.controllers.event-notifier :refer [start-event-notifier]]
             [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
             [mercurius.core.infraestructure.web.sente :refer [start-sente stop-sente]]
+            [mercurius.accounts.domain.use-cases.authenticate :refer [new-authenticate-use-case]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
@@ -44,6 +45,7 @@
    :adapters/ticker-repo nil
    :adapters/trades-repo nil
    :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
+   :use-cases/authenticate nil
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
@@ -62,7 +64,8 @@
                              :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/get-tickers {:ticker-repo (ig/ref :adapters/ticker-repo)}
    :use-cases/get-trades {:trades-repo (ig/ref :adapters/trades-repo)}
-   :use-cases/dispatch {:handlers {:deposit (ig/ref :use-cases/deposit)
+   :use-cases/dispatch {:handlers {:authenticate (ig/ref :use-cases/authenticate)
+                                   :deposit (ig/ref :use-cases/deposit)
                                    :withdraw (ig/ref :use-cases/withdraw)
                                    :transfer (ig/ref :use-cases/transfer)
                                    :get-wallet (ig/ref :use-cases/get-wallet)
@@ -85,7 +88,8 @@
                                 :pub-sub (ig/ref :infraestructure/pub-sub)}
    :infraestructure/web-server {:port port
                                 :session-key session-key
-                                :sente (ig/ref :infraestructure/sente)}
+                                :sente (ig/ref :infraestructure/sente)
+                                :dispatch (ig/ref :use-cases/dispatch)}
    :infraestructure/sente {:request-processor (ig/ref :controllers/request-processor)
                            :pub-sub (ig/ref :infraestructure/pub-sub)}})
 
@@ -109,6 +113,9 @@
 
 (defmethod ig/init-key :adapters/event-bus [_ deps]
   (new-pub-sub-event-bus deps))
+
+(defmethod ig/init-key :use-cases/authenticate [_ _]
+  (new-authenticate-use-case))
 
 (defmethod ig/init-key :use-cases/deposit [_ {:keys [wallet-repo]}]
   (new-deposit-use-case {:load-wallet (partial load-wallet wallet-repo)

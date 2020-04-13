@@ -3,8 +3,6 @@
             [clojure.tools.namespace.repl :as repl]
             [clojure.spec.test.alpha :as stest]))
 
-(repl/disable-reload!)
-
 (def system nil)
 
 (defn start []
