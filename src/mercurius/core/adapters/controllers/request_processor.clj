@@ -9,7 +9,9 @@
       [:ok (dispatch request-type (merge request-data context))]
       (catch clojure.lang.ExceptionInfo e
         (log/error e)
-        [:error (ex-data e)])
+        [:error {:type (:type (ex-data e))
+                 :message (.getMessage e)}])
       (catch Exception e
         (log/error e)
-        [:error (.getMessage e)]))))
+        [:error {:type :unexpected-error
+                 :message (.getMessage e)}]))))

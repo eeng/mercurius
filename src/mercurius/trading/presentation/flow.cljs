@@ -78,6 +78,13 @@
  (fn [db [_ trade]]
    (update-in db [:trades :data] (comp (partial take 100) conj) trade)))
 
+(reg-event-fx
+ :trading/place-order
+ (fn [_ [_ order]]
+   {:api {:request [:place-order order]
+          :on-success [:ok-response [:place-order]]
+          :on-failure [:bad-response [:place-order]]}}))
+
 ;;;; Subscriptions
 
 (reg-sub-raw
@@ -90,6 +97,14 @@
  :trading/ticker-selected
  (fn [db _]
    (ticker-selected db)))
+
+(reg-sub
+ :trading/ticker-selected-currencies
+ (fn [db _]
+   (let [ticker (ticker-selected db)]
+     (if ticker
+       [(subs ticker 0 3) (subs ticker 3 6)]
+       []))))
 
 (reg-sub
  :trading/order-book-filters

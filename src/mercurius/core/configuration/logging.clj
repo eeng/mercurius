@@ -15,7 +15,7 @@
      "[" (truncate (str (or ?ns-str ?file "?") ":" (or ?line "?")) 15) "] - "
      (force msg_)
      (when-let [err ?err]
-       (str "\n" (log/stacktrace err nil))))))
+       (str "\n" (log/stacktrace err {:stacktrace-fonts {}}))))))
 
 (defn configure-logger [{:keys [log-level]}]
   (log/merge-config!

@@ -1,6 +1,7 @@
 (ns mercurius.accounts.presentation.views.login
   (:require [reagent.core :as r]
-            [mercurius.core.presentation.util.reframe :refer [>evt <sub]]))
+            [mercurius.core.presentation.util.reframe :refer [>evt <sub]]
+            [mercurius.core.presentation.views.components :refer [input]]))
 
 (defn- login-form []
   (let [credentials (r/atom {:username "" :password ""})
@@ -12,21 +13,12 @@
         [:form {:on-submit on-submit}
          [:div.field
           [:div.control.has-icons-left
-           [:input.input
-            {:type "text"
-             :placeholder "Username"
-             :auto-focus true
-             :value (:username @credentials)
-             :on-change #(swap! credentials assoc :username (-> % .-target .-value))}]
+           [input credentials :username {:placeholder "Username" :auto-focus true}]
            [:span.icon.is-small.is-left
             [:i.fas.fa-user]]]]
          [:div.field
           [:div.control.has-icons-left
-           [:input.input
-            {:type "password"
-             :placeholder "Password"
-             :value (:password @credentials)
-             :on-change #(swap! credentials assoc :password (-> % .-target .-value))}]
+           [input credentials :password {:type "password" :placeholder "Password"}]
            [:span.icon.is-small.is-left
             [:i.fas.fa-lock]]]]
          [:div.field

@@ -19,3 +19,4 @@ Frontend
 
 - Add a change indicator to trades
 - Manage deps with deps.edn?
+- Unify the events (ns keywords or not?)

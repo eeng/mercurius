@@ -14,8 +14,8 @@ $primary: #3f92fb;
   a:hover {
     color: $link-visited;
   }
+}
 
-  ::placeholder {
-    color: $grey !important;
-  }
+::placeholder {
+  color: $grey !important;
 }

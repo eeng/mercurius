@@ -45,7 +45,8 @@
  (fn [_ [_ response]]
    (js/console.error "Ajax Error:" response)
    {:toast {:message "Oops! Network issues. Check the logs."
-            :type "is-danger faster"}}))
+            :type "is-danger faster"
+            :duration 5000}}))
 
 (reg-event-db
  :ok-response
@@ -58,7 +59,8 @@
    (js/console.error "Backend Error:" result)
    {:db (assoc-in db db-path {:loading? false :error result})
     :toast {:message (str "Backend Error: " (pr-str result))
-            :type "is-danger faster"}}))
+            :type "is-danger faster"
+            :duration 5000}}))
 
 (def domain-event-type-to-reframe
   {:ticker-updated :trading/ticker-updated
