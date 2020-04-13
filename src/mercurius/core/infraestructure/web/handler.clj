@@ -7,31 +7,16 @@
             [ring.middleware.session.cookie :refer [cookie-store]]
             [reitit.ring.middleware.muuntaja :as muuntaja]
             [muuntaja.core :as m]
-            [mercurius.core.infraestructure.web.helpers :refer [ok]]
-            [mercurius.core.infraestructure.web.index :refer [index]]))
-
-(defn status [_req]
-  (ok "System is online!"))
-
-(defn login [{:keys [body-params session]}]
-  (println ">>> login" body-params)
-  (let [user {:id (str "user-id for " (:username body-params))}
-        session (assoc session :uid (:id user))]
-    (-> (ok {:user user})
-        (assoc :session session))))
-
-(defn logout [{:keys [session]}]
-  (-> (ok nil)
-      (assoc :session (assoc session :uid nil))))
+            [mercurius.core.infraestructure.web.index :refer [index]]
+            [mercurius.core.adapters.controllers.auth-controller :as auth]))
 
 (defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente}]
   (ring/router
    [["/" {:get index}]
-    ["/login" {:post {:handler login
+    ["/login" {:post {:handler auth/login
                       :muuntaja m/instance
                       :middleware [muuntaja/format-middleware]}}]
-    ["/logout" {:post {:handler logout}}]
-    ["/status" {:get status}]
+    ["/logout" {:post {:handler auth/logout}}]
     ["/chsk" {:get ring-ajax-get-or-ws-handshake
               :post ring-ajax-post}]]))
 
@@ -51,4 +36,8 @@
 (comment
   (def handle (handler {:sente {:ring-ajax-get-or-ws-handshake identity :ring-ajax-post identity}}))
   (handle {:request-method :get :uri "/"})
-  (handle {:request-method :get :uri "/status"}))
+  ; Disable the wrap-anti-forgery for this one
+  (handle {:request-method :post
+           :uri "/login"
+           :body "{:username \"max\"}"
+           :headers {"accept" "application/edn" "content-type" "application/edn"}}))
