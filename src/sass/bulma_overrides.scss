@@ -8,3 +8,7 @@ $size-normal: 0.95rem;
 .is-hoverable {
   cursor: pointer;
 }
+
+.is-dark a:hover {
+  color: $link-visited;
+}

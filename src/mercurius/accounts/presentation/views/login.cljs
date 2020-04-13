@@ -50,4 +50,5 @@
    [:div.hero-foot
     [:div.navbar
      [:div.navbar-end
-      [:div.navbar-item "Developed by Emmanuel Nicolau"]]]]])
+      [:div.navbar-item "Developed by "
+       [:a {:href "https://github.com/eeng"} "eeng"]]]]]])
