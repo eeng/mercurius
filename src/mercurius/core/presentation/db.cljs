@@ -15,16 +15,20 @@
                            :ok ::success-state
                            :error ::failure-state))
 
+(s/def ::login-form map?)
+(s/def ::place-order-form map?)
 (s/def ::user-id (s/nilable string?))
-(s/def ::auth (s/keys :req-un [::loading?] :opt-un [::user-id]))
+(s/def ::auth (s/keys :opt-un [::user-id]))
 (s/def ::tickers ::remote-data)
 (s/def ::order-book ::remote-data)
 (s/def ::trades ::remote-data)
 (s/def ::ticker-selected string?)
 (s/def ::order-book-precision (set precisions))
 (s/def :app/db (s/keys :req-un [::order-book-precision]
-                       :opt-un [::auth
+                       :opt-un [::login-form
+                                ::auth
                                 ::tickers
                                 ::ticker-selected
                                 ::order-book
-                                ::trades]))
+                                ::trades
+                                ::place-order-form]))

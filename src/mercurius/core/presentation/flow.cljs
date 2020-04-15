@@ -3,7 +3,7 @@
             [mercurius.core.presentation.db :refer [default-db]]
             [mercurius.core.presentation.api :as backend]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
-            [mercurius.accounts.presentation.flow :refer [assoc-auth]]
+            [mercurius.accounts.presentation.flow :refer [mark-as-logged-in]]
             ["bulma-toast" :refer [toast]]))
 
 ;;;; Effects
@@ -38,7 +38,7 @@
  (fn [db [_ uid]]
    (-> db
        (assoc :ws-connected? true)
-       (assoc-auth uid))))
+       (mark-as-logged-in uid))))
 
 (reg-event-fx
  :ajax-error

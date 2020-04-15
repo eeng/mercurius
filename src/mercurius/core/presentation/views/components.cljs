@@ -23,13 +23,13 @@
      [:div.panel-block.has-loader [loader]]
      (into [:div.panel-block] body))])
 
-(defn input [{:keys [on-change value] :or {value ""} :as opts}]
+(defn input [{:keys [value on-change] :or {value "" on-change identity} :as opts}]
   [:input.input
    (assoc opts
           :value value
           :on-change #(on-change (-> % .-target .-value)))])
 
-(defn select [{:keys [collection on-change value] :or {value ""} :as opts}]
+(defn select [{:keys [collection value on-change] :or {value "" on-change identity} :as opts}]
   (let [html-opts (dissoc opts :collection :on-change :value)]
     [:div.select html-opts
      [:select

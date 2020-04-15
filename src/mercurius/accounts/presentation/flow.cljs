@@ -5,18 +5,23 @@
             [day8.re-frame.http-fx]
             [ajax.edn :as edn]))
 
-(defn assoc-auth [db user-id]
-  (assoc db :auth {:loading? false :user-id user-id}))
+(defn mark-as-logged-in [db user-id]
+  (assoc db :auth {:user-id user-id}))
 
 ;;;; Events
 
+(reg-event-db
+ :login-form-changed
+ (fn [db [_ changes]]
+   (update-in db [:login-form :values] merge changes)))
+
 (reg-event-fx
  :login
- (fn [{:keys [db]} [_ credentials]]
-   {:db (assoc db :auth {:loading? true})
+ (fn [{:keys [db]} [_]]
+   {:db (assoc-in db [:login-form :loading?] true)
     :http-xhrio {:method :post
                  :uri "/login"
-                 :params credentials
+                 :params (get-in db [:login-form :values])
                  :on-success [:login-success]
                  :on-failure [:login-failure]
                  :headers {"X-CSRF-Token" (csrf-token)}
@@ -26,15 +31,16 @@
 
 (reg-event-fx
  :login-success
- (fn [_ _]
+ (fn [{:keys [db]} _]
    ;; We need to reconnect the ws so Sente picks up the new uid. 
    ;; When it's done, the :core/socket-connected event handler will update the auth status on the db.
-   {:api {:reconnect true}}))
+   {:api {:reconnect true}
+    :db (dissoc db :login-form)}))
 
 (reg-event-fx
  :login-failure
  (fn [{:keys [db]} [_ response]]
-   {:db (assoc-auth db nil)
+   {:db (assoc-in db [:login-form :loading?] false)
     :toast {:message (case (:status response)
                        401 "Invalid username or password."
                        "There seems to be a network issue.")
@@ -56,7 +62,7 @@
 (reg-event-db
  :logout-success
  (fn [db [_ _]]
-   (assoc-auth db nil)))
+   (mark-as-logged-in db nil)))
 
 ;;;; Subscriptions
 
@@ -66,3 +72,7 @@
    (some? (get-in db [:auth :user-id]))))
 
 (reg-sub :auth :auth)
+
+(reg-sub
+ :login-form
+ :login-form)

@@ -1,30 +1,33 @@
 (ns mercurius.accounts.presentation.views.login
-  (:require [reagent.core :as r]
-            [mercurius.core.presentation.util.reframe :refer [>evt <sub]]
+  (:require [mercurius.core.presentation.util.reframe :refer [>evt <sub]]
             [mercurius.core.presentation.views.components :refer [input]]))
 
 (defn- login-form []
-  (let [credentials (r/atom {:username "" :password ""})
-        on-submit (fn [ev]
-                    (>evt [:login @credentials])
-                    (.preventDefault ev))]
-    (fn []
-      (let [{:keys [loading?]} (<sub [:auth])]
-        [:form {:on-submit on-submit}
-         [:div.field
-          [:div.control.has-icons-left
-           [input credentials :username {:placeholder "Username" :auto-focus true}]
-           [:span.icon.is-small.is-left
-            [:i.fas.fa-user]]]]
-         [:div.field
-          [:div.control.has-icons-left
-           [input credentials :password {:type "password" :placeholder "Password"}]
-           [:span.icon.is-small.is-left
-            [:i.fas.fa-lock]]]]
-         [:div.field
-          [:button.button.is-fullwidth.is-primary
-           {:type "submit" :class (when loading? "is-loading")}
-           "ENTER"]]]))))
+  (let [{:keys [values loading?]} (<sub [:login-form])]
+    [:form {:on-submit (fn [ev]
+                         (>evt [:login])
+                         (.preventDefault ev))}
+     [:div.field
+      [:div.control.has-icons-left
+       [input {:placeholder "Username"
+               :value (:username values)
+               :on-change #(>evt [:login-form-changed {:username %}])
+               :auto-focus true}]
+       [:span.icon.is-small.is-left
+        [:i.fas.fa-user]]]]
+     [:div.field
+      [:div.control.has-icons-left
+       [input {:type "password"
+               :placeholder "Password"
+               :value (:password values)
+               :on-change #(>evt [:login-form-changed {:password %}])}]
+       [:span.icon.is-small.is-left
+        [:i.fas.fa-lock]]]]
+     [:div.field
+      [:button.button.is-fullwidth.is-primary
+       {:type "submit"
+        :class (when loading? "is-loading")}
+       "ENTER"]]]))
 
 (defn login-page []
   [:section.hero.is-dark.is-bold.is-fullheight
