@@ -1,6 +1,7 @@
-(ns mercurius.trading.presentation.views.tickers
+(ns mercurius.trading.presentation.tickers.panel
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.views.components :refer [panel]]))
+            [mercurius.core.presentation.views.components :refer [panel]]
+            [mercurius.trading.presentation.tickers.flow]))
 
 (defn tickers-panel []
   (let [{:keys [data loading?]} (<sub [:trading/tickers])

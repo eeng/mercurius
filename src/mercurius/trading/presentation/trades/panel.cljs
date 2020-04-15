@@ -1,7 +1,8 @@
-(ns mercurius.trading.presentation.views.trades
+(ns mercurius.trading.presentation.trades.panel
   (:require [mercurius.core.presentation.util.reframe :refer [<sub]]
             [mercurius.core.presentation.util.format :refer [format-time]]
-            [mercurius.core.presentation.views.components :refer [panel]]))
+            [mercurius.core.presentation.views.components :refer [panel]]
+            [mercurius.trading.presentation.trades.flow]))
 
 (defn trades-panel []
   (let [ticker (<sub [:trading/ticker-selected])

@@ -1,12 +1,20 @@
-(ns mercurius.accounts.presentation.flow
+(ns mercurius.accounts.presentation.login.flow
   (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
             [mercurius.core.presentation.api :refer [csrf-token]]
             [day8.re-frame.http-fx]
             [ajax.edn :as edn]))
 
-(defn mark-as-logged-in [db user-id]
-  (assoc db :auth {:user-id user-id}))
+(def default-login-form {:loading? false :values {:username "" :password ""}})
+
+;;;; Subscriptions
+
+(reg-sub
+ :logged-in?
+ (fn [db _]
+   (some? (get-in db [:auth :user-id]))))
+
+(reg-sub :login-form :login-form)
 
 ;;;; Events
 
@@ -35,7 +43,7 @@
    ;; We need to reconnect the ws so Sente picks up the new uid. 
    ;; When it's done, the :core/socket-connected event handler will update the auth status on the db.
    {:api {:reconnect true}
-    :db (dissoc db :login-form)}))
+    :db (assoc db :login-form default-login-form)}))
 
 (reg-event-fx
  :login-failure
@@ -59,20 +67,10 @@
                  :format (edn/edn-request-format)
                  :response-format (edn/edn-response-format)}}))
 
+(defn mark-as-logged-in [db user-id]
+  (assoc db :auth {:user-id user-id}))
+
 (reg-event-db
  :logout-success
  (fn [db [_ _]]
    (mark-as-logged-in db nil)))
-
-;;;; Subscriptions
-
-(reg-sub
- :logged-in?
- (fn [db _]
-   (some? (get-in db [:auth :user-id]))))
-
-(reg-sub :auth :auth)
-
-(reg-sub
- :login-form
- :login-form)

@@ -1,9 +1,12 @@
 (ns mercurius.core.presentation.db
   (:require [clojure.spec.alpha :as s]
-            [mercurius.trading.presentation.flow :refer [precisions default-place-order-form]]))
+            [mercurius.accounts.presentation.login.flow :refer [default-login-form]]
+            [mercurius.trading.presentation.order-book.flow :refer [precisions]]
+            [mercurius.trading.presentation.place-order.flow :refer [default-place-order-form]]))
 
 (def default-db {:order-book-precision "P0"
-                 :place-order-form default-place-order-form})
+                 :place-order-form default-place-order-form
+                 :login-form default-login-form})
 
 (s/def ::loading? boolean?)
 (s/def ::data any?)
@@ -16,19 +19,21 @@
                            :error ::failure-state))
 
 (s/def ::login-form map?)
-(s/def ::place-order-form map?)
 (s/def ::user-id (s/nilable string?))
 (s/def ::auth (s/keys :opt-un [::user-id]))
+
 (s/def ::tickers ::remote-data)
 (s/def ::order-book ::remote-data)
 (s/def ::trades ::remote-data)
 (s/def ::ticker-selected string?)
 (s/def ::order-book-precision (set precisions))
-(s/def :app/db (s/keys :req-un [::order-book-precision]
-                       :opt-un [::login-form
-                                ::auth
+(s/def ::place-order-form map?)
+
+(s/def :app/db (s/keys :req-un [::login-form
+                                ::order-book-precision
+                                ::place-order-form]
+                       :opt-un [::auth
                                 ::tickers
                                 ::ticker-selected
                                 ::order-book
-                                ::trades
-                                ::place-order-form]))
+                                ::trades]))

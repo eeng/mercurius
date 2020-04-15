@@ -2,10 +2,8 @@
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.flow]
             [mercurius.core.presentation.views.components :refer [page-loader]]
-            [mercurius.accounts.presentation.flow]
-            [mercurius.accounts.presentation.views.login :refer [login-page]]
-            [mercurius.trading.presentation.flow]
-            [mercurius.trading.presentation.views.page :refer [trading-page]]))
+            [mercurius.accounts.presentation.login.page :refer [login-page]]
+            [mercurius.trading.presentation.page :refer [trading-page]]))
 
 (defn- navbar []
   [:nav.navbar.is-dark

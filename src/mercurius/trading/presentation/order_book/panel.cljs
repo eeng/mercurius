@@ -1,6 +1,7 @@
-(ns mercurius.trading.presentation.views.order-book
+(ns mercurius.trading.presentation.order-book.panel
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.views.components :refer [panel]]))
+            [mercurius.core.presentation.views.components :refer [panel]]
+            [mercurius.trading.presentation.order-book.flow]))
 
 (defn- buying-table [orders]
   [:table.table.is-narrow.is-fullwidth

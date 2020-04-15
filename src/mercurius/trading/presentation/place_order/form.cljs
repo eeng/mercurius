@@ -1,4 +1,4 @@
-(ns mercurius.trading.presentation.views.place-order
+(ns mercurius.trading.presentation.place-order.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.views.components :refer [panel input select]]))
 

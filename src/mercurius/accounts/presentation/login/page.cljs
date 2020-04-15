@@ -1,26 +1,28 @@
-(ns mercurius.accounts.presentation.views.login
+(ns mercurius.accounts.presentation.login.page
   (:require [mercurius.core.presentation.util.reframe :refer [>evt <sub]]
-            [mercurius.core.presentation.views.components :refer [input]]))
+            [mercurius.core.presentation.views.components :refer [input]]
+            [mercurius.accounts.presentation.login.flow]))
 
 (defn- login-form []
   (let [{:keys [values loading?]} (<sub [:login-form])]
-    [:form {:on-submit (fn [ev]
-                         (>evt [:login])
-                         (.preventDefault ev))}
+    [:form
+     {:on-submit (fn [ev] (>evt [:login]) (.preventDefault ev))}
      [:div.field
       [:div.control.has-icons-left
-       [input {:placeholder "Username"
-               :value (:username values)
-               :on-change #(>evt [:login-form-changed {:username %}])
-               :auto-focus true}]
+       [input
+        {:placeholder "Username"
+         :value (:username values)
+         :on-change #(>evt [:login-form-changed {:username %}])
+         :auto-focus true}]
        [:span.icon.is-small.is-left
         [:i.fas.fa-user]]]]
      [:div.field
       [:div.control.has-icons-left
-       [input {:type "password"
-               :placeholder "Password"
-               :value (:password values)
-               :on-change #(>evt [:login-form-changed {:password %}])}]
+       [input
+        {:type "password"
+         :placeholder "Password"
+         :value (:password values)
+         :on-change #(>evt [:login-form-changed {:password %}])}]
        [:span.icon.is-small.is-left
         [:i.fas.fa-lock]]]]
      [:div.field
