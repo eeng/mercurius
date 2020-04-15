@@ -23,19 +23,18 @@
      [:div.panel-block.has-loader [loader]]
      (into [:div.panel-block] body))])
 
-(defn input [form-atom form-key opts]
+(defn input [{:keys [on-change value] :or {value ""} :as opts}]
   [:input.input
-   (merge
-    {:value (get @form-atom form-key "")
-     :on-change #(swap! form-atom assoc form-key (-> % .-target .-value))}
-    opts)])
+   (assoc opts
+          :value value
+          :on-change #(on-change (-> % .-target .-value)))])
 
-(defn select [form-atom form-key collection {:keys [parser] :or {parser identity} :as opts}]
-  (let [opts (dissoc opts :parser)]
-    [:div.select opts
+(defn select [{:keys [collection on-change value] :or {value ""} :as opts}]
+  (let [html-opts (dissoc opts :collection :on-change :value)]
+    [:div.select html-opts
      [:select
-      {:value (get @form-atom form-key "")
-       :on-change #(swap! form-atom assoc form-key (parser (-> % .-target .-value)))}
-      (map (fn [[text value]]
-             [:option {:key value :value value} text])
-           collection)]]))
+      (assoc opts
+             :value value
+             :on-change #(on-change (-> % .-target .-value)))
+      (for [[text value] collection]
+        [:option {:key value :value value} text])]]))

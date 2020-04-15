@@ -16,7 +16,10 @@
       font-size: 3rem;
     }
   }
+}
 
+.panel-block,
+.element {
   &.is-loading {
     position: relative;
     pointer-events: none;

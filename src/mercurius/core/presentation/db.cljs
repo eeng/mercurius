@@ -1,8 +1,9 @@
 (ns mercurius.core.presentation.db
   (:require [clojure.spec.alpha :as s]
-            [mercurius.trading.presentation.flow :refer [precisions]]))
+            [mercurius.trading.presentation.flow :refer [precisions default-place-order-form]]))
 
-(def default-db {:order-book-precision "P0"})
+(def default-db {:order-book-precision "P0"
+                 :place-order-form default-place-order-form})
 
 (s/def ::loading? boolean?)
 (s/def ::data any?)

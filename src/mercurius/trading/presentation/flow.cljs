@@ -1,7 +1,9 @@
 (ns mercurius.trading.presentation.flow
   (:require [re-frame.core :refer [reg-sub-raw reg-sub reg-event-fx]]
             [reagent.ratom :refer [reaction]]
-            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
+            [cljs.core.match :refer-macros [match]]
+            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
+            [mercurius.core.presentation.util.string :refer [parse-float]]))
 
 ;;;; Events 
 
@@ -78,12 +80,51 @@
  (fn [db [_ trade]]
    (update-in db [:trades :data] (comp (partial take 100) conj) trade)))
 
+(reg-event-db
+ :trading/place-order-form-changed
+ (fn [db [_ form-changes]]
+   (update-in db [:place-order-form :values] merge form-changes)))
+
+(def default-place-order-form {:loading? false :values {:type "limit"}})
+
+(defn- dissoc-price-if-market-order [{:keys [type] :as order}]
+  (cond-> order
+    (= type :market) (dissoc :price)))
+
+(defn- coerce-order [order]
+  (-> order
+      (update :type keyword)
+      (update :amount parse-float)
+      (update :price parse-float)
+      (dissoc-price-if-market-order)))
+
 (reg-event-fx
  :trading/place-order
- (fn [_ [_ order]]
-   {:api {:request [:place-order order]
-          :on-success [:ok-response [:place-order]]
-          :on-failure [:bad-response [:place-order]]}}))
+ (fn [{:keys [db]} [_ side]]
+   (let [order (-> (get-in db [:place-order-form :values])
+                   (assoc :ticker (ticker-selected db) :side side)
+                   (coerce-order))]
+     {:db (assoc-in db [:place-order-form :loading?] true)
+      :api {:request [:place-order order]
+            :on-success [:trading/place-order-success]
+            :on-failure [:trading/place-order-failure]}})))
+
+(reg-event-db
+ :trading/place-order-success
+ (fn [{:keys [place-order-form] :as db} _]
+   (->> (get-in place-order-form [:values :type])
+        (assoc-in default-place-order-form [:values :type])
+        (assoc db :place-order-form))))
+
+(reg-event-fx
+ :trading/place-order-failure
+ (fn [{:keys [db]} [_ {:keys [type] :as error}]]
+   (js/console.error error)
+   {:db (assoc-in db [:place-order-form :loading?] false)
+    :toast {:message (case type
+                       :wallet/insufficient-balance "Insufficient balance"
+                       "Unexpected error")
+            :type "is-danger faster"}}))
 
 ;;;; Subscriptions
 
@@ -132,3 +173,15 @@
  (fn [app-db [_ ticker]]
    (>evt [:trading/get-trades ticker])
    (reaction (get @app-db :trades {:loading? true}))))
+
+(defn order-valid? [order]
+  (match [order]
+    [{:type :market :amount amount}] (pos? amount)
+    [{:type :limit :amount amount :price price}] (and (pos? amount) (pos? price))
+    :else false))
+
+(reg-sub
+ :trading/place-order-form
+ (fn [{:keys [place-order-form]}]
+   (assoc place-order-form
+          :valid? (-> place-order-form :values coerce-order order-valid?))))
