@@ -46,8 +46,9 @@
   (chsk-send! [:frontend/request request]
               timeout
               (fn [reply]
-                (when (sente/cb-success? reply)
+                (if (sente/cb-success? reply)
                   (let [[status data] reply]
                     (case status
                       :ok (on-success data)
-                      :error (on-error data)))))))
+                      :error (on-error data)))
+                  (js/console.error "Sente reply failure" reply)))))

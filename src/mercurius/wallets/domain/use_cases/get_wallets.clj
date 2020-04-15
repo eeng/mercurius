@@ -7,7 +7,8 @@
 
 (defn new-get-wallets-use-case
   "Returns a use case that allows to get a user's wallets."
-  [{:keys [get-user-wallets]}]
+  [{:keys [get-user-wallets presenter] :or {presenter identity}}]
   (fn [{:keys [user-id] :as command}]
     (s/assert ::command command)
-    (get-user-wallets user-id)))
+    (->> (get-user-wallets user-id)
+         (map presenter))))

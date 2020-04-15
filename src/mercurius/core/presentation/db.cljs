@@ -25,6 +25,7 @@
 (s/def ::tickers ::remote-data)
 (s/def ::order-book ::remote-data)
 (s/def ::trades ::remote-data)
+(s/def ::wallets ::remote-data)
 (s/def ::ticker-selected string?)
 (s/def ::order-book-precision (set precisions))
 (s/def ::place-order-form map?)
@@ -36,4 +37,5 @@
                                 ::tickers
                                 ::ticker-selected
                                 ::order-book
-                                ::trades]))
+                                ::trades
+                                ::wallets]))

@@ -13,8 +13,9 @@
     (when @active
       (when-let [{[event-type event-data] :event reply-fn :?reply-fn :keys [uid]} (<! ch-recv)]
         (when (= event-type :frontend/request)
-          (cond-> (request-processor event-data {:user-id uid})
-            reply-fn reply-fn))
+          (let [response (request-processor event-data {:user-id uid})]
+            (cond-> response
+              reply-fn reply-fn)))
         (recur)))))
 
 (defn- start-backend-event-pusher

@@ -17,6 +17,7 @@
             [mercurius.accounts.domain.use-cases.authenticate :refer [new-authenticate-use-case]]
             [mercurius.accounts.adapters.repositories.in-memory-user-repository :refer [new-in-memory-user-repo]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
+            [mercurius.wallets.adapters.presenters.wallet-presenter :refer [wallet-edn-presenter]]
             [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
             [mercurius.wallets.domain.use-cases.withdraw :refer [new-withdraw-use-case]]
@@ -52,7 +53,8 @@
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/get-wallet {:wallet-repo (ig/ref :adapters/wallet-repo)}
-   :use-cases/get-wallets {:wallet-repo (ig/ref :adapters/wallet-repo)}
+   :use-cases/get-wallets {:wallet-repo (ig/ref :adapters/wallet-repo)
+                           :presenter wallet-edn-presenter}
    :use-cases/calculate-monetary-base {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/place-order {:wallet-repo (ig/ref :adapters/wallet-repo)
                            :order-book-repo (ig/ref :adapters/order-book-repo)
@@ -137,8 +139,9 @@
 (defmethod ig/init-key :use-cases/get-wallet [_ {:keys [wallet-repo]}]
   (new-get-wallet-use-case {:load-wallet (partial load-wallet wallet-repo)}))
 
-(defmethod ig/init-key :use-cases/get-wallets [_ {:keys [wallet-repo]}]
-  (new-get-wallets-use-case {:get-user-wallets (partial get-user-wallets wallet-repo)}))
+(defmethod ig/init-key :use-cases/get-wallets [_ {:keys [wallet-repo presenter]}]
+  (new-get-wallets-use-case {:get-user-wallets (partial get-user-wallets wallet-repo)
+                             :presenter presenter}))
 
 (defmethod ig/init-key :use-cases/calculate-monetary-base [_ {:keys [wallet-repo]}]
   (new-calculate-monetary-base-use-case
