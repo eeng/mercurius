@@ -65,15 +65,22 @@
 (def domain-event-type-to-reframe
   {:ticker-updated :trading/ticker-updated
    :order-book-updated :trading/refresh-order-book
-   :trade-made :trading/trade-made})
+   :trade-made :trading/trade-made
+   :wallet-changed :trading/wallet-changed})
 
 ;; Receives push notifications from the backend and routes them to the corresponding re-frame event handler.
+;; *1) In a real application we would have the client subscribe to the corresponding topic to receive more targeted notifications.
 (reg-event-fx
  :backend/push
- (fn [_cofx [_ [be-event-type event-data]]]
+ (fn [{:keys [db]} [_ [be-event-type event-data]]]
    (let [event-type (or (get domain-event-type-to-reframe be-event-type)
-                        (throw (js/Error. (str "Backend event not supported: " be-event-type))))]
-     {:dispatch [event-type event-data]})))
+                        (throw (js/Error. (str "Backend event not supported: " be-event-type))))
+         user-id (get-in db [:auth :user-id])]
+     ;; This checks is needed in order to filter events not targeted to the user.
+     ;; If *1 is implementented we wouldn't need it.
+     (when (or (not (:user-id event-data))
+               (= (:user-id event-data) user-id))
+       {:dispatch [event-type event-data]}))))
 
 ;;;; Subscriptions
 

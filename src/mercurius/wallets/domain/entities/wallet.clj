@@ -12,7 +12,7 @@
 (s/def ::reserved ::bigdec)
 (s/def ::wallet (s/keys :req-un [::currency ::balance ::reserved]))
 
-(defrecord Wallet [id user-id currency balance reserved])
+(defrecord Wallet [id user-id currency balance reserved last-events])
 
 (defn new-wallet [{:keys [id user-id currency balance reserved]
                    :or {id (uuid) balance 0 reserved 0}}]
@@ -27,18 +27,30 @@
 (defn available-balance [{:keys [balance reserved]}]
   (- balance reserved))
 
+(defn- trx-event [event-type wallet extra-data]
+  (let [event-data (-> wallet
+                       (select-keys [:user-id :currency :balance :reserved])
+                       (merge extra-data))]
+    [event-type event-data]))
+
+(defn- add-event [wallet event-type extra-data]
+  (let [event (trx-event event-type wallet extra-data)]
+    (update wallet :last-events (fnil conj []) event)))
+
 (defn deposit [wallet amount]
   (s/assert ::wallet wallet)
   (when (<= amount 0)
     (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet}))
-  (update wallet :balance + (money amount)))
+  (-> (update wallet :balance + (money amount))
+      (add-event :deposited-into-wallet {:amount amount})))
 
 (defn withdraw [wallet amount]
   (s/assert ::wallet wallet)
   (cond
     (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet})
     (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
-  (update wallet :balance - (money amount)))
+  (-> (update wallet :balance - (money amount))
+      (add-event :withdraw-from-wallet {:amount amount})))
 
 (defn reserve
   "Reserves an order's amount until it's filled, so the amount remains unavailable for future orders."
@@ -47,14 +59,16 @@
   (cond
     (<= amount 0) (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet})
     (> amount (available-balance wallet)) (throw+ {:type :wallet/insufficient-balance :wallet wallet :amount amount}))
-  (update wallet :reserved + (money amount)))
+  (-> (update wallet :reserved + (money amount))
+      (add-event :reserve-from-wallet {:amount amount})))
 
 (defn cancel-reservation
   "Restores the order's reserved amount."
   [{:keys [reserved] :as wallet} amount]
   (when (> amount reserved)
     (throw+ {:type :wallet/invalid-amount :amount amount :wallet wallet}))
-  (update wallet :reserved - (money amount)))
+  (-> (update wallet :reserved - (money amount))
+      (add-event :cancel-wallet-reserve {:amount amount})))
 
 (defn transfer
   "Transfer the `amount` from the `src` wallet to the `dst` wallet.

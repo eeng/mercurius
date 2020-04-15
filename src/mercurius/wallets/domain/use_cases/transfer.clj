@@ -13,7 +13,7 @@
 
 (defn new-transfer-use-case
   "Returns a use case that allows to transfer some amount between two users' wallets."
-  [{:keys [load-wallet save-wallet]}]
+  [{:keys [load-wallet save-wallet publish-events]}]
   (fn [{:keys [from to currency transfer-amount cancel-amount] :as command
         :or {cancel-amount 0}}]
     (s/assert ::command command)
@@ -21,5 +21,6 @@
                   (cancel-reservation cancel-amount))
           dst (load-wallet to currency)
           wallets (transfer src dst transfer-amount)]
-      (doseq [wallet wallets]
-        (save-wallet wallet)))))
+      (doseq [{:keys [last-events] :as wallet} wallets]
+        (save-wallet wallet)
+        (publish-events last-events)))))

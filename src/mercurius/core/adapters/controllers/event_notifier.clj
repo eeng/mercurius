@@ -24,4 +24,10 @@
             ;; Encoding the ticker in the topic would allow clients
             ;; to receive updates only on that ticker.
             (let [topic (str "push.order-book-updated." (:ticker data))]
-              (publish pub-sub topic [:order-book-updated])))))
+              (publish pub-sub topic [:order-book-updated]))))
+
+  (listen event-bus
+          #{:deposited-into-wallet :withdraw-from-wallet :reserve-from-wallet :cancel-wallet-reserve}
+          (fn [{:keys [data]}]
+            (let [topic (str "push.wallet-changed." (:user-id data))]
+              (publish pub-sub topic [:wallet-changed data])))))

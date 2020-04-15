@@ -1,7 +1,8 @@
 (ns mercurius.trading.presentation.balances.flow
   (:require [reagent.ratom :refer [reaction]]
             [re-frame.core :refer [reg-sub-raw reg-event-fx]]
-            [mercurius.core.presentation.util.reframe :refer [>evt]]))
+            [mercurius.core.presentation.util.reframe :refer [>evt reg-event-db]]
+            [mercurius.util.collections :refer [insert-or-replace-by]]))
 
 ;;;; Subscriptions
 
@@ -19,3 +20,10 @@
    {:api {:request [:get-wallets]
           :on-success [:ok-response [:wallets]]
           :on-failure [:bad-response [:wallets]]}}))
+
+(reg-event-db
+ :trading/wallet-changed
+ (fn [db [_ event-data]]
+   (update-in db
+              [:wallets :data]
+              (partial insert-or-replace-by :currency event-data))))

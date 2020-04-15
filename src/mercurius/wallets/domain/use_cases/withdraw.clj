@@ -10,9 +10,11 @@
 
 (defn new-withdraw-use-case
   "Returns a use case that allows to withdraw some amount from a wallet."
-  [{:keys [load-wallet save-wallet]}]
+  [{:keys [load-wallet save-wallet publish-events]}]
   (fn [{:keys [user-id currency amount] :as command}]
     (s/assert ::command command)
-    (-> (load-wallet user-id currency)
-        (wallet/withdraw amount)
-        (save-wallet))))
+    (let [{:keys [last-events] :as wallet}
+          (-> (load-wallet user-id currency)
+              (wallet/withdraw amount))]
+      (save-wallet wallet)
+      (publish-events last-events))))

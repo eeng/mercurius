@@ -12,7 +12,7 @@
   (new-place-order-use-case
    (merge {:save-wallet identity
            :insert-order identity
-           :publish-event identity}
+           :publish-events identity}
           deps)))
 
 (deftest place-order-test
@@ -24,7 +24,8 @@
                                        :save-wallet save-wallet})]
       (place-order {:user-id bob :type :limit :side :buy :amount 0.2 :ticker "BTCUSD" :price 100})
       (assert/called-with? load-wallet bob "USD")
-      (assert/called-with? save-wallet (assoc wallet :reserved (* 0.2M 100)))))
+      (is (match? [[{:id (:id wallet) :reserved (* 0.2M 100)}]]
+                  (spy/calls save-wallet)))))
 
   (testing "should insert the order in the order book"
     (let [wallet (build-wallet {:balance 50 :currency "USD"})

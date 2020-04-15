@@ -6,7 +6,7 @@
   WalletRepository
 
   (save-wallet [this {:keys [user-id currency] :as wallet}]
-    (alter db assoc-in [user-id currency] wallet)
+    (alter db assoc-in [user-id currency] (dissoc wallet :last-events))
     (find-wallet this user-id currency))
 
   (find-wallet [this user-id currency]

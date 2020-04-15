@@ -49,9 +49,12 @@
    :adapters/user-repo nil
    :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
    :use-cases/authenticate {:user-repo (ig/ref :adapters/user-repo)}
-   :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)}
-   :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)}
-   :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)}
+   :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)
+                       :event-bus (ig/ref :adapters/event-bus)}
+   :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)
+                        :event-bus (ig/ref :adapters/event-bus)}
+   :use-cases/transfer {:wallet-repo (ig/ref :adapters/wallet-repo)
+                        :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/get-wallet {:wallet-repo (ig/ref :adapters/wallet-repo)}
    :use-cases/get-wallets {:wallet-repo (ig/ref :adapters/wallet-repo)
                            :presenter wallet-edn-presenter}
@@ -124,17 +127,20 @@
 (defmethod ig/init-key :use-cases/authenticate [_ deps]
   (new-authenticate-use-case deps))
 
-(defmethod ig/init-key :use-cases/deposit [_ {:keys [wallet-repo]}]
+(defmethod ig/init-key :use-cases/deposit [_ {:keys [wallet-repo event-bus]}]
   (new-deposit-use-case {:load-wallet (partial load-wallet wallet-repo)
-                         :save-wallet (partial save-wallet wallet-repo)}))
+                         :save-wallet (partial save-wallet wallet-repo)
+                         :publish-events (partial emit event-bus)}))
 
-(defmethod ig/init-key :use-cases/withdraw [_ {:keys [wallet-repo]}]
+(defmethod ig/init-key :use-cases/withdraw [_ {:keys [wallet-repo event-bus]}]
   (new-withdraw-use-case {:load-wallet (partial load-wallet wallet-repo)
-                          :save-wallet (partial save-wallet wallet-repo)}))
+                          :save-wallet (partial save-wallet wallet-repo)
+                          :publish-events (partial emit event-bus)}))
 
-(defmethod ig/init-key :use-cases/transfer [_ {:keys [wallet-repo]}]
+(defmethod ig/init-key :use-cases/transfer [_ {:keys [wallet-repo event-bus]}]
   (new-transfer-use-case {:load-wallet (partial load-wallet wallet-repo)
-                          :save-wallet (partial save-wallet wallet-repo)}))
+                          :save-wallet (partial save-wallet wallet-repo)
+                          :publish-events (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/get-wallet [_ {:keys [wallet-repo]}]
   (new-get-wallet-use-case {:load-wallet (partial load-wallet wallet-repo)}))
@@ -152,7 +158,7 @@
                              :save-wallet (partial save-wallet wallet-repo)
                              :get-bid-ask (partial get-bid-ask order-book-repo)
                              :insert-order (partial insert-order order-book-repo)
-                             :publish-event (partial emit event-bus)}))
+                             :publish-events (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/get-order-book [_ {:keys [order-book-repo]}]
   (new-get-order-book-use-case {:get-order-book (partial get-order-book order-book-repo)}))

@@ -26,3 +26,11 @@
      (if kvs
        (recur m (first kvs) (second kvs) (nnext kvs))
        m))))
+
+(defn index-by [field coll]
+  (zipmap (map field coll) coll))
+
+(defn insert-or-replace-by [field elem coll]
+  (-> (index-by field coll)
+      (assoc (get elem field) elem)
+      vals))

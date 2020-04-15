@@ -24,11 +24,27 @@
     or a predicate to do arbitrary
     The callback will receive instances of `Event`."))
 
-(defn emit [bus [event-type event-data]]
-  (->> (new-event event-type event-data)
-       (-emit bus)))
+(defn- wrap-events [event-or-events]
+  (cond
+    (keyword? (first event-or-events))
+    [event-or-events]
+
+    (vector? (first event-or-events))
+    event-or-events
+
+    :else
+    (throw (IllegalArgumentException. (str "Invalid event: " (pr-str event-or-events))))))
+
+(defn emit
+  "Publishes a single event or a collection of them to the bus."
+  [bus event-or-events]
+  (doseq [[event-type event-data] (wrap-events event-or-events)]
+    (->> (new-event event-type event-data)
+         (-emit bus))))
 
 (s/def ::event (s/cat :type keyword? :data any?))
 
 (s/fdef emit
-  :args (s/cat :bus any? :event (s/spec ::event)))
+  :args (s/cat :bus any?
+               :event (s/spec (s/or :single ::event
+                                    :multiple (s/coll-of ::event)))))

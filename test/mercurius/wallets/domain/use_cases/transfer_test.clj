@@ -16,7 +16,8 @@
                                   (if (= user-id u1) w1 w2)))
           save-wallet (spy/mock identity)
           transfer (new-transfer-use-case {:load-wallet load-wallet
-                                           :save-wallet save-wallet})]
+                                           :save-wallet save-wallet
+                                           :publish-events identity})]
       (transfer {:from u1 :to u2 :currency "USD" :transfer-amount 10})
       (is (match? [[{:user-id u1 :balance 90M}]
                    [{:user-id u2 :balance 60M}]]
@@ -29,7 +30,8 @@
                                   (if (= user-id u1) w1 w2)))
           save-wallet (spy/mock identity)
           transfer (new-transfer-use-case {:load-wallet load-wallet
-                                           :save-wallet save-wallet})]
+                                           :save-wallet save-wallet
+                                           :publish-events identity})]
       (transfer {:from u1 :to u2 :currency "USD" :transfer-amount 10 :cancel-amount 11})
       (is (match? [[{:user-id u1 :balance 90M :reserved 19M}]
                    [{:user-id u2 :balance 10M}]]

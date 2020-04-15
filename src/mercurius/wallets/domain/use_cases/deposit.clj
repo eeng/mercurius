@@ -10,14 +10,11 @@
 
 (defn new-deposit-use-case
   "Returns a use case that allows to deposit some amount into a wallet."
-  [{:keys [load-wallet save-wallet]}]
+  [{:keys [load-wallet save-wallet publish-events]}]
   (fn [{:keys [user-id currency amount] :as command}]
     (s/assert ::command command)
-    (-> (load-wallet user-id currency)
-        (wallet/deposit amount)
-        (save-wallet))))
-
-(comment
-  (let [deposit (new-deposit-use-case {:load-wallet (constantly {:balance 50})
-                                       :save-wallet identity})]
-    (deposit {:amount 10 :user-id 1 :currency "USD"})))
+    (let [{:keys [last-events] :as wallet}
+          (-> (load-wallet user-id currency)
+              (wallet/deposit amount))]
+      (save-wallet wallet)
+      (publish-events last-events))))
