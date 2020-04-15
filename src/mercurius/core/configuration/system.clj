@@ -17,7 +17,7 @@
             [mercurius.accounts.domain.use-cases.authenticate :refer [new-authenticate-use-case]]
             [mercurius.accounts.adapters.repositories.in-memory-user-repository :refer [new-in-memory-user-repo]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
-            [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
+            [mercurius.wallets.domain.repositories.wallet-repository :refer [load-wallet save-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.domain.use-cases.deposit :refer [new-deposit-use-case]]
             [mercurius.wallets.domain.use-cases.withdraw :refer [new-withdraw-use-case]]
             [mercurius.wallets.domain.use-cases.transfer :refer [new-transfer-use-case]]
@@ -127,16 +127,15 @@
                          :save-wallet (partial save-wallet wallet-repo)}))
 
 (defmethod ig/init-key :use-cases/withdraw [_ {:keys [wallet-repo]}]
-  (new-withdraw-use-case {:fetch-wallet (partial fetch-wallet wallet-repo)
+  (new-withdraw-use-case {:load-wallet (partial load-wallet wallet-repo)
                           :save-wallet (partial save-wallet wallet-repo)}))
 
 (defmethod ig/init-key :use-cases/transfer [_ {:keys [wallet-repo]}]
-  (new-transfer-use-case {:fetch-wallet (partial fetch-wallet wallet-repo)
-                          :load-wallet (partial load-wallet wallet-repo)
+  (new-transfer-use-case {:load-wallet (partial load-wallet wallet-repo)
                           :save-wallet (partial save-wallet wallet-repo)}))
 
 (defmethod ig/init-key :use-cases/get-wallet [_ {:keys [wallet-repo]}]
-  (new-get-wallet-use-case {:fetch-wallet (partial fetch-wallet wallet-repo)}))
+  (new-get-wallet-use-case {:load-wallet (partial load-wallet wallet-repo)}))
 
 (defmethod ig/init-key :use-cases/get-wallets [_ {:keys [wallet-repo]}]
   (new-get-wallets-use-case {:get-user-wallets (partial get-user-wallets wallet-repo)}))
@@ -146,7 +145,7 @@
    {:calculate-monetary-base (partial calculate-monetary-base wallet-repo)}))
 
 (defmethod ig/init-key :use-cases/place-order [_ {:keys [wallet-repo order-book-repo event-bus]}]
-  (new-place-order-use-case {:fetch-wallet (partial fetch-wallet wallet-repo)
+  (new-place-order-use-case {:load-wallet (partial load-wallet wallet-repo)
                              :save-wallet (partial save-wallet wallet-repo)
                              :get-bid-ask (partial get-bid-ask order-book-repo)
                              :insert-order (partial insert-order order-book-repo)

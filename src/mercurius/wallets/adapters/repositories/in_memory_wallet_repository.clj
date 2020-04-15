@@ -13,7 +13,7 @@
     (get-in @db [user-id currency]))
 
   (get-user-wallets [_ user-id]
-    (-> @db (get user-id) vals))
+    (-> @db (get user-id) vals (or [])))
 
   (calculate-monetary-base [_]
     (->> @db vals (mapcat vals)

@@ -10,9 +10,9 @@
 (deftest withdraw-test
   (testing "should fetch the wallet, make the withdraw, and save the wallet"
     (let [wallet (build-wallet {:balance 100})
-          fetch-wallet (spy/mock (constantly wallet))
+          load-wallet (spy/mock (constantly wallet))
           save-wallet (spy/mock identity)
-          withdraw (new-withdraw-use-case {:fetch-wallet fetch-wallet :save-wallet save-wallet})]
+          withdraw (new-withdraw-use-case {:load-wallet load-wallet :save-wallet save-wallet})]
       (withdraw {:user-id bob :amount 30 :currency "BTC"})
-      (assert/called-with? fetch-wallet bob "BTC")
+      (assert/called-with? load-wallet bob "BTC")
       (assert/called-with? save-wallet (assoc wallet :balance 70M)))))

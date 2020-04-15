@@ -13,11 +13,11 @@
 
 (defn new-transfer-use-case
   "Returns a use case that allows to transfer some amount between two users' wallets."
-  [{:keys [load-wallet fetch-wallet save-wallet]}]
+  [{:keys [load-wallet save-wallet]}]
   (fn [{:keys [from to currency transfer-amount cancel-amount] :as command
         :or {cancel-amount 0}}]
     (s/assert ::command command)
-    (let [src (-> (fetch-wallet from currency)
+    (let [src (-> (load-wallet from currency)
                   (cancel-reservation cancel-amount))
           dst (load-wallet to currency)
           wallets (transfer src dst transfer-amount)]

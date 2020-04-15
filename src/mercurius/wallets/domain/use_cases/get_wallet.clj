@@ -9,7 +9,7 @@
 
 (defn new-get-wallet-use-case
   "Returns a use case that allows to get a user's wallet."
-  [{:keys [fetch-wallet]}]
+  [{:keys [load-wallet]}]
   (fn [{:keys [user-id currency] :as command}]
     (s/assert ::command command)
-    (fetch-wallet user-id currency)))
+    (load-wallet user-id currency)))

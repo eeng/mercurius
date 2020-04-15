@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest testing is use-fixtures]]
             [mercurius.support.factory :refer [build-wallet build-user-id]]
             [mercurius.support.helpers :refer [ref-trx]]
-            [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet fetch-wallet get-user-wallets calculate-monetary-base]]
+            [mercurius.wallets.domain.repositories.wallet-repository :refer [save-wallet load-wallet get-user-wallets calculate-monetary-base]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]))
 
 (use-fixtures :each ref-trx)
@@ -22,16 +22,10 @@
       (save-wallet repo wallet2)
       (is (match? {:balance 9M} (load-wallet repo "456" "USD")))))
 
-  (testing "load-wallet creates the wallet if it doesn't exists and returns it"
-    (let [repo (new-in-memory-wallet-repo)
-          wallet (load-wallet repo "456" "USD")]
-      (is (match? wallet (load-wallet repo "456" "USD")))
-      (is (match? [wallet] (get-user-wallets repo "456")))))
-
-  (testing "fetch-wallet raises an error if it doesn't exists"
+  (testing "load-wallet returns a new one if it doesn't exists"
     (let [repo (new-in-memory-wallet-repo)]
-      (is (thrown-match? clojure.lang.ExceptionInfo {:type :wallet/not-found}
-                         (fetch-wallet repo "456" "USD")))))
+      (is (match? {:user-id "456" :currency "USD" :balance 0M} (load-wallet repo "456" "USD")))
+      (is (= [] (get-user-wallets repo "456")))))
 
   (testing "calculate-monetary-base should create or update the wallet"
     (let [repo (new-in-memory-wallet-repo)]

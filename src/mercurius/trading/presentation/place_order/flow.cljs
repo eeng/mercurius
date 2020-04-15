@@ -63,6 +63,6 @@
    (js/console.error error)
    {:db (assoc-in db [:place-order-form :loading?] false)
     :toast {:message (case type
-                       :wallet/insufficient-balance "Insufficient balance"
-                       "Unexpected error")
+                       :wallet/insufficient-balance "Insufficient balance."
+                       "Unexpected error.")
             :type "is-danger faster"}}))
