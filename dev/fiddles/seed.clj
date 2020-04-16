@@ -21,4 +21,4 @@
 
   ; Make a trade
   (let [dispatch (:use-cases/dispatch system)]
-    (dispatch :place-order {:user-id u1 :side :buy :amount 0.1 :ticker "BTCUSD" :price 1234 :type :limit})))
+    (dispatch :place-order {:user-id u1 :side :buy :amount 0.1 :ticker "BTCUSD" :price 5100 :type :limit})))

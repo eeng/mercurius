@@ -29,7 +29,7 @@
             [mercurius.trading.adapters.repositories.in-memory-ticker-repository :refer [new-in-memory-ticker-repo]]
             [mercurius.trading.adapters.repositories.in-memory-trade-repository :refer [new-in-memory-trade-repo]]
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]
-            [mercurius.trading.adapters.processes.ticker-updater :refer [new-ticker-updater]]
+            [mercurius.trading.adapters.processes.trade-processor :refer [new-trade-processor]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-bid-ask get-order-book]]
             [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers]]
             [mercurius.trading.domain.repositories.trade-repository :refer [add-trade get-trades]]
@@ -87,7 +87,7 @@
                         :middleware [logger stm]}
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
                             :dispatch (ig/ref :use-cases/dispatch)}
-   :processes/ticker-updater {:event-bus (ig/ref :adapters/event-bus)
+   :processes/trade-processor {:event-bus (ig/ref :adapters/event-bus)
                               :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
    :controllers/request-processor {:dispatch (ig/ref :use-cases/dispatch)}
@@ -189,8 +189,8 @@
   (new-trade-finder {:event-bus event-bus
                      :execute-trades (partial dispatch :execute-trades)}))
 
-(defmethod ig/init-key :processes/ticker-updater [_ {:keys [event-bus dispatch]}]
-  (new-ticker-updater {:event-bus event-bus
+(defmethod ig/init-key :processes/trade-processor [_ {:keys [event-bus dispatch]}]
+  (new-trade-processor {:event-bus event-bus
                        :process-trade (partial dispatch :process-trade)}))
 
 (defmethod ig/init-key :processes/activity-logger [_ {:keys [event-bus]}]
