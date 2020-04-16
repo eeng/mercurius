@@ -20,7 +20,7 @@
 
 (s/def ::login-form map?)
 (s/def ::user-id (s/nilable string?))
-(s/def ::auth (s/keys :opt-un [::user-id]))
+(s/def ::auth (s/keys :req-un [::user-id]))
 
 (s/def ::tickers ::remote-data)
 (s/def ::order-book ::remote-data)

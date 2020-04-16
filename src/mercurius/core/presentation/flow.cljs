@@ -3,7 +3,6 @@
             [mercurius.core.presentation.db :refer [default-db]]
             [mercurius.core.presentation.api :as backend]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
-            [mercurius.accounts.presentation.login.flow :refer [mark-as-logged-in]]
             ["bulma-toast" :refer [toast]]))
 
 ;;;; Effects
@@ -30,15 +29,18 @@
 
 (reg-event-db
  :core/initialize
- (fn [_ [_ _]]
+ (fn [_ _]
    default-db))
+
+(reg-event-db
+ :core/reset-db
+ (fn [{:keys [ws-connected?]} _]
+   (assoc default-db :ws-connected? ws-connected?)))
 
 (reg-event-db
  :core/socket-connected
  (fn [db [_ uid]]
-   (-> db
-       (assoc :ws-connected? true)
-       (mark-as-logged-in uid))))
+   (assoc db :ws-connected? true :auth {:user-id uid})))
 
 (reg-event-fx
  :ajax-error

@@ -60,17 +60,9 @@
  (fn [_ _]
    {:http-xhrio {:method :post
                  :uri "/logout"
-                 :on-success [:logout-success]
+                 :on-success [:core/reset-db]
                  :on-failure [:ajax-error]
                  :headers {"X-CSRF-Token" (csrf-token)}
                  :timeout 5000
                  :format (edn/edn-request-format)
                  :response-format (edn/edn-response-format)}}))
-
-(defn mark-as-logged-in [db user-id]
-  (assoc db :auth {:user-id user-id}))
-
-(reg-event-db
- :logout-success
- (fn [db [_ _]]
-   (mark-as-logged-in db nil)))
