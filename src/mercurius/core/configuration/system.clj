@@ -41,14 +41,7 @@
             [mercurius.trading.domain.use-cases.get-trades :refer [new-get-trades-use-case]]))
 
 (defn build-assembly [{:keys [port session-key]}]
-  {:infraestructure/pub-sub nil
-   :adapters/wallet-repo nil
-   :adapters/order-book-repo nil
-   :adapters/ticker-repo nil
-   :adapters/trade-repo nil
-   :adapters/user-repo nil
-   :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
-   :use-cases/authenticate {:user-repo (ig/ref :adapters/user-repo)}
+  {:use-cases/authenticate {:user-repo (ig/ref :adapters/user-repo)}
    :use-cases/deposit {:wallet-repo (ig/ref :adapters/wallet-repo)
                        :event-bus (ig/ref :adapters/event-bus)}
    :use-cases/withdraw {:wallet-repo (ig/ref :adapters/wallet-repo)
@@ -85,6 +78,12 @@
                                    :get-tickers (ig/ref :use-cases/get-tickers)
                                    :get-trades (ig/ref :use-cases/get-trades)}
                         :middleware [logger stm]}
+   :adapters/wallet-repo nil
+   :adapters/order-book-repo nil
+   :adapters/ticker-repo nil
+   :adapters/trade-repo nil
+   :adapters/user-repo nil
+   :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
                             :dispatch (ig/ref :use-cases/dispatch)}
    :processes/trade-processor {:event-bus (ig/ref :adapters/event-bus)
@@ -93,6 +92,7 @@
    :controllers/request-processor {:dispatch (ig/ref :use-cases/dispatch)}
    :controllers/event-notifier {:event-bus (ig/ref :adapters/event-bus)
                                 :pub-sub (ig/ref :infraestructure/pub-sub)}
+   :infraestructure/pub-sub nil
    :infraestructure/web-server {:port port
                                 :session-key session-key
                                 :sente (ig/ref :infraestructure/sente)
