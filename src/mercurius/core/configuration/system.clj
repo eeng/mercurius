@@ -31,7 +31,7 @@
             [mercurius.trading.adapters.processes.trade-finder :refer [new-trade-finder]]
             [mercurius.trading.adapters.processes.trade-processor :refer [new-trade-processor]]
             [mercurius.trading.domain.repositories.order-book-repository :refer [insert-order update-order remove-order get-bids-asks get-bid-ask get-order-book]]
-            [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers]]
+            [mercurius.trading.domain.repositories.ticker-repository :refer [update-ticker get-tickers get-ticker]]
             [mercurius.trading.domain.repositories.trade-repository :refer [add-trade get-trades]]
             [mercurius.trading.domain.use-cases.place-order :refer [new-place-order-use-case]]
             [mercurius.trading.domain.use-cases.get-order-book :refer [new-get-order-book-use-case]]
@@ -172,6 +172,7 @@
 
 (defmethod ig/init-key :use-cases/process-trade [_ {:keys [trades-repo ticker-repo event-bus]}]
   (new-process-trade-use-case {:add-trade (partial add-trade trades-repo)
+                               :get-ticker (partial get-ticker ticker-repo)
                                :update-ticker (partial update-ticker ticker-repo)
                                :publish-events (partial emit event-bus)}))
 

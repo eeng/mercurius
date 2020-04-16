@@ -57,3 +57,8 @@
     :transfer-amount (amount-paid :sell amount price)
     :cancel-amount (amount-paid :sell amount ask-limit-price)}])
 
+(defn calculate-price-direction [{:keys [price]} prev-price]
+  (if (or (not prev-price)
+          (>= price prev-price))
+    :up
+    :down))

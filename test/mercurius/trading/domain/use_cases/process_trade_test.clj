@@ -9,6 +9,7 @@
 (defn build-use-case [deps]
   (new-process-trade-use-case
    (merge {:update-ticker identity
+           :get-ticker identity
            :add-trade identity
            :publish-events identity}
           deps)))
@@ -23,7 +24,7 @@
     (let [add-trade (spy/spy)
           process-trade (build-use-case {:add-trade add-trade})]
       (process-trade (build-trade {:id "6" :ticker "BTCUSD" :price 50M :bid {} :ask {}}))
-      (is (match? [[{:id "6" :ticker "BTCUSD" :price 50M :bid m/absent :ask m/absent}]]
+      (is (match? [[{:id "6" :ticker "BTCUSD" :price 50M :bid m/absent :ask m/absent :direction :up}]]
                   (spy/calls add-trade)))))
 
   (testing "publishes a :trade-processed event "

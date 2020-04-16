@@ -6,9 +6,9 @@
 (defn- buying-table [orders]
   [:table.table.is-narrow.is-fullwidth
    [:thead>tr
-    [:th {:align "right"} "Count"]
-    [:th {:align "right"} "Amount"]
-    [:th {:align "right"} "Price"]]
+    [:th.has-text-success {:align "right"} "Count"]
+    [:th.has-text-success {:align "right"} "Amount"]
+    [:th.has-text-success {:align "right"} "Price"]]
    [:tbody
     (for [{:keys [count amount price]} orders]
       [:tr {:key price}
@@ -19,9 +19,9 @@
 (defn- selling-table [orders]
   [:table.table.is-narrow.is-fullwidth
    [:thead>tr
-    [:th "Price"]
-    [:th "Amount"]
-    [:th "Count"]]
+    [:th.has-text-danger "Price"]
+    [:th.has-text-danger "Amount"]
+    [:th.has-text-danger "Count"]]
    [:tbody
     (for [{:keys [count amount price]} orders]
       [:tr {:key price}
