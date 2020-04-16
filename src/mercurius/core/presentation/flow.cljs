@@ -65,7 +65,7 @@
 (def domain-event-type-to-reframe
   {:ticker-updated :trading/ticker-updated
    :order-book-updated :trading/refresh-order-book
-   :trade-made :trading/trade-made
+   :trade-executed :trading/trade-executed
    :wallet-changed :trading/wallet-changed})
 
 ;; Receives push notifications from the backend and routes them to the corresponding re-frame event handler.

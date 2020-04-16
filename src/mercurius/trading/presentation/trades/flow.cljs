@@ -21,6 +21,6 @@
           :on-failure [:bad-response [:trades]]}}))
 
 (reg-event-db
- :trading/trade-made
+ :trading/trade-executed
  (fn [db [_ trade]]
    (update-in db [:trades :data] (comp (partial take 100) conj) trade)))

@@ -88,7 +88,7 @@
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
                             :dispatch (ig/ref :use-cases/dispatch)}
    :processes/trade-processor {:event-bus (ig/ref :adapters/event-bus)
-                              :dispatch (ig/ref :use-cases/dispatch)}
+                               :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
    :controllers/request-processor {:dispatch (ig/ref :use-cases/dispatch)}
    :controllers/event-notifier {:event-bus (ig/ref :adapters/event-bus)
@@ -173,7 +173,7 @@
 (defmethod ig/init-key :use-cases/process-trade [_ {:keys [trades-repo ticker-repo event-bus]}]
   (new-process-trade-use-case {:add-trade (partial add-trade trades-repo)
                                :update-ticker (partial update-ticker ticker-repo)
-                               :publish-event (partial emit event-bus)}))
+                               :publish-events (partial emit event-bus)}))
 
 (defmethod ig/init-key :use-cases/get-tickers [_ {:keys [ticker-repo]}]
   (new-get-tickers-use-case {:get-tickers (partial get-tickers ticker-repo)}))
@@ -191,7 +191,7 @@
 
 (defmethod ig/init-key :processes/trade-processor [_ {:keys [event-bus dispatch]}]
   (new-trade-processor {:event-bus event-bus
-                       :process-trade (partial dispatch :process-trade)}))
+                        :process-trade (partial dispatch :process-trade)}))
 
 (defmethod ig/init-key :processes/activity-logger [_ {:keys [event-bus]}]
   (new-activity-logger {:event-bus event-bus}))
