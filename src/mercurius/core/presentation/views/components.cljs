@@ -7,18 +7,14 @@
 (defn loader []
   [:div.loader])
 
-(defn panel [{:keys [header subheader actions loading? class]} & body]
+(defn panel [{:keys [header subheader action loading? class]} & body]
   [:div.panel {:class class}
    [:div.panel-heading
-    [:div.level
-     [:div.level-left
-      [:div.level-item
-       header
-       (when subheader
-         [:span.is-size-6.has-text-grey.m-l-sm subheader])]]
-     (when (seq actions)
-       [:div.level-right
-        (into [:div.level-item] actions)])]]
+    header
+    (when subheader
+      [:span.is-size-6.has-text-grey.m-l-sm subheader])
+    (when action
+      [:div.is-pulled-right action])]
    (if loading?
      [:div.panel-block.has-loader [loader]]
      (into [:div.panel-block] body))])
@@ -45,3 +41,10 @@
      [:span.icon
       [:i.fas {:class (str "fa-" icon)}]]
      [:span text]]))
+
+(defn icon-button [{:keys [icon] :as opts}]
+  (let [opts (dissoc opts :icon)]
+    [:button.button.is-rounded
+     opts
+     [:span.icon
+      [:i.fas {:class (str "fa-" icon)}]]]))

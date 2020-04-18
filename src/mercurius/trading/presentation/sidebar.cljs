@@ -1,39 +1,37 @@
 (ns mercurius.trading.presentation.sidebar
   (:require [reagent.core :as r]
-            [mercurius.core.presentation.views.components :refer [button]]
+            [mercurius.util.collections :refer [index-by]]
+            [mercurius.core.presentation.views.components :refer [button panel icon-button]]
             [mercurius.trading.presentation.place-order.form :refer [place-order-form]]))
 
-(defn- accordion-item [{:keys [activator content]} active? set-active]
-  [:div.accordion-item
-   [:div.accordion-activator
-    [button (assoc activator
-                   :class (when active? "is-dark")
-                   :on-click set-active)]]
-   (when active?
-     [:div.accordion-content
-      content])])
+(defonce active-menu (r/atom nil))
 
-(defn accordion [{:keys [items initial]}]
-  (let [active (r/atom initial)]
-    (fn []
-      (into
-       [:div.accordion]
-       (for [{:keys [name] :as item} items
-             :let [active? (= @active name)
-                   set-active #(reset! active name)]]
-         [accordion-item item active? set-active])))))
+(defn- back-button []
+  [icon-button {:icon "arrow-left"
+                :class "is-small is-outlined is-dark"
+                :on-click #(reset! active-menu nil)}])
+
+(defn push-menu [items]
+  (if-let [{:keys [activator content]} (-> (index-by :name items)
+                                           (get @active-menu))]
+    [panel {:header (:text activator)
+            :action [back-button]}
+     content]
+    (into
+     [:div.push-menu]
+     (for [{:keys [name activator]} items
+           :let [set-active #(reset! active-menu name)]]
+       [button (assoc activator :on-click set-active)]))))
 
 (defn sidebar []
   [:div.sidebar
-   [accordion
-    {:items
-     [{:name "deposit"
-       :activator {:text "Deposit" :icon "dollar-sign"}
-       :content [:div "the content"]}
-      {:name "place-order"
-       :activator {:text "Place Order" :icon "shopping-cart"}
-       :content [place-order-form]}
-      {:name "simulate"
-       :activator {:text "Simulator" :icon "robot"}
-       :content [:div "the content"]}]
-     :initial "deposit"}]])
+   [push-menu
+    [{:name "deposit"
+      :activator {:text "Deposit" :icon "dollar-sign"}
+      :content [:div "the content"]}
+     {:name "place-order"
+      :activator {:text "Place Order" :icon "shopping-cart"}
+      :content [place-order-form]}
+     {:name "simulate"
+      :activator {:text "Simulator" :icon "robot"}
+      :content [:div "the content"]}]]])

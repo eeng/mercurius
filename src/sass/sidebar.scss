@@ -1,11 +1,11 @@
 .sidebar {
-  .accordion {
+  .push-menu {
     .button.is-fullwidth {
       margin-bottom: 0.5em;
     }
+  }
 
-    .accordion-content {
-      margin-bottom: 1em;
-    }
+  .form {
+    width: 100%;
   }
 }
