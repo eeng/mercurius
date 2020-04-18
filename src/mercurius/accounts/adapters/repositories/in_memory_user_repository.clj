@@ -2,9 +2,10 @@
   (:require [mercurius.accounts.domain.repositories.user-repository :refer [UserRepository find-by-username]]
             [mercurius.util.uuid :refer [uuid]]))
 
-(def users [{:id (uuid) :username "user1" :password "secret"}
-            {:id (uuid) :username "user2" :password "secret"}
-            {:id (uuid) :username "user3" :password "secret"}])
+(def users
+  (map (fn [i]
+         {:id (uuid) :username (str "user" i) :password "secret"})
+       (range 1 5)))
 
 (defrecord InMemoryUserRepository [db]
   UserRepository
