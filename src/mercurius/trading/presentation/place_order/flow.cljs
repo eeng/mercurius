@@ -51,5 +51,6 @@
       :api {:request [:place-order order]
             :on-success [:command-success [:place-order-form]
                          (->> (get-in db [:place-order-form :values :type])
-                              (assoc-in default-place-order-form [:values :type]))]
+                              (assoc-in default-place-order-form [:values :type]))
+                         "Order placed!"]
             :on-failure [:command-failure [:place-order-form]]}})))

@@ -64,10 +64,13 @@
             :type "is-danger faster"
             :duration 5000}}))
 
-(reg-event-db
+(reg-event-fx
  :command-success
- (fn [db [_ db-path empty-form]]
-   (assoc-in db db-path empty-form)))
+ (fn [{:keys [db]} [_ db-path empty-form msg]]
+   {:db (assoc-in db db-path empty-form)
+    :toast {:message msg
+            :type "is-success faster"
+            :duration 4000}}))
 
 (reg-event-fx
  :command-failure
