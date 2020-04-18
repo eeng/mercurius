@@ -9,12 +9,13 @@
   [:nav.navbar.is-dark
    [:div.navbar-brand
     [:div.navbar-item.is-uppercase.has-text-weight-bold "Mercurius"]]
-   [:div.navbar-end
-    [:div.navbar-item
-     [:a.button.is-black
-      {:on-click #(>evt [:logout])}
-      [:span.icon [:i.fas.fa-sign-out-alt]]
-      [:span "Logout"]]]]])
+   [:div.navbar-menu
+    [:div.navbar-end
+     [:div.navbar-item
+      [:a.button.is-black
+       {:on-click #(>evt [:logout])}
+       [:span.icon [:i.fas.fa-sign-out-alt]]
+       [:span "Logout"]]]]]])
 
 (defn app []
   (if (<sub [:core/initialized?])

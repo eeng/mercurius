@@ -38,3 +38,10 @@
              :on-change #(on-change (-> % .-target .-value)))
       (for [[text value] collection]
         [:option {:key value :value value} text])]]))
+
+(defn button [{:keys [icon text] :as opts}]
+  (let [opts (dissoc opts :icon :text)]
+    [:button.button.is-fullwidth opts
+     [:span.icon
+      [:i.fas {:class (str "fa-" icon)}]]
+     [:span text]]))

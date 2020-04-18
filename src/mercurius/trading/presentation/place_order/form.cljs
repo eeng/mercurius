@@ -2,7 +2,7 @@
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.views.components :refer [panel input select]]))
 
-(defn place-order-panel []
+(defn place-order-form []
   (let [[amount-cur price-cur] (<sub [:trading/ticker-selected-currencies])
         {:keys [values loading? valid?]} (<sub [:trading/place-order-form])
         place-order (fn [side] (>evt [:trading/place-order side]))]
