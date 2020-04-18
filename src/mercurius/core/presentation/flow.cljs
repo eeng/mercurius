@@ -64,6 +64,21 @@
             :type "is-danger faster"
             :duration 5000}}))
 
+(reg-event-db
+ :command-success
+ (fn [db [_ db-path empty-form]]
+   (assoc-in db db-path empty-form)))
+
+(reg-event-fx
+ :command-failure
+ (fn [{:keys [db]} [_ db-path error]]
+   (js/console.error error)
+   {:db (assoc-in db (conj db-path :loading?) false)
+    :toast {:message (case type
+                       :wallet/insufficient-balance "Insufficient balance."
+                       "Unexpected error.")
+            :type "is-danger faster"}}))
+
 (def domain-event-type-to-reframe
   {:ticker-updated :trading/ticker-updated
    :order-book-updated :trading/refresh-order-book

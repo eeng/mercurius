@@ -4,7 +4,7 @@
             [mercurius.util.uuid :refer [uuid]]
             [mercurius.util.money :refer [money]]))
 
-(def available-currencies #{"USD" "EUR" "BTC" "ETH"})
+(def available-currencies #{"USD" "EUR" "BTC" "ETH" "XRP" "DAI"})
 
 (s/def ::currency available-currencies)
 (s/def ::bigdec #(instance? BigDecimal %))

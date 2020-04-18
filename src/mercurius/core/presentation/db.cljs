@@ -2,11 +2,13 @@
   (:require [clojure.spec.alpha :as s]
             [mercurius.accounts.presentation.login.flow :refer [default-login-form]]
             [mercurius.trading.presentation.order-book.flow :refer [precisions]]
-            [mercurius.trading.presentation.place-order.flow :refer [default-place-order-form]]))
+            [mercurius.trading.presentation.place-order.flow :refer [default-place-order-form]]
+            [mercurius.trading.presentation.deposit.flow :refer [default-deposit-form]]))
 
 (def default-db {:order-book-precision "P0"
                  :place-order-form default-place-order-form
-                 :login-form default-login-form})
+                 :login-form default-login-form
+                 :deposit-form default-deposit-form})
 
 (s/def ::loading? boolean?)
 (s/def ::data any?)

@@ -2,7 +2,8 @@
   (:require [reagent.core :as r]
             [mercurius.util.collections :refer [index-by]]
             [mercurius.core.presentation.views.components :refer [button panel icon-button]]
-            [mercurius.trading.presentation.place-order.form :refer [place-order-form]]))
+            [mercurius.trading.presentation.place-order.form :refer [place-order-form]]
+            [mercurius.trading.presentation.deposit.form :refer [deposit-form]]))
 
 (defonce active-menu (r/atom nil))
 
@@ -28,7 +29,7 @@
    [push-menu
     [{:name "deposit"
       :activator {:text "Deposit" :icon "dollar-sign"}
-      :content [:div "the content"]}
+      :content [deposit-form]}
      {:name "place-order"
       :activator {:text "Place Order" :icon "shopping-cart"}
       :content [place-order-form]}
