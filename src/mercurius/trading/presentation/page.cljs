@@ -6,7 +6,7 @@
             [mercurius.trading.presentation.sidebar :refer [sidebar]]))
 
 (defn trading-page []
-  [:div.trading-page
+  [:div.page.trading-page
    [:div.columns
     [:div.column.is-3
      [sidebar]]

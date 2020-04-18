@@ -9,6 +9,5 @@
 Backend
 
 - Simulator, place orders around current price
-- When there is a bid/ask for the same user, it blocks further trades.
 
 Frontend

@@ -17,8 +17,8 @@
  :trading/get-trades
  (fn [_ [_ ticker]]
    {:api {:request [:get-trades {:ticker ticker}]
-          :on-success [:ok-response [:trades]]
-          :on-failure [:bad-response [:trades]]}}))
+          :on-success [:query-success [:trades]]
+          :on-failure [:query-failure [:trades]]}}))
 
 (reg-event-db
  :trading/trade-executed

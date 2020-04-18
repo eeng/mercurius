@@ -51,12 +51,12 @@
             :duration 5000}}))
 
 (reg-event-db
- :ok-response
+ :query-success
  (fn [db [_ db-path result]]
    (assoc-in db db-path {:loading? false :data result})))
 
 (reg-event-fx
- :bad-response
+ :query-failure
  (fn [{:keys [db]} [_ db-path result]]
    (js/console.error "Backend Error:" result)
    {:db (assoc-in db db-path {:loading? false :error result})

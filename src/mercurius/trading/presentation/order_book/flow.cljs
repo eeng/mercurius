@@ -40,8 +40,8 @@
  :trading/get-order-book
  (fn [_ [_ filters]]
    {:api {:request [:get-order-book filters]
-          :on-success [:ok-response [:order-book]]
-          :on-failure [:bad-response [:order-book]]}}))
+          :on-success [:query-success [:order-book]]
+          :on-failure [:query-failure [:order-book]]}}))
 
 (reg-event-fx
  :trading/refresh-order-book

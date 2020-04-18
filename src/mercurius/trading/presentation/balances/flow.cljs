@@ -18,8 +18,8 @@
  :trading/get-wallets
  (fn [_ _]
    {:api {:request [:get-wallets]
-          :on-success [:ok-response [:wallets]]
-          :on-failure [:bad-response [:wallets]]}}))
+          :on-success [:query-success [:wallets]]
+          :on-failure [:query-failure [:wallets]]}}))
 
 (reg-event-db
  :trading/wallet-changed

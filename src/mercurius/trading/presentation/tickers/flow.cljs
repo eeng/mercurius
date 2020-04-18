@@ -33,8 +33,8 @@
  :trading/get-tickers
  (fn [_ _]
    {:api {:request [:get-tickers]
-          :on-success [:ok-response [:tickers]]
-          :on-failure [:bad-response [:tickers]]}}))
+          :on-success [:query-success [:tickers]]
+          :on-failure [:query-failure [:tickers]]}}))
 
 (reg-event-db
  :trading/ticker-updated
