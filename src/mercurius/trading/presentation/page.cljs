@@ -8,9 +8,7 @@
 (defn trading-page []
   [:div.page.trading-page
    [:div.columns
-    [:div.column.is-3
-     [sidebar]]
-    [:div.column.page-content
+    [:div.column
      [:div.columns
       [:div.column.is-narrow
        [tickers-panel]]
@@ -18,4 +16,6 @@
        [balances-panel]]]
      [:div.columns
       [:div.column.is-7 [order-book-panel]]
-      [:div.column [trades-panel]]]]]])
+      [:div.column [trades-panel]]]]
+    [:div.column.is-3
+     [sidebar]]]])

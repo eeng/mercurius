@@ -34,5 +34,5 @@
       :activator {:text "Place Order" :icon "shopping-cart"}
       :content [place-order-form]}
      {:name "simulate"
-      :activator {:text "Simulator" :icon "robot"}
+      :activator {:text "Simulate" :icon "robot"}
       :content [:div "the content"]}]]])
