@@ -77,7 +77,7 @@
  (fn [{:keys [db]} [_ db-path error]]
    (js/console.error error)
    {:db (assoc-in db (conj db-path :loading?) false)
-    :toast {:message (case type
+    :toast {:message (case (:type error)
                        :wallet/insufficient-balance "Insufficient balance."
                        "Unexpected error.")
             :type "is-danger faster"}}))

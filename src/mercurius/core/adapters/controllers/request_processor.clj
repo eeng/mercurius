@@ -8,7 +8,8 @@
     (try
       [:ok (dispatch request-type (merge request-data context))]
       (catch Exception e
-        (if (instance? clojure.lang.ExceptionInfo e)
+        (if (and (instance? clojure.lang.ExceptionInfo e)
+                 (:type (ex-data e)))
           [:error {:type (:type (ex-data e))
                    :message (.getMessage e)}]
           [:error {:type :unexpected-error

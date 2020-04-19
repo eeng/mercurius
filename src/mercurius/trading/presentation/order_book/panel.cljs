@@ -44,19 +44,18 @@
     :disabled (<sub [:trading/cant-increase-book-precision])}])
 
 (defn order-book-panel []
-  (let [{:keys [ticker] :as filters} (<sub [:trading/order-book-filters])]
-    (when ticker
-      (let [{:keys [data loading?]} (<sub [:trading/order-book filters])]
-        [panel
-         {:header "Order Book"
-          :subheader ticker
-          :action [:<>
-                   [decrease-precision-btn]
-                   [increase-precision-btn]]
-          :loading? loading?
-          :class "order-book clipped"}
-         (if (or (seq (:buying data)) (seq (:selling data)))
-           [:div.columns
-            [:div.column [buying-table (:buying data)]]
-            [:div.column [selling-table (:selling data)]]]
-           [:div "Nothing to show here."])]))))
+  (let [{:keys [ticker] :as filters} (<sub [:trading/order-book-filters])
+        {:keys [data loading?]} (<sub [:trading/order-book filters])]
+    [panel
+     {:header "Order Book"
+      :subheader ticker
+      :action [:<>
+               [decrease-precision-btn]
+               [increase-precision-btn]]
+      :loading? loading?
+      :class "order-book clipped"}
+     (if (or (seq (:buying data)) (seq (:selling data)))
+       [:div.columns
+        [:div.column [buying-table (:buying data)]]
+        [:div.column [selling-table (:selling data)]]]
+       [:div "Nothing to show here."])]))
