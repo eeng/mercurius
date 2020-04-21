@@ -1,9 +1,9 @@
-(ns mercurius.core.adapters.controllers.request-processor
-  "Receives requests (commands and queries) coming from the UI
+(ns mercurius.core.adapters.controllers.use-case-controller
+  "Receives use case's requests (commands and queries) coming from Sente
   and dispatches them through the mediator. 
   Returns a tuple containing the status of the execution.")
 
-(defn new-request-processor [{:keys [dispatch]}]
+(defn new-use-case-controller [{:keys [dispatch]}]
   (fn [[request-type request-data] context]
     (try
       [:ok (dispatch request-type (merge request-data context))]
