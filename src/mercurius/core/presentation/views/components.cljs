@@ -38,8 +38,9 @@
 (defn button [{:keys [icon text] :as opts}]
   (let [opts (dissoc opts :icon :text)]
     [:button.button.is-fullwidth opts
-     [:span.icon
-      [:i.fas {:class (str "fa-" icon)}]]
+     (when icon
+       [:span.icon
+        [:i.fas {:class (str "fa-" icon)}]])
      [:span text]]))
 
 (defn icon-button [{:keys [icon] :as opts}]

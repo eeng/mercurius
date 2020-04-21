@@ -3,7 +3,8 @@
             [mercurius.util.collections :refer [index-by]]
             [mercurius.core.presentation.views.components :refer [button panel icon-button]]
             [mercurius.trading.presentation.place-order.form :refer [place-order-form]]
-            [mercurius.trading.presentation.deposit.form :refer [deposit-form]]))
+            [mercurius.trading.presentation.deposit.form :refer [deposit-form]]
+            [mercurius.trading.presentation.simulate.form :refer [simulate-form]]))
 
 (defonce active-menu (r/atom nil))
 
@@ -35,4 +36,4 @@
       :content [place-order-form]}
      {:name "simulate"
       :activator {:text "Simulate" :icon "robot"}
-      :content [:div "the content"]}]]])
+      :content [simulate-form]}]]])

@@ -66,11 +66,11 @@
 
 (reg-event-fx
  :command-success
- (fn [{:keys [db]} [_ db-path empty-form msg]]
-   {:db (assoc-in db db-path empty-form)
-    :toast {:message msg
-            :type "is-success faster"
-            :duration 4000}}))
+ (fn [{:keys [db]} [_ db-path data-to-store msg]]
+   (cond-> {:db (assoc-in db db-path data-to-store)}
+     msg (assoc :toast {:message msg
+                        :type "is-success faster"
+                        :duration 4000}))))
 
 (reg-event-fx
  :command-failure

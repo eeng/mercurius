@@ -1,6 +1,6 @@
 (ns mercurius.trading.presentation.deposit.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.views.components :refer [input select]]
+            [mercurius.core.presentation.views.components :refer [input select button]]
             [mercurius.trading.presentation.deposit.flow]))
 
 (defn deposit-form []
@@ -24,8 +24,8 @@
                 :class "is-fullwidth"}]]]
      [:div.field
       [:div.control.is-expanded
-       [:button.button.is-primary.is-fullwidth
-        {:type "submit"
+       [button
+        {:text "Confirm"
+         :type "submit"
          :disabled (not valid?)
-         :class (when loading? "is-loading")}
-        "Confirm"]]]]))
+         :class ["is-primary" (when loading? "is-loading")]}]]]]))

@@ -39,7 +39,7 @@
             [mercurius.trading.domain.use-cases.process-trade :refer [new-process-trade-use-case]]
             [mercurius.trading.domain.use-cases.get-tickers :refer [new-get-tickers-use-case]]
             [mercurius.trading.domain.use-cases.get-trades :refer [new-get-trades-use-case]]
-            [mercurius.simulation.adapters.processes.simulator :refer [new-simulator]]
+            [mercurius.simulation.adapters.processes.simulator :refer [new-simulator stop-simulator]]
             [mercurius.simulation.adapters.controllers.simulation-controller :refer [new-simulation-controller]]))
 
 (defn build-assembly [{:keys [port session-key]}]
@@ -204,6 +204,9 @@
 
 (defmethod ig/init-key :processes/simulator [_ deps]
   (new-simulator deps))
+
+(defmethod ig/halt-key! :processes/simulator [_ simulator]
+  (stop-simulator simulator))
 
 (defmethod ig/init-key :infraestructure/web-server [_ deps]
   (start-web-server deps))
