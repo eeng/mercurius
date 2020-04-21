@@ -19,21 +19,32 @@
      [:div.panel-block.has-loader [loader]]
      (into [:div.panel-block] body))])
 
-(defn input [{:keys [value on-change] :or {on-change identity} :as opts}]
-  [:input.input
-   (assoc opts
-          :value (or value "")
-          :on-change #(on-change (-> % .-target .-value)))])
+(defn label [text]
+  [:label.label text])
 
-(defn select [{:keys [collection value on-change] :or {on-change identity} :as opts}]
+(defn- value-and-on-change [{:keys [value on-change] :or {on-change identity} :as opts}]
+  (assoc opts
+         :value (or value "")
+         :on-change #(on-change (-> % .-target .-value))))
+
+(defn input [opts]
+  [:input.input (value-and-on-change opts)])
+
+(defn select [{:keys [collection] :as opts}]
   (let [html-opts (dissoc opts :collection :on-change :value)]
     [:div.select html-opts
      [:select
-      (assoc opts
-             :value (or value "")
-             :on-change #(on-change (-> % .-target .-value)))
+      (value-and-on-change opts)
       (for [[text value] collection]
         [:option {:key value :value value} text])]]))
+
+(defn slider [{:keys [value] :as opts}]
+  [:<>
+   [:input.slider.is-fullwidth.is-circle.has-output
+    (merge
+     {:step 1 :min 0 :max 100 :type "range"}
+     (value-and-on-change opts))]
+   [:output value]])
 
 (defn button [{:keys [icon text] :as opts}]
   (let [opts (dissoc opts :icon :text)]

@@ -5,3 +5,9 @@
     (if (js/isNaN num)
       nil
       num)))
+
+(defn parse-int [str]
+  (let [num (js/parseInt str)]
+    (if (js/isNaN num)
+      nil
+      num)))

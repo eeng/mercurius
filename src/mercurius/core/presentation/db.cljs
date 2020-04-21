@@ -3,12 +3,14 @@
             [mercurius.accounts.presentation.login.flow :refer [default-login-form]]
             [mercurius.trading.presentation.order-book.flow :refer [precisions]]
             [mercurius.trading.presentation.place-order.flow :refer [default-place-order-form]]
-            [mercurius.trading.presentation.deposit.flow :refer [default-deposit-form]]))
+            [mercurius.trading.presentation.deposit.flow :refer [default-deposit-form]]
+            [mercurius.trading.presentation.simulate.flow :refer [default-simulate-form]]))
 
 (def default-db {:order-book-precision "P0"
                  :place-order-form default-place-order-form
                  :login-form default-login-form
-                 :deposit-form default-deposit-form})
+                 :deposit-form default-deposit-form
+                 :simulate-form default-simulate-form})
 
 (s/def ::loading? boolean?)
 (s/def ::data any?)
@@ -31,10 +33,12 @@
 (s/def ::ticker-selected string?)
 (s/def ::order-book-precision (set precisions))
 (s/def ::place-order-form map?)
+(s/def ::simulate-form map?)
 
 (s/def :app/db (s/keys :req-un [::login-form
                                 ::order-book-precision
-                                ::place-order-form]
+                                ::place-order-form
+                                ::simulate-form]
                        :opt-un [::auth
                                 ::tickers
                                 ::ticker-selected

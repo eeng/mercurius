@@ -14,7 +14,7 @@
     (when (and @running (< i 10))
       (println "Running" i params)
       (progress!)
-      (Thread/sleep 100)
+      (Thread/sleep 1000)
       (recur (inc i)))))
 
 ;; TODO this fake event [:simulation-progress %] its only needed because the client can't join topics yet
@@ -23,7 +23,7 @@
 
 (defn start-simulator [{:keys [running pub-sub]} params]
   (when (compare-and-set! running false true)
-    (log/info "Starting simulator")
+    (log/info "Starting simulator with params" params)
     (thread
       (let [{:keys [progress!]} (new-progress-tracker {:total 10
                                                        :on-progress (partial notify-progress pub-sub)})]
