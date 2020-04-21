@@ -86,7 +86,8 @@
   {:ticker-updated :trading/ticker-updated
    :order-book-updated :trading/refresh-order-book
    :trade-executed :trading/trade-executed
-   :wallet-changed :trading/wallet-changed})
+   :wallet-changed :trading/wallet-changed
+   :simulation-progress :trading/simulation-progress})
 
 ;; Receives push notifications from the backend and routes them to the corresponding re-frame event handler.
 ;; *1) In a real application we would have the client subscribe to the corresponding topic to receive more targeted notifications.

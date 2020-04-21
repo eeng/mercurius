@@ -91,7 +91,8 @@
    :processes/trade-processor {:event-bus (ig/ref :adapters/event-bus)
                                :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
-   :processes/simulator {:dispatch (ig/ref :use-cases/dispatch)}
+   :processes/simulator {:dispatch (ig/ref :use-cases/dispatch)
+                         :pub-sub (ig/ref :infraestructure/pub-sub)}
    :controllers/use-case-controller {:dispatch (ig/ref :use-cases/dispatch)}
    :controllers/simulation-controller {:simulator (ig/ref :processes/simulator)}
    :controllers/event-notifier {:event-bus (ig/ref :adapters/event-bus)

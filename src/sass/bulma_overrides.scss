@@ -24,3 +24,7 @@ $primary: #3f92fb;
   padding-left: 1em !important;
   padding-right: 1em !important;
 }
+
+.progress::-webkit-progress-value {
+  transition: width 0.1s ease;
+}

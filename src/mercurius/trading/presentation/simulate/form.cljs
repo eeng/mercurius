@@ -4,8 +4,11 @@
             [mercurius.trading.presentation.simulate.flow]))
 
 (defn simulate-form []
-  (let [{:keys [values loading? running?]} (<sub [:trading/simulate-form])]
+  (let [{:keys [values loading? running? progress]} (<sub [:trading/simulate-form])]
     [:div.form
+     (if running?
+       [:progress.progress.m-t-md.is-primary {:value progress :max 100}]
+       [:div])
      [:div.field
       [:div.control.is-expanded
        (if running?
