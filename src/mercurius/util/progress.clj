@@ -1,7 +1,7 @@
 (ns mercurius.util.progress)
 
 (defn- progress-percent [value total]
-  (/ value total 1.0))
+  (min (/ value total 1.0) 1.0))
 
 (defn new-progress-tracker [{:keys [total on-progress] :or {on-progress identity}}]
   (let [current-value (atom 0)
