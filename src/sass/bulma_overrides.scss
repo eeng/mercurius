@@ -30,11 +30,10 @@ $primary: #3f92fb;
 }
 
 .field {
-  input[type="range"].slider:not([orient="vertical"]).has-output {
-    width: calc(100% - 4rem);
-  }
-
-  input[type="range"].slider:not([orient="vertical"]).has-output + output {
-    top: auto !important;
+  .slider-value {
+    float: right;
+    margin-top: -50px;
+    color: $grey;
+    font-size: 90%;
   }
 }

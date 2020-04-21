@@ -7,7 +7,8 @@
                             :running? false
                             :progress 0
                             :values {:n-traders 100
-                                     :n-orders-per-trader 5}})
+                                     :n-orders-per-trader 5
+                                     :max-ms-between-orders 1000}})
 
 ;;;; Subscriptions
 

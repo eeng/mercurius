@@ -20,6 +20,12 @@
 
 .panel-block,
 .element {
+  &.is-disabled {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
   &.is-loading {
     position: relative;
     pointer-events: none;

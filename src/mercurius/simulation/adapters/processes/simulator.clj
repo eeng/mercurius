@@ -23,7 +23,7 @@
 
 (defn start-simulator [{:keys [running pub-sub]} params]
   (when (compare-and-set! running false true)
-    (log/info "Starting simulator with params" params)
+    (log/info "Starting simulation with params" params)
     (thread
       (let [{:keys [progress!]} (new-progress-tracker {:total 10
                                                        :on-progress (partial notify-progress pub-sub)})]
@@ -33,7 +33,7 @@
 (defn stop-simulator [{:keys [running pub-sub]}]
   (reset! running false)
   (notify-progress pub-sub 1.0) ; Notify one more time just in case the client receives a progress notification after stopping the simulator
-  (log/info "Stopping simulator"))
+  (log/info "Stopping simulation"))
 
 (comment
   (def sim (new-simulator {}))

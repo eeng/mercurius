@@ -40,11 +40,11 @@
 
 (defn slider [{:keys [value] :as opts}]
   [:<>
-   [:input.slider.is-fullwidth.is-circle.has-output
+   [:input.slider.is-fullwidth.is-circle
     (merge
      {:step 1 :min 0 :max 100 :type "range"}
      (value-and-on-change opts))]
-   [:output value]])
+   [:span.slider-value value]])
 
 (defn button [{:keys [icon text] :as opts}]
   (let [opts (dissoc opts :icon :text)]
