@@ -42,8 +42,3 @@
 (defn stop-simulator [{:keys [running]}]
   (reset! running false)
   (log/info "Stopping simulation"))
-
-(comment
-  (def sim (new-simulator {}))
-  (start-simulator sim {:n-orders-per-trader 10})
-  (stop-simulator sim))

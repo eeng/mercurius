@@ -1,5 +1,5 @@
 (ns mercurius.core.infraestructure.messaging.channel-based-pub-sub
-  (:require [clojure.core.async :refer [put! chan close! go-loop <!]]
+  (:require [clojure.core.async :refer [put! chan close! go-loop <! sliding-buffer]]
             [clojure.string :as str]
             [taoensso.timbre :as log]
             [mercurius.core.adapters.messaging.pub-sub :refer [PubSub]]))
@@ -31,7 +31,7 @@
 
 (defn start-channel-based-pub-sub []
   (log/info "Starting channel based pubsub")
-  (let [in-chan (chan)
+  (let [in-chan (chan (sliding-buffer 1048576))
         subscribers (atom [])]
     (start-listener in-chan subscribers)
     (ChannelBasedPubSub. in-chan subscribers)))

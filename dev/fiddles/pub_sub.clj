@@ -9,7 +9,6 @@
   (def bus (start-channel-based-pub-sub))
   (subscribe bus "backend.events" #(println "backend event:" %))
   (subscribe bus "frontend.events" #(println "frontend event:" %))
-  (publish bus "backend.events" {:some "event"})
   (stop-channel-based-pub-sub bus)
 
   (let [bus (:infraestructure/pub-sub system)]

@@ -35,7 +35,7 @@
        [slider {:value (:n-traders values)
                 :on-change #(>evt [:trading/simulate-form-changed {:n-traders %}])
                 :min 1
-                :max 500}]]
+                :max 200}]]
       [:div.field
        [label "Orders per trader"]
        [slider {:value (:n-orders-per-trader values)
