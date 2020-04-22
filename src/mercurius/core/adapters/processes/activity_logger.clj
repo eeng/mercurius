@@ -9,4 +9,4 @@
   (listen event-bus
           (constantly true)
           (fn [{:keys [type data]}]
-            (log/info "New event" [type data]))))
+            (log/debug "New event" [type data]))))

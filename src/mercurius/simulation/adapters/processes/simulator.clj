@@ -26,15 +26,17 @@
   (when (compare-and-set! running false true)
     (log/info "Starting simulation with params" params)
     (thread
-      (try
-        (let [{:keys [n-traders n-orders-per-trader] :as params} (merge default-params params)
-              {:keys [progress!]} (new-progress-tracker {:total (* n-traders n-orders-per-trader)
-                                                         :on-progress (partial notify-progress pub-sub)})]
+      (let [{:keys [n-traders n-orders-per-trader] :as params} (merge default-params params)
+            {:keys [progress! finish!]} (new-progress-tracker {:total (* n-traders n-orders-per-trader)
+                                                               :on-progress (partial notify-progress pub-sub)
+                                                               :notify-every-ms 100})]
+        (try
           (run-simulation params {:dispatch dispatch :running running :progress! progress!})
-          (reset! running false))
-        (catch Exception e
-          (log/error e)
-          (throw e))))))
+          (catch Exception e
+            (log/error e)
+            (throw e)))
+        (finish!)
+        (reset! running false)))))
 
 (defn stop-simulator [{:keys [running]}]
   (reset! running false)
