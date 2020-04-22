@@ -26,14 +26,15 @@
 (defn coerced-command [db]
   (-> (get-in db [:simulate-form :values])
       (update :n-traders parse-int)
-      (update :n-orders-per-trader parse-int)))
+      (update :n-orders-per-trader parse-int)
+      (update :max-ms-between-orders parse-int)))
 
 (reg-event-fx
  :trading/start-simulation
  (fn [{{:keys [simulate-form] :as db} :db} _]
    {:db (assoc-in db [:simulate-form :loading?] true)
     :api {:request [:start-simulation (coerced-command db)]
-          :on-success [:command-success [:simulate-form] (assoc simulate-form :running? true)]
+          :on-success [:command-success [:simulate-form] (assoc simulate-form :running? true :progress 0)]
           :on-failure [:command-failure [:simulate-form]]}}))
 
 (reg-event-fx
@@ -48,6 +49,6 @@
  :trading/simulation-progress
  (fn [db [_ progress]]
    (update db :simulate-form merge
-           (if (< progress 1.0)
-             {:running? true :progress (int (* progress 100))}
-             {:running? false :progress 0}))))
+           (if (and (< progress 1.0) (get-in db [:simulate-form :running?]))
+             {:progress (int (* progress 100))}
+             {:running? false}))))

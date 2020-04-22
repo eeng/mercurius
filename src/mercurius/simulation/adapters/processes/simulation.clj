@@ -1,4 +1,4 @@
-(ns mercurius.simulation.trading.simulator
+(ns mercurius.simulation.adapters.processes.simulation
   (:require [clojure.spec.alpha :as s]
             [mercurius.accounts.domain.entities.user :refer [new-user]]
             [mercurius.trading.domain.entities.ticker :as ticker]
@@ -50,9 +50,11 @@
 (defn- calculate-position-size [max-pos-size-pct current-balance]
   (* (rand max-pos-size-pct) current-balance))
 
-(defn- place-order [trader dispatch {:keys [tickers max-pos-size-pct spread-around-better-price]
-                                     :or {max-pos-size-pct 0.3
-                                          spread-around-better-price [0.2 0.01]}}]
+(defn- place-order [trader
+                    {:keys [tickers max-pos-size-pct spread-around-better-price]
+                     :or {max-pos-size-pct 0.3
+                          spread-around-better-price [0.2 0.01]}}
+                    dispatch]
   (let [ticker (pick-ticker tickers)
         side (pick-side)
         current-balance (find-current-balance trader ticker side dispatch)
@@ -66,19 +68,22 @@
                             :price price
                             :type :limit})))
 
-(defn- start-trading [trader dispatch {:keys [initial-funds n-orders-per-trader max-ms-between-orders]
-                                       :or {n-orders-per-trader 1
-                                            max-ms-between-orders 0}
-                                       :as config}]
+(defn- start-trader [trader
+                     {:keys [initial-funds n-orders-per-trader max-ms-between-orders]
+                      :or {n-orders-per-trader 1
+                           max-ms-between-orders 0}
+                      :as config}
+                     {:keys [dispatch progress! running]}]
   (fund-accounts trader initial-funds dispatch)
-  (doseq [_ (range n-orders-per-trader)]
+  (doseq [_ (range n-orders-per-trader) :while @running]
     (Thread/sleep (rand max-ms-between-orders))
-    (place-order trader dispatch config)))
+    (place-order trader config dispatch)
+    (progress!)))
 
-(defn run-simulation [dispatch & {:keys [n-traders] :as config}]
+(defn run-simulation [{:keys [n-traders] :as config} deps]
   (s/assert ::config config)
   (let [traders (repeatedly n-traders make-trader)]
-    (doall (pmap #(start-trading % dispatch config) traders)))
+    (doall (pmap #(start-trader % config deps) traders)))
   :done)
 
 (s/def ::percent (s/and number? #(<= 0 % 1)))

@@ -2,37 +2,42 @@
   (:require [clojure.core.async :refer [thread]]
             [taoensso.timbre :as log]
             [mercurius.util.progress :refer [new-progress-tracker]]
-            [mercurius.core.adapters.messaging.pub-sub :refer [publish]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [publish]]
+            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]))
 
 (defrecord Simulator [running dispatch pub-sub])
 
 (defn new-simulator [{:keys [dispatch pub-sub]}]
   (Simulator. (atom false) dispatch pub-sub))
 
-(defn- run-simulation [params {:keys [running progress!]}]
-  (loop [i 0]
-    (when (and @running (< i 10))
-      (println "Running" i params)
-      (progress!)
-      (Thread/sleep 1000)
-      (recur (inc i)))))
-
 ;; TODO this fake event [:simulation-progress %] its only needed because the client can't join topics yet
 (defn- notify-progress [pub-sub progress]
   (publish pub-sub "push.simulation-progress" [:simulation-progress progress]))
 
-(defn start-simulator [{:keys [running pub-sub]} params]
+(def default-params {:tickers {"BTCUSD" {:initial-price 5000}}
+                     :initial-funds {"USD" 10000 "BTC" 2}
+                     :n-traders 10
+                     :n-orders-per-trader 5
+                     :max-ms-between-orders 100
+                     :max-pos-size-pct 0.3
+                     :spread-around-better-price [0.2 0.005]})
+
+(defn start-simulator [{:keys [running pub-sub dispatch]} params]
   (when (compare-and-set! running false true)
     (log/info "Starting simulation with params" params)
     (thread
-      (let [{:keys [progress!]} (new-progress-tracker {:total 10
-                                                       :on-progress (partial notify-progress pub-sub)})]
-        (run-simulation params {:running running :progress! progress!})
-        (reset! running false)))))
+      (try
+        (let [{:keys [n-traders n-orders-per-trader] :as params} (merge default-params params)
+              {:keys [progress!]} (new-progress-tracker {:total (* n-traders n-orders-per-trader)
+                                                         :on-progress (partial notify-progress pub-sub)})]
+          (run-simulation params {:dispatch dispatch :running running :progress! progress!})
+          (reset! running false))
+        (catch Exception e
+          (log/error e)
+          (throw e))))))
 
-(defn stop-simulator [{:keys [running pub-sub]}]
+(defn stop-simulator [{:keys [running]}]
   (reset! running false)
-  (notify-progress pub-sub 1.0) ; Notify one more time just in case the client receives a progress notification after stopping the simulator
   (log/info "Stopping simulation"))
 
 (comment

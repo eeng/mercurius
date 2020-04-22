@@ -48,7 +48,7 @@
                 :on-change #(>evt [:trading/simulate-form-changed {:max-ms-between-orders %}])
                 :min 100
                 :step 100
-                :max 10000}]]]
+                :max 3000}]]]
      (if running?
        [stop-simulation-controls form]
        [start-simulation-controls form])]))
