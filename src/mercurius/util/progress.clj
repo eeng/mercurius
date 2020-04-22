@@ -4,25 +4,29 @@
 (defn- progress-percent [value total]
   (min (/ value total 1.0) 1.0))
 
+(defrecord ProgressTracker [current-value total on-progress on-progress-throttled])
+
 (defn new-progress-tracker [{:keys [total on-progress notify-every-ms]
                              :or {on-progress identity notify-every-ms 0}}]
-  (let [current-value (atom 0)
-        progress! (fn [& [step]]
-                    (let [on-progress (throttle on-progress {:rate-ms notify-every-ms})
-                          [_ new-val] (swap-vals! current-value + (or step 1))]
-                      (on-progress (progress-percent new-val total))))
-        finish! (fn []
-                  (reset! current-value total)
-                  ;; We don't want to throllle this one.
-                  (on-progress 1.0))
-        current-progress (fn []
-                           (progress-percent @current-value total))]
-    {:progress! progress!
-     :finish! finish!
-     :current-progress current-progress}))
+  (map->ProgressTracker {:current-value (atom 0)
+                         :total total
+                         :on-progress on-progress
+                         :on-progress-throttled (throttle on-progress {:rate-ms notify-every-ms})}))
+
+(defn current [{:keys [current-value total]}]
+  (progress-percent @current-value total))
+
+(defn advance! [{:keys [current-value total on-progress-throttled]}]
+  (let [[_ new-val] (swap-vals! current-value inc)]
+    (on-progress-throttled (progress-percent new-val total))))
+
+(defn finish! [{:keys [current-value total on-progress]}]
+  (reset! current-value total)
+  (on-progress 1.0))
 
 (comment
-  (let [{:keys [progress! current-progress]} (new-progress-tracker {:total 10 :on-progress println})]
-    (dotimes [_ 5]
-      (progress!))
-    (println "final:" (current-progress))))
+  (let [progress (new-progress-tracker {:total 10 :on-progress println :notify-every-ms 50})]
+    (dotimes [_ 10]
+      (advance! progress)
+      (Thread/sleep 20))
+    (println "final:" (current progress))))

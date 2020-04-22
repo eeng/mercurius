@@ -3,7 +3,8 @@
             [mercurius.accounts.domain.entities.user :refer [new-user]]
             [mercurius.trading.domain.entities.ticker :as ticker]
             [mercurius.wallets.domain.entities.wallet :as wallet :refer [available-balance]]
-            [mercurius.util.number :as n :refer [round-to-significant-figures]]))
+            [mercurius.util.number :as n :refer [round-to-significant-figures]]
+            [mercurius.util.progress :refer [advance!]]))
 
 (defn user-id-gen []
   (let [last-user-id (atom 0)]
@@ -73,12 +74,12 @@
                       :or {n-orders-per-trader 1
                            max-ms-between-orders 0}
                       :as config}
-                     {:keys [dispatch progress! running]}]
+                     {:keys [dispatch progress running]}]
   (fund-accounts trader initial-funds dispatch)
   (doseq [_ (range n-orders-per-trader) :while @running]
     (Thread/sleep (rand max-ms-between-orders))
     (place-order trader config dispatch)
-    (progress!)))
+    (advance! progress)))
 
 (defn run-simulation [{:keys [n-traders] :as config} deps]
   (s/assert ::config config)

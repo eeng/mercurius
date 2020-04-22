@@ -1,6 +1,7 @@
 (ns fiddles.simulation
   (:require [user :refer [system reset]]
-            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]))
+            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]
+            [mercurius.util.progress :refer [new-progress-tracker]]))
 
 (comment
   (do
@@ -15,7 +16,7 @@
                            :spread-around-better-price [0.2 0.005]}
                           {:dispatch dispatch
                            :running (atom true)
-                           :progress! (constantly nil)}))
+                           :progress (new-progress-tracker {:total 1})}))
     (dispatch :calculate-monetary-base))
 
   (dispatch :get-order-book {:ticker "BTCUSD" :precision "P1" :limit 10})

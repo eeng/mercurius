@@ -1,7 +1,8 @@
 (ns mercurius.simulation.adapters.processes.simulation-test
   (:require [clojure.test :refer [deftest is testing]]
             [mercurius.support.helpers :refer [with-system]]
-            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]))
+            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]
+            [mercurius.util.progress :refer [new-progress-tracker]]))
 
 (deftest ^:integration ^:slow run-simulation-test
   (testing "should not have concurrency issues"
@@ -20,5 +21,5 @@
                          :max-ms-between-orders 10}
                         {:dispatch dispatch
                          :running (atom true)
-                         :progress! (constantly nil)})
+                         :progress (new-progress-tracker {:total 1})})
         (is (= expected-monetary-base (dispatch :calculate-monetary-base)))))))

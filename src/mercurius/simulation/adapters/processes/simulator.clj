@@ -1,7 +1,7 @@
 (ns mercurius.simulation.adapters.processes.simulator
   (:require [clojure.core.async :refer [thread]]
             [taoensso.timbre :as log]
-            [mercurius.util.progress :refer [new-progress-tracker]]
+            [mercurius.util.progress :refer [new-progress-tracker finish!]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish]]
             [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]))
 
@@ -27,16 +27,17 @@
     (log/info "Starting simulation with params" params)
     (thread
       (let [{:keys [n-traders n-orders-per-trader] :as params} (merge default-params params)
-            {:keys [progress! finish!]} (new-progress-tracker {:total (* n-traders n-orders-per-trader)
-                                                               :on-progress (partial notify-progress pub-sub)
-                                                               :notify-every-ms 100})]
+            progress (new-progress-tracker {:total (* n-traders n-orders-per-trader)
+                                            :on-progress (partial notify-progress pub-sub)
+                                            :notify-every-ms 250})]
         (try
-          (run-simulation params {:dispatch dispatch :running running :progress! progress!})
+          (run-simulation params {:dispatch dispatch :running running :progress progress})
           (catch Exception e
             (log/error e)
-            (throw e)))
-        (finish!)
-        (reset! running false)))))
+            (throw e))
+          (finally
+            (finish! progress)
+            (reset! running false)))))))
 
 (defn stop-simulator [{:keys [running]}]
   (reset! running false)
