@@ -6,7 +6,6 @@
 
 (defn start []
   (re-frame/clear-subscription-cache!)
-  (api/clear-subscriptions!)
   (rd/render [app]
              (.getElementById js/document "app")))
 

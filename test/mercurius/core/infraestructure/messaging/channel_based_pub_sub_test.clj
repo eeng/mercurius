@@ -4,14 +4,14 @@
             [matcher-combinators.test]
             [matcher-combinators.matchers :as m]
             [mercurius.support.helpers :refer [with-system recorded-calls]]
-            [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe unsubscribe]]
+            [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]
             [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [match-topic?]]))
 
 (deftest pub-sub-test
   (testing "one subscriber to a specific topic"
     (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [calls (chan)]
-        (subscribe pub-sub "t1" #(>!! calls %))
+        (subscribe pub-sub "t1" {:on-message #(>!! calls %)})
         (publish pub-sub "t1" "m1")
         (publish pub-sub "t2" "ignored")
         (publish pub-sub "t1" "m2")
@@ -21,8 +21,8 @@
     (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [topic "some topic"
             calls (chan)]
-        (subscribe pub-sub topic #(>!! calls ["s1" %]))
-        (subscribe pub-sub topic #(>!! calls ["s2" %]))
+        (subscribe pub-sub topic {:on-message #(>!! calls ["s1" %])})
+        (subscribe pub-sub topic {:on-message #(>!! calls ["s2" %])})
         (publish pub-sub topic "msg")
         (is (match? (m/in-any-order [["s1" "msg"] ["s2" "msg"]])
                     (recorded-calls calls 2))))))
@@ -30,7 +30,7 @@
   (testing "subscribing with a pattern"
     (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [calls (chan)]
-        (subscribe pub-sub "events.*" #(>!! calls %))
+        (subscribe pub-sub "events.*" {:on-message #(>!! calls %)})
         (publish pub-sub "events.orders" "m1")
         (publish pub-sub "other" "ignored")
         (publish pub-sub "events.tickers" "m2")

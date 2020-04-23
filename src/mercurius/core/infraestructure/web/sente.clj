@@ -3,8 +3,7 @@
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
             [clojure.core.async :refer [go-loop <!]]
             [taoensso.timbre :as log]
-            [mercurius.core.adapters.messaging.pub-sub :refer [subscribe]]
-            [mercurius.util.uuid :refer [uuid]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [subscribe unsubscribe]]))
 
 (defn- route-to-controller
   "Routes a request (which comes from the frontend on the Sente event's data) to the respective controller.
@@ -19,18 +18,21 @@
     (when-let [response (controller event-data context)]
       (reply-fn response))))
 
-(defn- handle-subscribe [{[_ topic] :event reply-fn :?reply-fn :keys [uid]}
-                         send-fn
-                         {:keys [pub-sub]}]
-  (let [client-subscription-id (uuid) ; TODO instead of this we could return the topic itself so when reloading it overrides the subscription and we don't need to clear-subscriptions
-        on-message #(send-fn uid [:app/push {:subscription client-subscription-id :message %}])
-        topic (str "push." topic) ; Scope the push notifications to prevent clashes with domain events
-        ;; Here we are allowing clients to subscribe to any topics. 
-        ;; In a real scenario we would make some kind of authorization check.
-        ;; TODO use map this to uid so when it disconnect we unsubscribe
-        ;; FIXME when reloading another subscription it's created. Must implement some way to override a subscription
-        server-subscription (subscribe pub-sub topic on-message)]
-    (reply-fn {:subscription client-subscription-id})))
+;; Here we are allowing clients to subscribe to any topics. 
+;; In a real scenario we would make some kind of authorization check.
+(defn- handle-subscribe
+  [{[_ topic] :event reply-fn :?reply-fn :keys [uid]}
+   send-fn
+   {:keys [pub-sub]}]
+  (let [subscription-id (str uid ":" topic) ; This id makes the subscribe idempotent, so when the frontend reloads, or components remount, they don't need to unsubscribe.
+        on-message #(send-fn uid [:app/push {:subscription subscription-id :message %}])
+        scoped-topic (str "push." topic)] ; Scope the push notifications to prevent clashes with domain events
+    (subscribe pub-sub scoped-topic {:on-message on-message :subscription-id subscription-id})
+    (reply-fn {:subscription subscription-id})))
+
+(defn- handle-unsubscribe [{[_ subscriptions] :event} {:keys [pub-sub]}]
+  (doseq [subscription subscriptions]
+    (unsubscribe pub-sub subscription)))
 
 (defn- start-frontend-request-router
   "Receives events from the clients and dispatch the ones that are requests to the processor. 
@@ -41,38 +43,24 @@
       (when-let [{[event-type _] :event :as event-msg} (<! ch-recv)]
         (case event-type
           ;; TODO rename to :app
-          :frontend/request
+          :app/request
           (route-to-controller event-msg deps)
 
           :app/subscribe
           (handle-subscribe event-msg send-fn deps)
 
+          :app/unsubscribe
+          (handle-unsubscribe event-msg deps)
+
           nil)
         (recur)))))
 
-(defn- start-backend-event-pusher
-  "Subscribes to the topic 'push.*' and pushes those messages to all the clients.
-  In a real-life application we'd have clients join specific topics,
-  and then here we would notify only those interested."
-  [active send-fn connected-uids pub-sub]
-  (go-loop []
-    (when @active
-      (subscribe pub-sub
-                 "push.*"
-                 (fn [message]
-                   (doseq [uid (:any @connected-uids)]
-                     (send-fn uid [:backend/push message])))))))
-
-(defn start-sente [{:keys [pub-sub] :as deps}]
+(defn start-sente [deps]
   (log/info "Starting Sente")
-  (let [{:keys [ch-recv send-fn connected-uids
-                ajax-post-fn ajax-get-or-ws-handshake-fn]}
+  (let [{:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn]}
         (sente/make-channel-socket! (get-sch-adapter) {})
         active (atom true)]
-
     (start-frontend-request-router active ch-recv send-fn deps)
-    (start-backend-event-pusher active send-fn connected-uids pub-sub)
-
     {:active active
      :ring-ajax-post ajax-post-fn
      :ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn}))

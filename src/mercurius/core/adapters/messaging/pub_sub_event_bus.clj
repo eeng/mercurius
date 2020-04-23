@@ -15,10 +15,14 @@
 
   (listen [_ selector callback]
     (if (keyword? selector)
-      (subscribe pub-sub (event-type-to-topic selector) callback)
-      (subscribe pub-sub (str events-ns "*") (fn [{:keys [type] :as event}]
-                                               (when (selector type)
-                                                 (callback event)))))))
+      (subscribe pub-sub
+                 (event-type-to-topic selector)
+                 {:on-message callback})
+      (subscribe pub-sub
+                 (str events-ns "*")
+                 {:on-message (fn [{:keys [type] :as event}]
+                                (when (selector type)
+                                  (callback event)))}))))
 
 (defn new-pub-sub-event-bus [{:keys [pub-sub]}]
   (PubSubEventBus. pub-sub))

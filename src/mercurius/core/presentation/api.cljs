@@ -53,7 +53,7 @@
 
 (defn send-request [request & {:keys [on-success on-error]
                                :or {on-success identity on-error identity}}]
-  (chsk-send! [:frontend/request request]
+  (chsk-send! [:app/request request]
               timeout
               (fn [reply]
                 (if (sente/cb-success? reply)
@@ -71,8 +71,5 @@
                   (swap! sente assoc-in [:subscriptions (:subscription reply)] on-message)
                   (js/console.error "Sente reply to :app/subscribe failure" reply)))))
 
-(defn clear-subscriptions! []
-  (swap! sente assoc :subscriptions {}))
-
-(js/setTimeout #(subscribe "ticker-updated.*" {:on-message println}) 500)
+(js/setTimeout #(subscribe "test.*" {:on-message println}) 500)
 #_(js/setTimeout #(println (:subscriptions @sente)) 1000)

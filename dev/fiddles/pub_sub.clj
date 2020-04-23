@@ -5,10 +5,10 @@
 
 (comment
   (def bus (start-channel-based-pub-sub))
-  (def handle (subscribe bus "backend.events" #(println "backend event:" %)))
-  (subscribe bus "frontend.events" #(println "frontend event:" %))
+  (def subscription (subscribe bus "backend.events" {:on-message #(println "backend event:" %)}))
+  (subscribe bus "frontend.events" {:on-message #(println "frontend event:" %)})
   (publish bus "backend.events" {:some "msg"})
-  (unsubscribe bus handle)
+  (unsubscribe bus subscription)
   (stop-channel-based-pub-sub bus)
 
   (let [bus (:infraestructure/pub-sub system)]

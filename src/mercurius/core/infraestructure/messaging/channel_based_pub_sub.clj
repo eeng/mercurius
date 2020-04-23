@@ -12,14 +12,14 @@
     (log/debug "Publish" [topic message])
     (put! in-chan [topic message]))
 
-  (subscribe [_ topic-pattern callback]
-    (log/debug "Subscribing to" topic-pattern "with" callback)
-    (let [handle (uuid)]
-      (swap! subscribers assoc handle [topic-pattern callback])
-      handle))
+  (subscribe [_ topic-pattern {:keys [on-message subscription-id] :or {subscription-id (uuid)}}]
+    (log/debug "Subscribing to" topic-pattern "- Subscription:" subscription-id "- Callback:" on-message)
+    (swap! subscribers assoc subscription-id [topic-pattern on-message])
+    subscription-id)
 
-  (unsubscribe [_ handle]
-    (swap! subscribers dissoc handle)
+  (unsubscribe [_ subscription-id]
+    (log/debug "Unsubscribing" subscription-id)
+    (swap! subscribers dissoc subscription-id)
     :ok))
 
 (defn match-topic? [pattern topic]
