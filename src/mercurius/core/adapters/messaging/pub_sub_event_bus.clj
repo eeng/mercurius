@@ -2,7 +2,7 @@
   (:require [mercurius.core.domain.messaging.event-bus :refer [EventBus]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]))
 
-(def events-ns "events.")
+(def events-ns "domain-events.")
 
 (defn- event-type-to-topic [event-type]
   (str events-ns (.-sym event-type)))

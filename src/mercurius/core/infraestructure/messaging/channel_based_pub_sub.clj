@@ -13,6 +13,7 @@
     (put! in-chan [topic message]))
 
   (subscribe [_ topic-pattern callback]
+    (log/debug "Subscribing to" topic-pattern "with" callback)
     (let [handle (uuid)]
       (swap! subscribers assoc handle [topic-pattern callback])
       handle))
