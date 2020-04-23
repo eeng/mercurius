@@ -3,16 +3,16 @@
             [taoensso.timbre :as log]
             [mercurius.util.progress :refer [new-progress-tracker finish!]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish]]
-            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]))
+            [mercurius.simulation.adapters.processes.simulation :refer [run-simulation]]
+            [mercurius.core.adapters.controllers.event-notifier :refer [push-topic]]))
 
 (defrecord Simulator [running dispatch pub-sub])
 
 (defn new-simulator [{:keys [dispatch pub-sub]}]
   (Simulator. (atom false) dispatch pub-sub))
 
-;; TODO this fake event [:simulation-progress %] its only needed because the client can't join topics yet
 (defn- notify-progress [pub-sub progress]
-  (publish pub-sub "push.simulation-progress" [:simulation-progress progress]))
+  (publish pub-sub (push-topic "simulation-progress") progress))
 
 (def default-params {:tickers {"BTCUSD" {:initial-price 5000}}
                      :initial-funds {"USD" 10000 "BTC" 2}

@@ -27,28 +27,30 @@
        :on-click #(>evt [:trading/stop-simulation])}]]]])
 
 (defn simulate-form []
-  (let [{:keys [running? values] :as form} (<sub [:trading/simulate-form])]
-    [:div.form
-     [:div {:class (when running? "element is-disabled")}
-      [:div.field
-       [label "Number of traders"]
-       [slider {:value (:n-traders values)
-                :on-change #(>evt [:trading/simulate-form-changed {:n-traders %}])
-                :min 1
-                :max 200}]]
-      [:div.field
-       [label "Orders per trader"]
-       [slider {:value (:n-orders-per-trader values)
-                :on-change #(>evt [:trading/simulate-form-changed {:n-orders-per-trader %}])
-                :min 1
-                :max 10}]]
-      [:div.field
-       [label "Max ms between orders"]
-       [slider {:value (:max-ms-between-orders values)
-                :on-change #(>evt [:trading/simulate-form-changed {:max-ms-between-orders %}])
-                :min 100
-                :step 100
-                :max 3000}]]]
-     (if running?
-       [stop-simulation-controls form]
-       [start-simulation-controls form])]))
+  (>evt [:trading/subscribe-to-simulation-progress])
+  (fn []
+    (let [{:keys [running? values] :as form} (<sub [:trading/simulate-form])]
+      [:div.form
+       [:div {:class (when running? "element is-disabled")}
+        [:div.field
+         [label "Number of traders"]
+         [slider {:value (:n-traders values)
+                  :on-change #(>evt [:trading/simulate-form-changed {:n-traders %}])
+                  :min 1
+                  :max 200}]]
+        [:div.field
+         [label "Orders per trader"]
+         [slider {:value (:n-orders-per-trader values)
+                  :on-change #(>evt [:trading/simulate-form-changed {:n-orders-per-trader %}])
+                  :min 1
+                  :max 10}]]
+        [:div.field
+         [label "Max ms between orders"]
+         [slider {:value (:max-ms-between-orders values)
+                  :on-change #(>evt [:trading/simulate-form-changed {:max-ms-between-orders %}])
+                  :min 100
+                  :step 100
+                  :max 3000}]]]
+       (if running?
+         [stop-simulation-controls form]
+         [start-simulation-controls form])])))

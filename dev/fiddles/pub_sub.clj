@@ -12,4 +12,4 @@
   (stop-channel-based-pub-sub bus)
 
   (let [bus (:infraestructure/pub-sub system)]
-    (publish bus "push.ticker-updated.BTCUSD" [:ticker-updated {:ticker "BTCUSD" :last-price 10 :volume 90}])))
+    (publish bus "push.ticker-updated.BTCUSD" {:ticker "BTCUSD" :last-price 10 :volume 90})))

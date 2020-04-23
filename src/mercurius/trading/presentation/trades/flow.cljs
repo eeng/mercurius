@@ -16,9 +16,12 @@
 (reg-event-fx
  :trading/get-trades
  (fn [_ [_ ticker]]
-   {:api {:request [:get-trades {:ticker ticker}]
-          :on-success [:query-success [:trades]]
-          :on-failure [:query-failure [:trades]]}}))
+   (when ticker
+     {:api {:request [:get-trades {:ticker ticker}]
+            :on-success [:query-success [:trades]]
+            :on-failure [:query-failure [:trades]]}
+      :socket-subscribe {:topic (str "trade-executed." ticker)
+                         :on-message [:trading/trade-executed]}})))
 
 (reg-event-db
  :trading/trade-executed

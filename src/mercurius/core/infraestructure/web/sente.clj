@@ -3,7 +3,8 @@
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
             [clojure.core.async :refer [go-loop <!]]
             [taoensso.timbre :as log]
-            [mercurius.core.adapters.messaging.pub-sub :refer [subscribe unsubscribe]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [subscribe unsubscribe]]
+            [mercurius.core.adapters.controllers.event-notifier :refer [push-topic]]))
 
 (defn- route-to-controller
   "Routes a request (which comes from the frontend on the Sente event's data) to the respective controller.
@@ -25,9 +26,8 @@
    send-fn
    {:keys [pub-sub]}]
   (let [subscription-id (str uid ":" topic) ; This id makes the subscribe idempotent, so when the frontend reloads, or components remount, they don't need to unsubscribe.
-        on-message #(send-fn uid [:app/push {:subscription subscription-id :message %}])
-        scoped-topic (str "push." topic)] ; Scope the push notifications to prevent clashes with domain events
-    (subscribe pub-sub scoped-topic {:on-message on-message :subscription-id subscription-id})
+        on-message #(send-fn uid [:app/push {:subscription subscription-id :message %}])]
+    (subscribe pub-sub (push-topic topic) {:on-message on-message :subscription-id subscription-id})
     (reply-fn {:subscription subscription-id})))
 
 (defn- handle-unsubscribe [{[_ subscriptions] :event} {:keys [pub-sub]}]
@@ -42,7 +42,6 @@
     (when @active
       (when-let [{[event-type _] :event :as event-msg} (<! ch-recv)]
         (case event-type
-          ;; TODO rename to :app
           :app/request
           (route-to-controller event-msg deps)
 

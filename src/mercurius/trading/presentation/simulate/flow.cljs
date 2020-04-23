@@ -45,6 +45,12 @@
           :on-success [:command-success [:simulate-form] (assoc simulate-form :running? false)]
           :on-failure [:command-failure [:simulate-form]]}}))
 
+(reg-event-fx
+ :trading/subscribe-to-simulation-progress
+ (fn [_ _]
+   {:socket-subscribe {:topic "simulation-progress"
+                       :on-message [:trading/simulation-progress]}}))
+
 (reg-event-db
  :trading/simulation-progress
  (fn [db [_ progress]]

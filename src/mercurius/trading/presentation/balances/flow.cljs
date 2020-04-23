@@ -16,14 +16,17 @@
 
 (reg-event-fx
  :trading/get-wallets
- (fn [_ _]
+ (fn [{:keys [db]} _]
    {:api {:request [:get-wallets]
           :on-success [:query-success [:wallets]]
-          :on-failure [:query-failure [:wallets]]}}))
+          :on-failure [:query-failure [:wallets]]}
+    :socket-subscribe {:topic (str "wallet-changed." (get-in db [:auth :user-id]))
+                       :on-message [:trading/wallet-changed]}}))
 
 (reg-event-db
  :trading/wallet-changed
  (fn [db [_ event-data]]
+   (println (get-in db [:wallets :data]) event-data)
    (update-in db
               [:wallets :data]
               (partial insert-or-replace-by :currency event-data))))

@@ -22,6 +22,7 @@
  :trading/order-book
  (fn [app-db [_ filters]]
    (>evt [:trading/get-order-book filters])
+   (>evt [:trading/subscribe-to-order-book-updates filters])
    (reaction (get @app-db :order-book {:loading? true}))))
 
 (reg-sub
@@ -43,6 +44,13 @@
      {:api {:request [:get-order-book filters]
             :on-success [:query-success [:order-book]]
             :on-failure [:query-failure [:order-book]]}})))
+
+(reg-event-fx
+ :trading/subscribe-to-order-book-updates
+ (fn [_ [_ {:keys [ticker]}]]
+   (when ticker
+     {:socket-subscribe {:topic (str "order-book-updated." ticker)
+                         :on-message [:trading/refresh-order-book]}})))
 
 (reg-event-fx
  :trading/refresh-order-book

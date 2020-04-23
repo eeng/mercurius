@@ -18,10 +18,6 @@
     [:chsk/state [_ {:open? true :uid uid}]]
     (>evt [:core/socket-connected (when (not= uid :taoensso.sente/nil-uid) uid)])
 
-    ;; TODO remove
-    [:chsk/recv ([:backend/push _] :as backend-event)]
-    (>evt backend-event)
-
     [:chsk/recv [:app/push {:subscription subscription :message message}]]
     (when-let [on-message (get-in @sente [:subscriptions subscription])]
       (on-message message))
@@ -70,6 +66,3 @@
                 (if (sente/cb-success? reply)
                   (swap! sente assoc-in [:subscriptions (:subscription reply)] on-message)
                   (js/console.error "Sente reply to :app/subscribe failure" reply)))))
-
-(js/setTimeout #(subscribe "test.*" {:on-message println}) 500)
-#_(js/setTimeout #(println (:subscriptions @sente)) 1000)

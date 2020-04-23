@@ -34,7 +34,9 @@
  (fn [_ _]
    {:api {:request [:get-tickers]
           :on-success [:query-success [:tickers]]
-          :on-failure [:query-failure [:tickers]]}}))
+          :on-failure [:query-failure [:tickers]]}
+    :socket-subscribe {:topic "ticker-updated.*"
+                       :on-message [:trading/ticker-updated]}}))
 
 (reg-event-db
  :trading/ticker-updated
