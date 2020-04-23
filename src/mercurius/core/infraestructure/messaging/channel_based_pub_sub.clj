@@ -2,7 +2,8 @@
   (:require [clojure.core.async :refer [put! chan close! go-loop <! sliding-buffer]]
             [clojure.string :as str]
             [taoensso.timbre :as log]
-            [mercurius.core.adapters.messaging.pub-sub :refer [PubSub]]))
+            [mercurius.core.adapters.messaging.pub-sub :refer [PubSub]]
+            [mercurius.util.uuid :refer [uuid]]))
 
 (defrecord ChannelBasedPubSub [in-chan subscribers]
   PubSub
@@ -12,7 +13,13 @@
     (put! in-chan [topic message]))
 
   (subscribe [_ topic-pattern callback]
-    (swap! subscribers conj [topic-pattern callback])))
+    (let [handle (uuid)]
+      (swap! subscribers assoc handle [topic-pattern callback])
+      handle))
+
+  (unsubscribe [_ handle]
+    (swap! subscribers dissoc handle)
+    :ok))
 
 (defn match-topic? [pattern topic]
   (str/starts-with? topic (str/replace pattern "*" "")))
@@ -20,7 +27,7 @@
 (defn- start-listener [in-chan subscribers]
   (go-loop []
     (when-some [[topic msg] (<! in-chan)]
-      (doseq [[topic-pattern callback] @subscribers
+      (doseq [[topic-pattern callback] (vals @subscribers)
               :when (match-topic? topic-pattern topic)]
         (try
           (callback msg)
@@ -32,7 +39,7 @@
 (defn start-channel-based-pub-sub []
   (log/info "Starting channel based pubsub")
   (let [in-chan (chan (sliding-buffer 1048576))
-        subscribers (atom [])]
+        subscribers (atom {})]
     (start-listener in-chan subscribers)
     (ChannelBasedPubSub. in-chan subscribers)))
 

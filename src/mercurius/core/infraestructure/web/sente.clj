@@ -23,7 +23,7 @@
   [active ch-recv deps]
   (go-loop []
     (when @active
-      (when-let [{[event-type _] :event reply-fn :?reply-fn :as event-msg} (<! ch-recv)]
+      (when-let [{[event-type _ :as e] :event reply-fn :?reply-fn :as event-msg} (<! ch-recv)]
         (when (= event-type :frontend/request)
           (let [response (route-to-controller event-msg deps)]
             (cond-> response

@@ -4,7 +4,7 @@
             [matcher-combinators.test]
             [matcher-combinators.matchers :as m]
             [mercurius.support.helpers :refer [with-system recorded-calls]]
-            [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]
+            [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe unsubscribe]]
             [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [match-topic?]]))
 
 (deftest pub-sub-test
