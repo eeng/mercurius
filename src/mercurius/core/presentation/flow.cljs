@@ -8,18 +8,21 @@
 ;;;; Effects
 
 (reg-fx
- :api
- (fn [{:keys [request on-success on-failure reconnect]}]
-   (if reconnect
-     (socket/reconnect!)
-     (socket/send-request request
-                          :on-success #(>evt (conj on-success %))
-                          :on-error #(>evt (conj on-failure %))))))
+ :socket-request
+ (fn [{:keys [request on-success on-failure]}]
+   (socket/send-request request
+                        :on-success #(>evt (conj on-success %))
+                        :on-error #(>evt (conj on-failure %)))))
 
 (reg-fx
  :socket-subscribe
  (fn [{:keys [topic on-message]}]
    (socket/subscribe topic {:on-message #(>evt (conj on-message %))})))
+
+(reg-fx
+ :socket-reconnect
+ (fn [_]
+   (socket/reconnect!)))
 
 (reg-fx
  :toast

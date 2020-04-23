@@ -48,9 +48,9 @@
    (let [order (-> (coerced-command db)
                    (assoc :side side :ticker (ticker-selected db)))]
      {:db (assoc-in db [:place-order-form :loading?] true)
-      :api {:request [:place-order order]
-            :on-success [:command-success [:place-order-form]
-                         (->> (get-in db [:place-order-form :values :type])
-                              (assoc-in default-place-order-form [:values :type]))
-                         "Order placed!"]
-            :on-failure [:command-failure [:place-order-form]]}})))
+      :socket-request {:request [:place-order order]
+                       :on-success [:command-success [:place-order-form]
+                                    (->> (get-in db [:place-order-form :values :type])
+                                         (assoc-in default-place-order-form [:values :type]))
+                                    "Order placed!"]
+                       :on-failure [:command-failure [:place-order-form]]}})))

@@ -17,9 +17,9 @@
 (reg-event-fx
  :trading/get-wallets
  (fn [{:keys [db]} _]
-   {:api {:request [:get-wallets]
-          :on-success [:query-success [:wallets]]
-          :on-failure [:query-failure [:wallets]]}
+   {:socket-request {:request [:get-wallets]
+                     :on-success [:query-success [:wallets]]
+                     :on-failure [:query-failure [:wallets]]}
     :socket-subscribe {:topic (str "wallet-changed." (get-in db [:auth :user-id]))
                        :on-message [:trading/wallet-changed]}}))
 

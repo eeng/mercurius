@@ -42,7 +42,7 @@
  (fn [{:keys [db]} _]
    ;; We need to reconnect the ws so Sente picks up the new uid. 
    ;; When it's done, the :core/socket-connected event handler will update the auth status on the db.
-   {:api {:reconnect true}
+   {:socket-reconnect true
     :db (assoc db :login-form default-login-form)}))
 
 (reg-event-fx

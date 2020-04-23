@@ -41,9 +41,9 @@
  :trading/get-order-book
  (fn [_ [_ {:keys [ticker] :as filters}]]
    (when ticker
-     {:api {:request [:get-order-book filters]
-            :on-success [:query-success [:order-book]]
-            :on-failure [:query-failure [:order-book]]}})))
+     {:socket-request {:request [:get-order-book filters]
+                       :on-success [:query-success [:order-book]]
+                       :on-failure [:query-failure [:order-book]]}})))
 
 (reg-event-fx
  :trading/subscribe-to-order-book-updates

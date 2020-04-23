@@ -31,6 +31,7 @@
  :trading/deposit
  (fn [{:keys [db]} _]
    {:db (assoc-in db [:deposit-form :loading?] true)
-    :api {:request [:deposit (coerced-command db)]
-          :on-success [:command-success [:deposit-form] default-deposit-form "Deposit successful!"]
-          :on-failure [:command-failure [:deposit-form]]}}))
+    :socket-request
+    {:request [:deposit (coerced-command db)]
+     :on-success [:command-success [:deposit-form] default-deposit-form "Deposit successful!"]
+     :on-failure [:command-failure [:deposit-form]]}}))

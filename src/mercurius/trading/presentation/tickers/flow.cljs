@@ -32,9 +32,9 @@
 (reg-event-fx
  :trading/get-tickers
  (fn [_ _]
-   {:api {:request [:get-tickers]
-          :on-success [:query-success [:tickers]]
-          :on-failure [:query-failure [:tickers]]}
+   {:socket-request {:request [:get-tickers]
+                     :on-success [:query-success [:tickers]]
+                     :on-failure [:query-failure [:tickers]]}
     :socket-subscribe {:topic "ticker-updated.*"
                        :on-message [:trading/ticker-updated]}}))
 

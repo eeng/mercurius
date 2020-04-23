@@ -33,17 +33,17 @@
  :trading/start-simulation
  (fn [{{:keys [simulate-form] :as db} :db} _]
    {:db (assoc-in db [:simulate-form :loading?] true)
-    :api {:request [:start-simulation (coerced-command db)]
-          :on-success [:command-success [:simulate-form] (assoc simulate-form :running? true :progress 0)]
-          :on-failure [:command-failure [:simulate-form]]}}))
+    :socket-request {:request [:start-simulation (coerced-command db)]
+                     :on-success [:command-success [:simulate-form] (assoc simulate-form :running? true :progress 0)]
+                     :on-failure [:command-failure [:simulate-form]]}}))
 
 (reg-event-fx
  :trading/stop-simulation
  (fn [{{:keys [simulate-form] :as db} :db} _]
    {:db (assoc-in db [:simulate-form :loading?] true)
-    :api {:request [:stop-simulation]
-          :on-success [:command-success [:simulate-form] (assoc simulate-form :running? false)]
-          :on-failure [:command-failure [:simulate-form]]}}))
+    :socket-request {:request [:stop-simulation]
+                     :on-success [:command-success [:simulate-form] (assoc simulate-form :running? false)]
+                     :on-failure [:command-failure [:simulate-form]]}}))
 
 (reg-event-fx
  :trading/subscribe-to-simulation-progress
