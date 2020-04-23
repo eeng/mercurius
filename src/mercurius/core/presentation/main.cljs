@@ -1,7 +1,8 @@
 (ns mercurius.core.presentation.main
   (:require [reagent.dom :as rd]
             [re-frame.core :as re-frame :refer [dispatch-sync]]
-            [mercurius.core.presentation.api :as api]
+            [mercurius.core.presentation.util.reframe :refer [>evt]]
+            [mercurius.core.presentation.socket :as socket]
             [mercurius.core.presentation.app :refer [app]]))
 
 (defn start []
@@ -12,5 +13,5 @@
 (defn init []
   (println "Starting app...")
   (dispatch-sync [:core/initialize])
-  (api/connect!)
+  (socket/connect! :on-connect #(>evt [:core/socket-connected (:uid %)]))
   (start))

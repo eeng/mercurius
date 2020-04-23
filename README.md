@@ -14,5 +14,4 @@ Backend
 
 Frontend
 
-- Rename the api namespace to socket and dont forget the aliases
 - Unsubscribe on unmount?

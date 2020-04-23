@@ -1,22 +1,21 @@
-(ns mercurius.core.presentation.api
+(ns mercurius.core.presentation.socket
   "Handles the communication with the backend via Web Sockets."
   (:require [taoensso.sente :as sente]
             [clojure.core.async :refer [go-loop <!]]
             [cljs.core.match :refer-macros [match]]
-            [mercurius.core.presentation.util.reframe :refer [>evt]]))
+            [mercurius.core.presentation.util.meta :refer [csrf-token]]))
 
 ;; This will hold the Sente client, and a subscriptions map which will allow to register 
 ;; the frontend callback that will be called everytime a message is pushed from the server.
 (defonce sente (atom nil))
 
-(defn csrf-token []
-  (-> js/document (.querySelector "meta[name='csrf-token']") .-content))
-
 (defn- handle-event [event]
   (js/console.log "Received" event)
   (match event
+
     [:chsk/state [_ {:open? true :uid uid}]]
-    (>evt [:core/socket-connected (when (not= uid :taoensso.sente/nil-uid) uid)])
+    (when-let [on-connect (get @sente :on-connect)]
+      (on-connect {:uid (when (not= uid :taoensso.sente/nil-uid) uid)}))
 
     [:chsk/recv [:app/push {:subscription subscription :message message}]]
     (when-let [on-message (get-in @sente [:subscriptions subscription])]
@@ -30,11 +29,10 @@
       (handle-event event))
     (recur)))
 
-;; TODO Remove the dependency from trom re-frame in this ns to make it more general. 
-;; Instead receive an on-connect callback here
-(defn connect! []
+(defn connect! [& {:keys [on-connect]}]
   (reset! sente {:client (sente/make-channel-socket! "/chsk" (csrf-token) {:type :auto})
-                 :subscriptions {}})
+                 :subscriptions {}
+                 :on-connect on-connect})
   (start-events-processor))
 
 (defn reconnect! []

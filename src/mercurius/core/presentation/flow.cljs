@@ -1,7 +1,7 @@
 (ns mercurius.core.presentation.flow
   (:require [re-frame.core :refer [reg-sub reg-event-fx reg-fx]]
             [mercurius.core.presentation.db :refer [default-db]]
-            [mercurius.core.presentation.api :as backend]
+            [mercurius.core.presentation.socket :as socket]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
             ["bulma-toast" :refer [toast]]))
 
@@ -11,15 +11,15 @@
  :api
  (fn [{:keys [request on-success on-failure reconnect]}]
    (if reconnect
-     (backend/reconnect!)
-     (backend/send-request request
-                           :on-success #(>evt (conj on-success %))
-                           :on-error #(>evt (conj on-failure %))))))
+     (socket/reconnect!)
+     (socket/send-request request
+                          :on-success #(>evt (conj on-success %))
+                          :on-error #(>evt (conj on-failure %))))))
 
 (reg-fx
  :socket-subscribe
  (fn [{:keys [topic on-message]}]
-   (backend/subscribe topic {:on-message #(>evt (conj on-message %))})))
+   (socket/subscribe topic {:on-message #(>evt (conj on-message %))})))
 
 (reg-fx
  :toast
@@ -86,10 +86,6 @@
                        :wallet/insufficient-balance "Insufficient balance."
                        "Unexpected error.")
             :type "is-danger faster"}}))
-
-;; TODO remove
-(def domain-event-type-to-reframe
-  {:simulation-progress :trading/simulation-progress})
 
 ;;;; Subscriptions
 
