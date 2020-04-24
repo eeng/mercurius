@@ -23,7 +23,9 @@
     :ok))
 
 (defn match-topic? [pattern topic]
-  (str/starts-with? topic (str/replace pattern "*" "")))
+  (if (str/includes? pattern "*")
+    (str/starts-with? topic (str/replace pattern "*" ""))
+    (= pattern topic)))
 
 (defn- start-listener [in-chan subscribers]
   (go-loop []

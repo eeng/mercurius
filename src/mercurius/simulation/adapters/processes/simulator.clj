@@ -20,7 +20,7 @@
                      :n-orders-per-trader 5
                      :max-ms-between-orders 100
                      :max-pos-size-pct 0.3
-                     :spread-around-better-price [0.2 0.005]})
+                     :spread-around-better-price [0.2 0.01]})
 
 (defn start-simulator [{:keys [running pub-sub dispatch]} params]
   (when (compare-and-set! running false true)

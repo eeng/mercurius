@@ -39,7 +39,8 @@
 (deftest match-topic?-test
   (testing "without wildcards"
     (is (match-topic? "room.1" "room.1"))
-    (is (not (match-topic? "room.1" "room.2"))))
+    (is (not (match-topic? "room.1" "room.2")))
+    (is (not (match-topic? "room" "room.2"))))
 
   (testing "with wildcards"
     (is (match-topic? "room.*" "room.1"))
