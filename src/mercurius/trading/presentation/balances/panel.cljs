@@ -7,13 +7,12 @@
   (let [{:keys [loading? data]} (<sub [:trading/wallets])]
     [panel {:header "Balances" :loading? loading?}
      (if (seq data)
-       [:table.table
-        [:tbody
-         (for [{:keys [currency balance reserved]} data]
-           [:tr {:key currency}
-            [:td {:style {:vertical-align "middle"}} currency]
-            [:td {:align "right"}
-             [:div balance]
-             (when (pos? reserved)
-               [:div.m-l-xs.has-text-grey-light reserved])]])]]
+       [:div.level.balances
+        (for [{:keys [currency balance reserved]} data]
+          [:div.level-item.has-text-centered {:key currency}
+           [:div
+            [:p.heading.is-size-6 currency]
+            [:p.title balance]
+            (when (pos? reserved)
+              [:p.has-text-grey-light reserved " reserved"])]])]
        [:div "No wallets created yet."])]))

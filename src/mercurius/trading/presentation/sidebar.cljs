@@ -19,21 +19,22 @@
     [panel {:header (:text activator)
             :action [back-button]}
      content]
-    (into
-     [:div.push-menu]
-     (for [{:keys [name activator]} items
-           :let [set-active #(reset! active-menu name)]]
-       [button (assoc activator :on-click set-active)]))))
+    [panel {:header "Actions"}
+     (into
+      [:div.push-menu]
+      (for [{:keys [name activator]} items
+            :let [set-active #(reset! active-menu name)]]
+        [button (assoc activator :on-click set-active)]))]))
 
 (defn sidebar []
   [:div.sidebar
    [push-menu
     [{:name "deposit"
-      :activator {:text "Deposit" :icon "dollar-sign"}
+      :activator {:text "Deposit" :icon "dollar-sign" :class "is-light"}
       :content [deposit-form]}
      {:name "place-order"
-      :activator {:text "Place Order" :icon "shopping-cart"}
+      :activator {:text "Place Order" :icon "shopping-cart" :class "is-light"}
       :content [place-order-form]}
      {:name "simulate"
-      :activator {:text "Simulate" :icon "robot"}
+      :activator {:text "Simulate" :icon "robot" :class "is-light"}
       :content [simulate-form]}]]])

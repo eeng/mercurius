@@ -14,19 +14,15 @@
 (defn trades-panel []
   (let [ticker (<sub [:trading/ticker-selected])
         {:keys [data loading?]} (<sub [:trading/trades ticker])]
-    [panel {:header "Trades" :subheader ticker :loading? loading? :class "clipped"}
+    [panel {:header "Trades" :subheader ticker :loading? loading? :class "clipped trades"}
      (if (seq data)
-       [:table.table.is-narrow.is-fullwidth
-        [:thead>tr
-         [:th.is-narrow]
-         [:th "Time"]
-         [:th {:align "right"} "Price"]
-         [:th {:align "right"} "Amount"]]
-        [:tbody
-         (for [{:keys [id price amount created-at direction]} data]
-           [:tr {:key id}
-            [:td.is-narrow [direction-icon direction]]
-            [:td (format-time created-at)]
-            [:td {:align "right"} price]
-            [:td {:align "right"} amount]])]]
+       (for [{:keys [id price amount created-at direction]} data]
+         [:div.item {:key id}
+          [:div.direction [direction-icon direction]]
+          [:div.price.has-text-weight-bold.is-size-5
+           {:class (case direction :up "has-text-success" :down "has-text-danger")}
+           price]
+          [:div.details
+           [:div amount]
+           [:div.has-text-grey-light.is-size-7 (format-time created-at)]]])
        [:div "Nothing to show here."])]))

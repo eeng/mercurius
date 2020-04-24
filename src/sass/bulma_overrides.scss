@@ -1,8 +1,10 @@
 @import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+@import "variables";
 
 $family-sans-serif: "Nunito", sans-serif;
 $size-normal: 0.95rem;
 $primary: #3f92fb;
+$table-cell-border: 1px solid $background-color;
 
 @import "../../node_modules/bulma/bulma.sass";
 

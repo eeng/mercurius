@@ -10,12 +10,11 @@
    [:div.columns
     [:div.column
      [:div.columns
-      [:div.column.is-narrow
-       [tickers-panel]]
-      [:div.column.is-narrow
-       [balances-panel]]]
-     [:div.columns
-      [:div.column.is-7 [order-book-panel]]
-      [:div.column [trades-panel]]]]
+      [:div.column.is-4
+       [tickers-panel]
+       [trades-panel]]
+      [:div.column
+       [balances-panel]
+       [order-book-panel]]]]
     [:div.column.is-3
      [sidebar]]]])
