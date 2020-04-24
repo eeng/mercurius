@@ -1,18 +1,9 @@
 (ns mercurius.support.helpers
-  (:require [clojure.core.async :refer [timeout alts!!]]
+  (:require [clojure.test :refer [assert-expr]]
+            [matcher-combinators.test :refer [build-match-assert]]
+            [matcher-combinators.core :as mc]
+            [matcher-combinators.matchers :as m]
             [mercurius.core.configuration.system :refer [start stop]]))
-
-(defn recorded-calls [calls-chan expected-count & {:keys [wait-for] :or {wait-for 500}}]
-  (loop [recorded []
-         actual-count 0]
-    (if (< actual-count expected-count)
-      (let [[call ch] (alts!! [calls-chan (timeout wait-for)])]
-        (if call
-          (recur (conj recorded call) (inc actual-count))
-          (if (= ch calls-chan)
-            recorded
-            (throw (Exception. (str "Timeout on recorded-calls. So far we have: " (pr-str recorded)))))))
-      recorded)))
 
 (defn ref-trx [f]
   (dosync
@@ -28,3 +19,21 @@
          ~@body)
        (finally
          (stop system#)))))
+
+(def ^:dynamic *retry-matcher-wait* 50)
+(def ^:dynamic *retry-matcher-retries* 4)
+
+(defrecord RetryMatcher [expected]
+  mc/Matcher
+  (match [this actual]
+    (loop [n *retry-matcher-retries*]
+      (let [{:matcher-combinators.result/keys [type] :as result}
+            (mc/match (m/equals expected) @actual)]
+        (if (and (pos? n) (= type :mismatch))
+          (do
+            (Thread/sleep (/ *retry-matcher-wait* *retry-matcher-retries*))
+            (recur (dec n)))
+          result)))))
+
+(defmethod assert-expr 'match-eventually? [msg form]
+  (build-match-assert 'match-eventually? {clojure.lang.IPersistentVector ->RetryMatcher} msg form))

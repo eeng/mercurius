@@ -1,40 +1,36 @@
 (ns mercurius.core.infraestructure.messaging.channel-based-pub-sub-test
   (:require [clojure.test :refer [deftest testing is]]
-            [clojure.core.async :refer [chan >!!]]
-            [matcher-combinators.test]
-            [matcher-combinators.matchers :as m]
-            [mercurius.support.helpers :refer [with-system recorded-calls]]
+            [mercurius.support.helpers :refer [with-system]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]
             [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [match-topic?]]))
 
 (deftest pub-sub-test
   (testing "one subscriber to a specific topic"
     (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
-      (let [calls (chan)]
-        (subscribe pub-sub "t1" {:on-message #(>!! calls %)})
+      (let [msgs (atom [])]
+        (subscribe pub-sub "t1" {:on-message #(swap! msgs conj %)})
         (publish pub-sub "t1" "m1")
         (publish pub-sub "t2" "ignored")
         (publish pub-sub "t1" "m2")
-        (is (match? ["m1" "m2"] (recorded-calls calls 2))))))
+        (is (match-eventually? ["m1" "m2"] msgs)))))
 
   (testing "multiple subscribers to the same specific topic"
     (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
       (let [topic "some topic"
-            calls (chan)]
-        (subscribe pub-sub topic {:on-message #(>!! calls ["s1" %])})
-        (subscribe pub-sub topic {:on-message #(>!! calls ["s2" %])})
+            msgs (atom [])]
+        (subscribe pub-sub topic {:on-message #(swap! msgs conj {:sub 1 :msg %})})
+        (subscribe pub-sub topic {:on-message #(swap! msgs conj {:sub 2 :msg %})})
         (publish pub-sub topic "msg")
-        (is (match? (m/in-any-order [["s1" "msg"] ["s2" "msg"]])
-                    (recorded-calls calls 2))))))
+        (is (match-eventually? [{:sub 1 :msg "msg"} {:sub 2 :msg "msg"}] msgs)))))
 
   (testing "subscribing with a pattern"
     (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
-      (let [calls (chan)]
-        (subscribe pub-sub "events.*" {:on-message #(>!! calls %)})
+      (let [msgs (atom [])]
+        (subscribe pub-sub "events.*" {:on-message #(swap! msgs conj %)})
         (publish pub-sub "events.orders" "m1")
         (publish pub-sub "other" "ignored")
         (publish pub-sub "events.tickers" "m2")
-        (is (match? ["m1" "m2"] (recorded-calls calls 2)))))))
+        (is (match-eventually? ["m1" "m2"] msgs))))))
 
 (deftest match-topic?-test
   (testing "without wildcards"

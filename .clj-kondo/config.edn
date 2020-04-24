@@ -1,5 +1,5 @@
 {:linters
- {:unresolved-symbol {:exclude [(clojure.test/is [match? thrown-match?])
+ {:unresolved-symbol {:exclude [(clojure.test/is [match? thrown-match? eventually? match-eventually?])
                                 (cljs.core.match/match)
                                 (clojure.core.match/match)]}}
  :lint-as {mercurius.support.helpers/with-system clojure.core/let}}
