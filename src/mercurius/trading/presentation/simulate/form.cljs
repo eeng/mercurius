@@ -1,6 +1,6 @@
 (ns mercurius.trading.presentation.simulate.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.views.components :refer [slider button label]]
+            [mercurius.core.presentation.views.components :refer [slider button label select]]
             [mercurius.trading.presentation.simulate.flow]))
 
 (defn- start-simulation-controls [{:keys [loading?]}]
@@ -29,9 +29,23 @@
 (defn simulate-form []
   (>evt [:trading/subscribe-to-simulation-progress])
   (fn []
-    (let [{:keys [running? values] :as form} (<sub [:trading/simulate-form])]
+    (let [{:keys [running? values] :as form} (<sub [:trading/simulate-form])
+          {:keys [data] :as tickers} (<sub [:trading/tickers])]
       [:div.form
        [:div {:class (when running? "element is-disabled")}
+        [:div.field
+         [label "Ticker"]
+         [select {:collection (map (juxt :ticker :ticker) (vals data))
+                  :value (:ticker values)
+                  :on-change #(>evt [:trading/simulate-form-changed {:ticker %}])
+                  :class ["is-fullwidth" (when (:loading? tickers) "is-loading")]}]]
+        [:div.field
+         [label "Initial Price"]
+         [slider {:value (:initial-price values)
+                  :on-change #(>evt [:trading/simulate-form-changed {:initial-price %}])
+                  :min 100
+                  :step 100
+                  :max 10000}]]
         [:div.field
          [label "Number of traders"]
          [slider {:value (:n-traders values)

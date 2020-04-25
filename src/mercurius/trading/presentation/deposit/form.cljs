@@ -1,6 +1,6 @@
 (ns mercurius.trading.presentation.deposit.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.views.components :refer [input select button]]
+            [mercurius.core.presentation.views.components :refer [input select button label]]
             [mercurius.trading.presentation.deposit.flow]))
 
 (defn deposit-form []
@@ -9,23 +9,21 @@
                               (>evt [:trading/deposit])
                               (.preventDefault e))}
      [:div.field
-      [:label.label "Amount"]
+      [label "Amount"]
       [input {:auto-focus true
               :value (:amount values)
               :on-change #(>evt [:trading/deposit-form-changed {:amount %}])}]]
      [:div.field
-      [:label.label "Currency"]
-      [:div.control.is-expanded
-       [select {:collection [["US Dollars" "USD"]
-                             ["Bitcoin" "BTC"]
-                             ["Ethereum" "ETH"]]
-                :value (:currency values)
-                :on-change #(>evt [:trading/deposit-form-changed {:currency %}])
-                :class "is-fullwidth"}]]]
+      [label "Currency"]
+      [select {:collection [["US Dollars" "USD"]
+                            ["Bitcoin" "BTC"]
+                            ["Ethereum" "ETH"]]
+               :value (:currency values)
+               :on-change #(>evt [:trading/deposit-form-changed {:currency %}])
+               :class "is-fullwidth"}]]
      [:div.field
-      [:div.control.is-expanded
-       [button
-        {:text "Confirm"
-         :type "submit"
-         :disabled (not valid?)
-         :class ["is-primary" (when loading? "is-loading")]}]]]]))
+      [button
+       {:text "Confirm"
+        :type "submit"
+        :disabled (not valid?)
+        :class ["is-primary" (when loading? "is-loading")]}]]]))

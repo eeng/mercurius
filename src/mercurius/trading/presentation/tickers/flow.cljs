@@ -1,7 +1,8 @@
 (ns mercurius.trading.presentation.tickers.flow
   (:require [re-frame.core :refer [reg-sub-raw reg-sub reg-event-fx]]
             [reagent.ratom :refer [reaction]]
-            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
+            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
+            [mercurius.trading.domain.entities.ticker :refer [currencies]]))
 
 ;;;; Subscriptions
 
@@ -19,13 +20,13 @@
  (fn [db _]
    (ticker-selected db)))
 
+(defn ticker-selected-currencies [db]
+  (currencies (ticker-selected db)))
+
 (reg-sub
  :trading/ticker-selected-currencies
  (fn [db _]
-   (let [ticker (ticker-selected db)]
-     (if ticker
-       [(subs ticker 0 3) (subs ticker 3 6)]
-       []))))
+   (ticker-selected-currencies db)))
 
 ;;;; Events 
 

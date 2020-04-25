@@ -1,6 +1,6 @@
 (ns mercurius.trading.presentation.place-order.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.views.components :refer [input select]]
+            [mercurius.core.presentation.views.components :refer [input select label]]
             [mercurius.trading.presentation.place-order.flow]))
 
 (defn place-order-form []
@@ -9,21 +9,20 @@
         place-order (fn [side] (>evt [:trading/place-order side]))]
     [:div.form
      [:div.field
-      [:label.label "Order Type"]
-      [:div.control.is-expanded
-       [select {:collection [["Limit" "limit"] ["Market" "market"]]
-                :value (:type values)
-                :on-change #(>evt [:trading/place-order-form-changed {:type %}])
-                :class "is-fullwidth"
-                :auto-focus true}]]]
+      [label "Order Type"]
+      [select {:collection [["Limit" "limit"] ["Market" "market"]]
+               :value (:type values)
+               :on-change #(>evt [:trading/place-order-form-changed {:type %}])
+               :class "is-fullwidth"
+               :auto-focus true}]]
      [:div.field
-      [:label.label "Amount"]
+      [label "Amount"]
       [input {:placeholder amount-cur
               :value (:amount values)
               :on-change #(>evt [:trading/place-order-form-changed {:amount %}])}]]
      (when (= "limit" (:type values))
        [:div.field
-        [:label.label "Price"]
+        [label "Price"]
         [input {:placeholder price-cur
                 :value (:price values)
                 :on-change #(>evt [:trading/place-order-form-changed {:price %}])}]])
