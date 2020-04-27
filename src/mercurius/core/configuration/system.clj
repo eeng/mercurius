@@ -237,7 +237,7 @@
   (let [config (read-config)
         assembly (build-assembly config)]
     (configure-logger config)
-    (log/info "Starting system with config" (pr-str config))
+    (log/info "Starting system")
     (try
       (if only
         (ig/init assembly only)

@@ -1,0 +1,10 @@
+.git
+.clj-kondo
+.cpcache
+.shadow-cljs
+.vscode
+bin
+dev
+node_modules
+/resources/public/js
+/resources/public/css/*.css
