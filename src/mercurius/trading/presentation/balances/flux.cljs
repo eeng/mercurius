@@ -26,7 +26,6 @@
 (reg-event-db
  :trading/wallet-changed
  (fn [db [_ event-data]]
-   (println (get-in db [:wallets :data]) event-data)
    (update-in db
               [:wallets :data]
               (partial insert-or-replace-by :currency event-data))))
