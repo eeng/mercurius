@@ -1,7 +1,8 @@
 (ns user
-  (:require [mercurius.core.configuration.system :as s]
-            [clojure.tools.namespace.repl :as repl]
-            [clojure.spec.test.alpha :as stest]))
+  (:require [clojure.tools.namespace.repl :as repl]
+            [clojure.spec.test.alpha :as stest]
+            [mercurius.core.configuration.system :as s]
+            [mercurius.core.configuration.seed :as sd]))
 
 (def system nil)
 
@@ -22,6 +23,9 @@
 (defn reset-all []
   (stop)
   (repl/refresh-all :after 'user/start))
+
+(defn seed []
+  (sd/seed system))
 
 (comment
   (start)
