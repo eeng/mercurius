@@ -1,4 +1,4 @@
-(ns mercurius.core.presentation.flow
+(ns mercurius.core.presentation.flux
   (:require [re-frame.core :refer [reg-sub reg-event-fx reg-fx]]
             [mercurius.core.presentation.db :refer [default-db]]
             [mercurius.core.presentation.socket :as socket]

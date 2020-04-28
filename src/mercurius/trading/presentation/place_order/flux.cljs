@@ -1,9 +1,9 @@
-(ns mercurius.trading.presentation.place-order.flow
+(ns mercurius.trading.presentation.place-order.flux
   (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [cljs.core.match :refer-macros [match]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
             [mercurius.core.presentation.util.string :refer [parse-float]]
-            [mercurius.trading.presentation.tickers.flow :refer [ticker-selected]]))
+            [mercurius.trading.presentation.tickers.flux :refer [ticker-selected]]))
 
 (def default-place-order-form
   {:values {:type "limit"}

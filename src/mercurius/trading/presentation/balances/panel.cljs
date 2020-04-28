@@ -1,7 +1,7 @@
 (ns mercurius.trading.presentation.balances.panel
   (:require [mercurius.core.presentation.util.reframe :refer [<sub]]
             [mercurius.core.presentation.views.components :refer [panel]]
-            [mercurius.trading.presentation.balances.flow]))
+            [mercurius.trading.presentation.balances.flux]))
 
 (defn balances-panel []
   (let [{:keys [loading? data]} (<sub [:trading/wallets])]

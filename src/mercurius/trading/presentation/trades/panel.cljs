@@ -2,7 +2,7 @@
   (:require [mercurius.core.presentation.util.reframe :refer [<sub]]
             [mercurius.core.presentation.util.format :refer [format-time]]
             [mercurius.core.presentation.views.components :refer [panel]]
-            [mercurius.trading.presentation.trades.flow]))
+            [mercurius.trading.presentation.trades.flux]))
 
 (defn- direction-icon [direction]
   (case direction

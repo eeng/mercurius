@@ -1,4 +1,4 @@
-(ns mercurius.trading.presentation.tickers.flow
+(ns mercurius.trading.presentation.tickers.flux
   (:require [re-frame.core :refer [reg-sub-raw reg-sub reg-event-fx]]
             [reagent.ratom :refer [reaction]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]

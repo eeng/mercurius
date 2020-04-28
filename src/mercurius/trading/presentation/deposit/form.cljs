@@ -1,7 +1,7 @@
 (ns mercurius.trading.presentation.deposit.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.views.components :refer [input select button label]]
-            [mercurius.trading.presentation.deposit.flow]))
+            [mercurius.trading.presentation.deposit.flux]))
 
 (defn deposit-form []
   (let [{:keys [values loading? valid?]} (<sub [:trading/deposit-form])]

@@ -1,7 +1,7 @@
 (ns mercurius.trading.presentation.simulate.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.views.components :refer [slider button label select]]
-            [mercurius.trading.presentation.simulate.flow]))
+            [mercurius.trading.presentation.simulate.flux]))
 
 (defn- start-simulation-controls [{:keys [loading?]}]
   [:div.field

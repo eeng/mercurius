@@ -1,7 +1,7 @@
 (ns mercurius.trading.presentation.tickers.panel
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.views.components :refer [panel]]
-            [mercurius.trading.presentation.tickers.flow]
+            [mercurius.trading.presentation.tickers.flux]
             [mercurius.core.presentation.util.format :refer [format-number]]))
 
 (defn tickers-panel []

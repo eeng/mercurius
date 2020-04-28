@@ -1,7 +1,7 @@
 (ns mercurius.trading.presentation.place-order.form
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
             [mercurius.core.presentation.views.components :refer [input select label]]
-            [mercurius.trading.presentation.place-order.flow]))
+            [mercurius.trading.presentation.place-order.flux]))
 
 (defn place-order-form []
   (let [[amount-cur price-cur] (<sub [:trading/ticker-selected-currencies])

@@ -1,6 +1,6 @@
 (ns mercurius.core.presentation.app
   (:require [mercurius.core.presentation.util.reframe :refer [<sub >evt]]
-            [mercurius.core.presentation.flow]
+            [mercurius.core.presentation.flux]
             [mercurius.core.presentation.views.components :refer [page-loader]]
             [mercurius.accounts.presentation.login.page :refer [login-page]]
             [mercurius.trading.presentation.page :refer [trading-page]]))

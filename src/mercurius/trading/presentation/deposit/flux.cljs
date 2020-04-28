@@ -1,4 +1,4 @@
-(ns mercurius.trading.presentation.deposit.flow
+(ns mercurius.trading.presentation.deposit.flux
   (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
             [mercurius.core.presentation.util.string :refer [parse-float]]))

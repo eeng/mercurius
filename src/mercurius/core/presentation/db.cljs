@@ -1,10 +1,10 @@
 (ns mercurius.core.presentation.db
   (:require [clojure.spec.alpha :as s]
-            [mercurius.accounts.presentation.login.flow :refer [default-login-form]]
-            [mercurius.trading.presentation.order-book.flow :refer [precisions]]
-            [mercurius.trading.presentation.place-order.flow :refer [default-place-order-form]]
-            [mercurius.trading.presentation.deposit.flow :refer [default-deposit-form]]
-            [mercurius.trading.presentation.simulate.flow :refer [default-simulate-form]]))
+            [mercurius.accounts.presentation.login.flux :refer [default-login-form]]
+            [mercurius.trading.presentation.order-book.flux :refer [precisions]]
+            [mercurius.trading.presentation.place-order.flux :refer [default-place-order-form]]
+            [mercurius.trading.presentation.deposit.flux :refer [default-deposit-form]]
+            [mercurius.trading.presentation.simulate.flux :refer [default-simulate-form]]))
 
 (def default-db {:order-book-precision "P0"
                  :place-order-form default-place-order-form

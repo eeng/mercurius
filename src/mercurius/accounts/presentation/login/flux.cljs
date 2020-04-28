@@ -1,4 +1,4 @@
-(ns mercurius.accounts.presentation.login.flow
+(ns mercurius.accounts.presentation.login.flux
   (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
             [mercurius.core.presentation.util.meta :refer [csrf-token]]

@@ -1,7 +1,7 @@
 (ns mercurius.accounts.presentation.login.page
   (:require [mercurius.core.presentation.util.reframe :refer [>evt <sub]]
             [mercurius.core.presentation.views.components :refer [input]]
-            [mercurius.accounts.presentation.login.flow]))
+            [mercurius.accounts.presentation.login.flux]))
 
 (defn- login-form []
   (let [{:keys [values loading?]} (<sub [:login-form])]

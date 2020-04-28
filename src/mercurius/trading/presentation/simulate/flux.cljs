@@ -1,8 +1,8 @@
-(ns mercurius.trading.presentation.simulate.flow
+(ns mercurius.trading.presentation.simulate.flux
   (:require [re-frame.core :refer [reg-sub reg-event-fx]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db]]
             [mercurius.core.presentation.util.string :refer [parse-int parse-float]]
-            [mercurius.trading.presentation.tickers.flow :refer [ticker-selected]]
+            [mercurius.trading.presentation.tickers.flux :refer [ticker-selected]]
             [mercurius.trading.domain.entities.ticker :refer [currencies]]))
 
 (def default-simulate-form {:loading? false

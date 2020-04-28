@@ -1,8 +1,8 @@
-(ns mercurius.trading.presentation.order-book.flow
+(ns mercurius.trading.presentation.order-book.flux
   (:require [re-frame.core :refer [reg-sub-raw reg-sub reg-event-fx]]
             [reagent.ratom :refer [reaction]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
-            [mercurius.trading.presentation.tickers.flow :refer [ticker-selected]]))
+            [mercurius.trading.presentation.tickers.flux :refer [ticker-selected]]))
 
 (def precisions ["P0" "P1" "P2" "P3" "P4"])
 
