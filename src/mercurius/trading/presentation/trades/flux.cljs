@@ -1,7 +1,8 @@
 (ns mercurius.trading.presentation.trades.flux
   (:require [re-frame.core :refer [reg-sub-raw reg-event-fx]]
             [reagent.ratom :refer [reaction]]
-            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]))
+            [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
+            [mercurius.trading.presentation.tickers.flux :refer [ticker-selected]]))
 
 ;;;; Subscriptions
 
@@ -26,4 +27,7 @@
 (reg-event-db
  :trading/trade-executed
  (fn [db [_ trade]]
-   (update-in db [:trades :data] (comp (partial take 100) conj) trade)))
+   ; Just in case we receive the event after selecting other ticker
+   (if (= (:ticker trade) (ticker-selected db))
+     (update-in db [:trades :data] (comp (partial take 100) conj) trade)
+     db)))

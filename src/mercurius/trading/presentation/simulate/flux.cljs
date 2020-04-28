@@ -13,11 +13,16 @@
                                      :max-ms-between-orders 1000
                                      :initial-price 5000}})
 
+(defn- simulate-form [db]
+  (cond-> (:simulate-form db)
+    (not (get-in db [:simulate-form :values :ticker]))
+    (assoc-in [:values :ticker] (ticker-selected db))))
+
 ;;;; Subscriptions
 
 (reg-sub
  :trading/simulate-form
- :simulate-form)
+ simulate-form)
 
 ;;;; Events
 
@@ -27,8 +32,8 @@
    (update-in db [:simulate-form :values] merge form-changes)))
 
 (defn coerced-command [db]
-  (let [values (get-in db [:simulate-form :values])
-        ticker (or (:ticker values) (ticker-selected db))
+  (let [{:keys [values]} (simulate-form db)
+        ticker (:ticker values)
         initial-price (parse-float (:initial-price values))
         [first-cur last-cur] (currencies ticker)
         buying-initial-funds 10000]

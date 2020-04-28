@@ -17,8 +17,7 @@
 
 (reg-sub
  :trading/ticker-selected
- (fn [db _]
-   (ticker-selected db)))
+ ticker-selected)
 
 (defn ticker-selected-currencies [db]
   (currencies (ticker-selected db)))
