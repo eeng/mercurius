@@ -2,7 +2,8 @@
   (:require [reagent.ratom :refer [reaction]]
             [re-frame.core :refer [reg-sub-raw reg-event-fx]]
             [mercurius.core.presentation.util.reframe :refer [>evt reg-event-db]]
-            [mercurius.util.collections :refer [insert-or-replace-by]]))
+            [mercurius.util.collections :refer [insert-or-replace-by]]
+            [mercurius.accounts.presentation.login.flux :refer [current-user-id]]))
 
 ;;;; Subscriptions
 
@@ -20,7 +21,7 @@
    {:socket-request {:request [:get-wallets]
                      :on-success [:query-success [:wallets]]
                      :on-failure [:query-failure [:wallets]]}
-    :socket-subscribe {:topic (str "wallet-changed." (get-in db [:auth :user-id]))
+    :socket-subscribe {:topic (str "wallet-changed." (current-user-id db))
                        :on-message [:trading/wallet-changed]}}))
 
 (reg-event-db

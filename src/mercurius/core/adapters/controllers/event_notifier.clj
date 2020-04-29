@@ -7,12 +7,19 @@
   (apply str "push." args))
 
 (defn start-event-notifier [{:keys [event-bus pub-sub]}]
-  ;; Encoding the ticker in the topic allow clients to receive updates only on that ticker.
   (listen event-bus
           :trade-processed
           (fn [{:keys [data]}]
-            (let [topic (push-topic "trade-executed." (:ticker data))]
-              (publish pub-sub topic data))))
+            (let [{:keys [ticker users-involved] :as trade} data
+                  public-trade (dissoc trade :users-involved)]
+              ; Notify the frontend that some trade on the ticker was made (possibly for different users)
+              ; so it can update the list of global trades.
+              (publish pub-sub (push-topic "trade-executed." ticker) public-trade)
+
+              ; Notify each user involved so we can display a message that a trade for
+              ; one of its orders was executed.
+              (doseq [user-id users-involved]
+                (publish pub-sub (push-topic "trade-executed." user-id) public-trade)))))
 
   (listen event-bus
           :ticker-updated

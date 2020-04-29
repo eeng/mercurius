@@ -11,9 +11,10 @@
 (s/def ::created-at any?)
 (s/def ::command (s/keys :req-un [::id ::created-at ::ticker ::price ::amount]))
 
-(defn- adapt-for-storage [trade prev-price]
+(defn- adapt-for-storage [{:keys [bid ask] :as trade} prev-price]
   (-> (dissoc trade :bid :ask)
-      (assoc :direction (calculate-price-direction trade prev-price))))
+      (assoc :direction (calculate-price-direction trade prev-price))
+      (assoc :users-involved (mapv :user-id [bid ask]))))
 
 (defn new-process-trade-use-case
   "Updates a ticker stats from a trade and stores it."

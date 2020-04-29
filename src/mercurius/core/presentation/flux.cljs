@@ -16,8 +16,10 @@
 
 (reg-fx
  :socket-subscribe
- (fn [{:keys [topic on-message]}]
-   (socket/subscribe topic {:on-message #(>evt (conj on-message %))})))
+ (fn [configs]
+   (let [configs (if (map? configs) [configs] configs)]
+     (doseq [{:keys [topic on-message]} configs]
+       (socket/subscribe topic {:on-message #(>evt (conj on-message %))})))))
 
 (reg-fx
  :socket-reconnect

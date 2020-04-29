@@ -27,11 +27,11 @@
       (is (match? [[{:id "6" :ticker "BTCUSD" :price 50M :bid m/absent :ask m/absent :direction :up}]]
                   (spy/calls add-trade)))))
 
-  (testing "publishes a :trade-processed event "
+  (testing "publishes a :trade-processed event containing the two user-ids involved in the transaction"
     (let [publish-events (spy/spy)
           process-trade (build-use-case {:publish-events publish-events})]
-      (process-trade (build-trade {:id "5"}))
-      (is (match? [:trade-processed {:id "5"}]
+      (process-trade (build-trade {:id "5" :ticker "ETHUSD" :bid {:user-id "7"} :ask {:user-id "8"}}))
+      (is (match? [:trade-processed {:id "5" :ticker "ETHUSD" :users-involved ["7" "8"]}]
                   (-> (spy/calls publish-events) first first first)))))
 
   (testing "publishes a :ticker-updated event"

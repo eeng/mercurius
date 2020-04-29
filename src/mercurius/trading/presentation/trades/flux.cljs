@@ -2,7 +2,8 @@
   (:require [re-frame.core :refer [reg-sub-raw reg-event-fx]]
             [reagent.ratom :refer [reaction]]
             [mercurius.core.presentation.util.reframe :refer [reg-event-db >evt]]
-            [mercurius.trading.presentation.tickers.flux :refer [ticker-selected]]))
+            [mercurius.trading.presentation.tickers.flux :refer [ticker-selected]]
+            [mercurius.accounts.presentation.login.flux :refer [current-user-id]]))
 
 ;;;; Subscriptions
 
@@ -16,13 +17,15 @@
 
 (reg-event-fx
  :trading/get-trades
- (fn [_ [_ ticker]]
+ (fn [{:keys [db]} [_ ticker]]
    (when ticker
      {:socket-request {:request [:get-trades {:ticker ticker}]
                        :on-success [:query-success [:trades]]
                        :on-failure [:query-failure [:trades]]}
-      :socket-subscribe {:topic (str "trade-executed." ticker)
-                         :on-message [:trading/trade-executed]}})))
+      :socket-subscribe [{:topic (str "trade-executed." ticker)
+                          :on-message [:trading/trade-executed]}
+                         {:topic (str "trade-executed." (current-user-id db))
+                          :on-message [:trading/my-trade-executed]}]})))
 
 (reg-event-db
  :trading/trade-executed
@@ -31,3 +34,10 @@
    (if (= (:ticker trade) (ticker-selected db))
      (update-in db [:trades :data] (comp (partial take 100) conj) trade)
      db)))
+
+(reg-event-fx
+ :trading/my-trade-executed
+ (fn [_ [_ {:keys [amount ticker]}]]
+   {:toast {:message (str "Trade for " amount " " ticker " executed!")
+            :type "is-success faster"
+            :duration 7000}}))

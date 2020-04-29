@@ -7,12 +7,15 @@
 
 (def default-login-form {:loading? false :values {:username "" :password ""}})
 
+(defn current-user-id [db]
+  (get-in db [:auth :user-id]))
+
 ;;;; Subscriptions
 
 (reg-sub
  :logged-in?
  (fn [db _]
-   (some? (get-in db [:auth :user-id]))))
+   (some? (current-user-id db))))
 
 (reg-sub :login-form :login-form)
 

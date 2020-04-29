@@ -10,7 +10,7 @@
 (defonce sente (atom nil))
 
 (defn- handle-event [event]
-  ; (js/console.log "Received" event)
+  (js/console.log "Received" event)
   (match event
 
     [:chsk/state [_ {:open? true :uid uid}]]
