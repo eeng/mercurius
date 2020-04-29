@@ -8,12 +8,12 @@
             [mercurius.core.domain.use-cases.mediator.middleware.stm :refer [stm]]
             [mercurius.core.domain.messaging.event-bus :refer [emit]]
             [mercurius.core.adapters.messaging.pub-sub-event-bus :refer [new-pub-sub-event-bus]]
-            [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
+            [mercurius.core.infrastructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.processes.activity-logger :refer [new-activity-logger]]
             [mercurius.core.adapters.controllers.use-case-controller :refer [new-use-case-controller]]
             [mercurius.core.adapters.controllers.event-notifier :refer [start-event-notifier]]
-            [mercurius.core.infraestructure.web.server :refer [start-web-server stop-web-server]]
-            [mercurius.core.infraestructure.web.sente :refer [start-sente stop-sente]]
+            [mercurius.core.infrastructure.web.server :refer [start-web-server stop-web-server]]
+            [mercurius.core.infrastructure.web.sente :refer [start-sente stop-sente]]
             [mercurius.accounts.domain.use-cases.authenticate :refer [new-authenticate-use-case]]
             [mercurius.accounts.adapters.repositories.in-memory-user-repository :refer [new-in-memory-user-repo]]
             [mercurius.wallets.adapters.repositories.in-memory-wallet-repository :refer [new-in-memory-wallet-repo]]
@@ -85,26 +85,26 @@
    :adapters/ticker-repo nil
    :adapters/trade-repo nil
    :adapters/user-repo nil
-   :adapters/event-bus {:pub-sub (ig/ref :infraestructure/pub-sub)}
+   :adapters/event-bus {:pub-sub (ig/ref :infrastructure/pub-sub)}
    :processes/trade-finder {:event-bus (ig/ref :adapters/event-bus)
                             :dispatch (ig/ref :use-cases/dispatch)}
    :processes/trade-processor {:event-bus (ig/ref :adapters/event-bus)
                                :dispatch (ig/ref :use-cases/dispatch)}
    :processes/activity-logger {:event-bus (ig/ref :adapters/event-bus)}
    :processes/simulator {:dispatch (ig/ref :use-cases/dispatch)
-                         :pub-sub (ig/ref :infraestructure/pub-sub)}
+                         :pub-sub (ig/ref :infrastructure/pub-sub)}
    :controllers/use-case-controller {:dispatch (ig/ref :use-cases/dispatch)}
    :controllers/simulation-controller {:simulator (ig/ref :processes/simulator)}
    :controllers/event-notifier {:event-bus (ig/ref :adapters/event-bus)
-                                :pub-sub (ig/ref :infraestructure/pub-sub)}
-   :infraestructure/pub-sub nil
-   :infraestructure/web-server {:port port
-                                :session-key session-key
-                                :sente (ig/ref :infraestructure/sente)
-                                :dispatch (ig/ref :use-cases/dispatch)}
-   :infraestructure/sente {:use-case-controller (ig/ref :controllers/use-case-controller)
-                           :simulation-controller (ig/ref :controllers/simulation-controller)
-                           :pub-sub (ig/ref :infraestructure/pub-sub)}})
+                                :pub-sub (ig/ref :infrastructure/pub-sub)}
+   :infrastructure/pub-sub nil
+   :infrastructure/web-server {:port port
+                               :session-key session-key
+                               :sente (ig/ref :infrastructure/sente)
+                               :dispatch (ig/ref :use-cases/dispatch)}
+   :infrastructure/sente {:use-case-controller (ig/ref :controllers/use-case-controller)
+                          :simulation-controller (ig/ref :controllers/simulation-controller)
+                          :pub-sub (ig/ref :infrastructure/pub-sub)}})
 
 (defmethod ig/init-key :adapters/wallet-repo [_ _]
   (new-in-memory-wallet-repo))
@@ -121,10 +121,10 @@
 (defmethod ig/init-key :adapters/user-repo [_ _]
   (new-in-memory-user-repo))
 
-(defmethod ig/init-key :infraestructure/pub-sub [_ _]
+(defmethod ig/init-key :infrastructure/pub-sub [_ _]
   (start-channel-based-pub-sub))
 
-(defmethod ig/halt-key! :infraestructure/pub-sub [_ pub-sub]
+(defmethod ig/halt-key! :infrastructure/pub-sub [_ pub-sub]
   (stop-channel-based-pub-sub pub-sub))
 
 (defmethod ig/init-key :adapters/event-bus [_ deps]
@@ -209,10 +209,10 @@
 (defmethod ig/halt-key! :processes/simulator [_ simulator]
   (stop-simulator simulator))
 
-(defmethod ig/init-key :infraestructure/web-server [_ deps]
+(defmethod ig/init-key :infrastructure/web-server [_ deps]
   (start-web-server deps))
 
-(defmethod ig/halt-key! :infraestructure/web-server [_ server]
+(defmethod ig/halt-key! :infrastructure/web-server [_ server]
   (stop-web-server server))
 
 (defmethod ig/init-key :controllers/use-case-controller [_ deps]
@@ -224,10 +224,10 @@
 (defmethod ig/init-key :controllers/event-notifier [_ deps]
   (start-event-notifier deps))
 
-(defmethod ig/init-key :infraestructure/sente [_ deps]
+(defmethod ig/init-key :infrastructure/sente [_ deps]
   (start-sente deps))
 
-(defmethod ig/halt-key! :infraestructure/sente [_ sente]
+(defmethod ig/halt-key! :infrastructure/sente [_ sente]
   (stop-sente sente))
 
 (defn start

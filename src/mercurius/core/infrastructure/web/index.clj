@@ -1,4 +1,4 @@
-(ns mercurius.core.infraestructure.web.index
+(ns mercurius.core.infrastructure.web.index
   (:require [hiccup.page :as page]
             [mercurius.util.ring :refer [ok]]))
 

@@ -1,12 +1,12 @@
-(ns mercurius.core.infraestructure.messaging.channel-based-pub-sub-test
+(ns mercurius.core.infrastructure.messaging.channel-based-pub-sub-test
   (:require [clojure.test :refer [deftest testing is]]
             [mercurius.support.helpers :refer [with-system]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe]]
-            [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [match-topic?]]))
+            [mercurius.core.infrastructure.messaging.channel-based-pub-sub :refer [match-topic?]]))
 
 (deftest pub-sub-test
   (testing "one subscriber to a specific topic"
-    (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
+    (with-system [{pub-sub :infrastructure/pub-sub} {:only [:infrastructure/pub-sub]}]
       (let [msgs (atom [])]
         (subscribe pub-sub "t1" {:on-message #(swap! msgs conj %)})
         (publish pub-sub "t1" "m1")
@@ -15,7 +15,7 @@
         (is (match-eventually? ["m1" "m2"] msgs)))))
 
   (testing "multiple subscribers to the same specific topic"
-    (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
+    (with-system [{pub-sub :infrastructure/pub-sub} {:only [:infrastructure/pub-sub]}]
       (let [topic "some topic"
             msgs (atom [])]
         (subscribe pub-sub topic {:on-message #(swap! msgs conj {:sub 1 :msg %})})
@@ -24,7 +24,7 @@
         (is (match-eventually? [{:sub 1 :msg "msg"} {:sub 2 :msg "msg"}] msgs)))))
 
   (testing "subscribing with a pattern"
-    (with-system [{pub-sub :infraestructure/pub-sub} {:only [:infraestructure/pub-sub]}]
+    (with-system [{pub-sub :infrastructure/pub-sub} {:only [:infrastructure/pub-sub]}]
       (let [msgs (atom [])]
         (subscribe pub-sub "events.*" {:on-message #(swap! msgs conj %)})
         (publish pub-sub "events.orders" "m1")

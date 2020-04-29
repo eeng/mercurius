@@ -1,4 +1,4 @@
-(ns mercurius.core.infraestructure.web.handler
+(ns mercurius.core.infrastructure.web.handler
   (:require [reitit.ring :as ring]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.params :refer [wrap-params]]
@@ -7,7 +7,7 @@
             [ring.middleware.session.cookie :refer [cookie-store]]
             [reitit.ring.middleware.muuntaja :as muuntaja]
             [muuntaja.core :as m]
-            [mercurius.core.infraestructure.web.index :refer [index]]
+            [mercurius.core.infrastructure.web.index :refer [index]]
             [mercurius.accounts.adapters.controllers.auth-controller :as auth]))
 
 (defn router [{{:keys [ring-ajax-get-or-ws-handshake ring-ajax-post]} :sente

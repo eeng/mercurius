@@ -1,6 +1,6 @@
 (ns fiddles.pub-sub
   (:require [user :refer [system]]
-            [mercurius.core.infraestructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
+            [mercurius.core.infrastructure.messaging.channel-based-pub-sub :refer [start-channel-based-pub-sub stop-channel-based-pub-sub]]
             [mercurius.core.adapters.messaging.pub-sub :refer [publish subscribe unsubscribe]]))
 
 (comment
@@ -11,5 +11,5 @@
   (unsubscribe bus subscription)
   (stop-channel-based-pub-sub bus)
 
-  (let [bus (:infraestructure/pub-sub system)]
+  (let [bus (:infrastructure/pub-sub system)]
     (publish bus "push.ticker-updated.BTCUSD" {:ticker "BTCUSD" :last-price 10 :volume 90})))
