@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "bulma": "^0.8.1",
-    "node-sass": "^7.0.0"
+    "node-sass": "^9.0.0"
   },
   "scripts": {
     "css-build": "node-sass --output-style compressed --omit-source-map-url src/sass/main.scss resources/public/css/main.css",
